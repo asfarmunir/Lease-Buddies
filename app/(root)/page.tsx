@@ -6,6 +6,7 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
+import Link from "next/link";
 
 const Page = () => {
   return (
@@ -214,6 +215,141 @@ const Page = () => {
                 alt="Lease Buddies"
               />
             </div>
+          </div>
+        </div>
+      </div>
+      <div className="wrapper">
+        <div className="w-full flex flex-col wrapper items-center py-[40px]  bg-[#FAFAFA] rounded-[40px]  px-5 xl:px-8 2xl:px-10 3xl:px-12">
+          <div className=" flex items-center justify-between w-full">
+            <div>
+              <h2 className="text-2xl xl:text-2xl font-bold 2xl:text-4xl text-center sm:text-start 3xl:text-5xl text-[#0A0915]">
+                Your <span className="px-1 text-primary  ">Popular </span>{" "}
+                Leasing <span className="px-1 text-primary  ">Buddi</span>
+              </h2>
+              <p className="res_text text-center sm:text-start text-[#0A0915CC] mt-2">
+                Find the perfect place for your family to cherish.
+              </p>
+            </div>
+            <button className=" hidden sm:block res_text bg-primary rounded-full px-4 xl:px-6 py-4 text-white   ">
+              Read all Stories
+            </button>
+          </div>
+          <div className="w-full flex flex-col gap-4 py-6">
+            <div className=" w-full flex flex-col-reverse md:flex-row gap-4 items-center bg-white rounded-[20px] justify-between">
+              <div className="p-4 xl:p-8 res_text font-semibold ">
+                <p>
+                  The team at Luxey went above and beyond to help me find the
+                  perfect property. Their knowledge of the market is impressive,
+                  and their dedication is unmatched."
+                </p>
+                <p className="flex items-center gap-2 mt-6 mb-2 sm:mb-0">
+                  <Image src="/user.svg" width={25} height={25} alt="Quote" />
+                  John Doe
+                </p>
+              </div>
+              <div className=" 2xl:h-[330px] 3xl:h-[400px] xl:w-[500px] rounded-[20px]  overflow-hidden 2xl:w-[600px] ">
+                <Image
+                  src="/home/testimonial1.png"
+                  alt="hehe"
+                  width={400}
+                  height={400}
+                  className=" w-full h-full object-cover"
+                />
+              </div>
+            </div>
+            <div className=" w-full flex flex-col-reverse md:flex-row-reverse gap-4 items-center bg-white rounded-[20px] justify-between">
+              <div className="p-4 xl:p-8 res_text font-semibold ">
+                <p>
+                  The team at Luxey went above and beyond to help me find the
+                  perfect property. Their knowledge of the market is impressive,
+                  and their dedication is unmatched."
+                </p>
+                <p className="flex items-center gap-2 mt-6 mb-2 sm:mb-0">
+                  <Image src="/user.svg" width={25} height={25} alt="Quote" />
+                  John Doe
+                </p>
+              </div>
+              <div className=" 2xl:h-[330px] 3xl:h-[400px] xl:w-[500px] rounded-[20px]  overflow-hidden 2xl:w-[600px] ">
+                <Image
+                  src="/home/testimonial1.png"
+                  alt="hehe"
+                  width={400}
+                  height={400}
+                  className=" w-full h-full object-cover"
+                />
+              </div>
+            </div>
+            <div className=" w-full flex flex-col-reverse md:flex-row gap-4 items-center bg-white rounded-[20px] justify-between">
+              <div className="p-4 xl:p-8 res_text font-semibold ">
+                <p>
+                  The team at Luxey went above and beyond to help me find the
+                  perfect property. Their knowledge of the market is impressive,
+                  and their dedication is unmatched."
+                </p>
+                <p className="flex items-center gap-2 mt-6 mb-2 sm:mb-0">
+                  <Image src="/user.svg" width={25} height={25} alt="Quote" />
+                  John Doe
+                </p>
+              </div>
+              <div className=" 2xl:h-[330px] 3xl:h-[400px] xl:w-[500px] rounded-[20px]  overflow-hidden 2xl:w-[600px] ">
+                <Image
+                  src="/home/testimonial1.png"
+                  alt="hehe"
+                  width={400}
+                  height={400}
+                  className=" w-full h-full object-cover"
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div className="wrapper">
+        <div
+          className=" relative  py-12 2xl:h-[515px]  px-6 2xl:px-10 flex flex-col md:flex-row items-center gap-6 2xl:gap-12 justify-between  rounded-[40px]"
+          style={{
+            backgroundImage: "url(/home/bg2.webp)",
+            backgroundSize: "cover",
+            backgroundPosition: "center",
+          }}
+        >
+          <div className="   text-white flex  flex-col justify-center items-center sm:items-start gap-1 ">
+            <h1 className="text-3xl xl:text-4xl text-center sm:text-start 2xl:text-5xl max-w-2xl 3xl:max-w-2xl 3xl:text-5xl 2xl:leading-[60px] 3xl:leading-[70px]  font-bold tracking-wide ">
+              Questions? <br />
+              We've got answers.
+            </h1>
+            <p className="res_text leading-[28px] max-w-xl text-center sm:text-start 3xl:max-w-2xl  text-[#FFFFFFCC]">
+              Discover houses and apartments for rent in our most popular
+              locations..
+            </p>
+            <button className=" res_text bg-primary rounded-full px-4  mt-3 xl:px-8 py-4 text-white  ">
+              Explore more
+            </button>
+          </div>
+          <div className="bg-white rounded-[40px] max-w-3xl 3xl:max-w-4xl w-full  flex-1 flex flex-col justify-start items-start p-4 xl:p-6 ">
+            <Accordion
+              type="single"
+              collapsible
+              className=" w-full space-y-1 2xl:space-y-2 "
+            >
+              {Array.from({ length: 4 }).map((_, index) => (
+                <AccordionItem
+                  key={index}
+                  value={`item-${index}`}
+                  className="border-b border-[#0000001A] rounded-[28px] overflow-hidden "
+                >
+                  <AccordionTrigger className=" flex items-start rounded-[10px] px-4 2xl:px-6  ">
+                    <h2 className="2xl:text-sm text-xs font-semibold">
+                      Comprehensive listings
+                    </h2>
+                  </AccordionTrigger>
+                  <AccordionContent className="px-4 2xl:px-6 pb-3 text-xs 2xl:text-sm ">
+                    Browse and apply to over 1 million listings with long or
+                    short term leases throughout the U.S. and Canada.
+                  </AccordionContent>
+                </AccordionItem>
+              ))}
+            </Accordion>
           </div>
         </div>
       </div>

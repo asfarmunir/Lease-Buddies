@@ -126,6 +126,25 @@
      }
 }
 
+*::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+*::-webkit-scrollbar-track {
+  background: #050614;
+}
+
+*::-webkit-scrollbar-thumb {
+  background-color: #3A89D491;
+  border-radius: 13px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background-color: #3A89D491;
+  cursor: pointer;
+}
+
 body {
   font-family: var(--font-poppins);
 }
