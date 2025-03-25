@@ -4,6 +4,18 @@ import Image from "next/image";
 import { FaBath, FaBed, FaRulerCombined, FaStar } from "react-icons/fa";
 import { IoMdHeartEmpty } from "react-icons/io";
 import { HiOutlineShieldCheck } from "react-icons/hi2";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { GoChevronDown } from "react-icons/go";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Slider } from "@/components/ui/slider";
+import FIlters from "@/components/shared/modals/FIlters";
 
 const properties = [
   {
@@ -56,7 +68,7 @@ export default function ApartmentListings() {
   const [selectedFilter, setSelectedFilter] = useState("Pets");
 
   return (
-    <div className="p-4 md:p-6">
+    <div className="p-4 md:px-6 2xl:px-10">
       {/* Filters */}
       {/* <div className="flex gap-4 items-center">
         <button className="bg-gray-100 px-4 py-2 rounded-full">
@@ -68,9 +80,160 @@ export default function ApartmentListings() {
           Pets
         </button>
       </div> */}
+      <div className="hidden sm:flex  items-center gap-2 my-3">
+        <div className="flex items-center    w-fit p-1 bg-[#F7F7F7] rounded-full gap-2 text-gray-700 text-[12px] 2xl:text-[10px] 3xl:text-sm ">
+          <DropdownMenu>
+            <DropdownMenuTrigger className=" flex font-semibold items-center bg-white px-4 py-3 rounded-full gap-2 2xl:gap-8 focus:outline-none res_text">
+              Beds/Baths
+              <GoChevronDown />
+            </DropdownMenuTrigger>
+            <DropdownMenuContent className="w-[300px] sm:w-[400px] rounded-3xl shadow-lg bg-white p-4 md:px-6 ml-6 mt-2">
+              <h2 className="res_text">Bedrooms </h2>
+              <div className="flex items-center  w-full mb-4  p-1 my-2 bg-[#F7F7F7] rounded-full gap-1.5 text-gray-700 text-[12px] 2xl:text-[10px] 3xl:text-sm mt-2">
+                <button className=" flex-grow font-semibold text-center bg-white px-4 py-2.5 rounded-full gap-2 2xl:gap-8 focus:outline-none res_text">
+                  Studio
+                </button>
+                <button className=" flex-grow font-semibold text-center bg-white px-4 py-2.5 rounded-full gap-2 2xl:gap-8 focus:outline-none res_text">
+                  1
+                </button>
+                <button className=" flex-grow font-semibold text-center bg-white px-4 py-2.5 rounded-full gap-2 2xl:gap-8 focus:outline-none res_text">
+                  2
+                </button>
+                <button className=" flex-grow font-semibold text-center bg-white px-4 py-2.5 rounded-full gap-2 2xl:gap-8 focus:outline-none res_text">
+                  3
+                </button>
+                <button className=" flex-grow font-semibold text-center bg-white px-4 py-2.5 rounded-full gap-2 2xl:gap-8 focus:outline-none res_text">
+                  4+
+                </button>
+              </div>
+              <h2 className="res_text">Bathrooms </h2>
+              <div className="flex items-center  w-full mb-4  p-1 my-2 bg-[#F7F7F7] rounded-full gap-1.5 text-gray-700 text-[12px] 2xl:text-[10px] 3xl:text-sm mt-2">
+                <button className=" flex-grow font-semibold text-center bg-white px-4 py-2.5 rounded-full gap-2 2xl:gap-8 focus:outline-none res_text">
+                  1
+                </button>
+                <button className=" flex-grow font-semibold text-center bg-white px-4 py-2.5 rounded-full gap-2 2xl:gap-8 focus:outline-none res_text">
+                  2
+                </button>
+                <button className=" flex-grow font-semibold text-center bg-white px-4 py-2.5 rounded-full gap-2 2xl:gap-8 focus:outline-none res_text">
+                  3
+                </button>
+                <button className=" flex-grow font-semibold text-center bg-white px-4 py-2.5 rounded-full gap-2 2xl:gap-8 focus:outline-none res_text">
+                  4
+                </button>
+              </div>
+
+              <div className="pt-4 mt-4 border-t-2 border-[#28303F1A]">
+                <button className=" rounded-full font-semibold res_text w-full py-3.5 bg-[#28303F] text-white">
+                  View Rentals
+                </button>
+                <button className=" rounded-full w-full res_text py-3.5 text-[#28303F] ">
+                  Clear
+                </button>
+              </div>
+            </DropdownMenuContent>
+          </DropdownMenu>
+          <DropdownMenu>
+            <DropdownMenuTrigger className=" flex font-semibold items-center bg-white px-4 py-3 rounded-full gap-2 2xl:gap-8 focus:outline-none res_text">
+              Price
+              <GoChevronDown />
+            </DropdownMenuTrigger>
+            <DropdownMenuContent className="w-[300px] sm:w-[400px] rounded-3xl shadow-lg bg-white p-4 md:px-6 ml-6 mt-2">
+              <div className=" w-full py-4 justify-center items-center   flex flex-col">
+                <Image
+                  src="/images/range.svg"
+                  width={270}
+                  height={270}
+                  alt="Dollar"
+                />
+                <Slider
+                  defaultValue={[1000, 3000]}
+                  max={5000}
+                  className="max-w-xs 2xl:max-w-sm mx-auto"
+                  step={1}
+                />
+              </div>
+              <div className="py-3 flex gap-3 items-center justify-between ">
+                <div className=" flex-grow">
+                  <h4 className="res_text mb-1">Minimum</h4>
+                  <p className="border border-[#28303F1A] p-4 text-center rounded-full">
+                    <span className="font-semibold">$0</span> /mo
+                  </p>
+                </div>
+                <div className=" flex-grow">
+                  <h4 className="res_text mb-1">Maximum</h4>
+                  <p className="border border-[#28303F1A] p-4 text-center rounded-full">
+                    <span className="font-semibold">$0</span> /mo
+                  </p>
+                </div>
+              </div>
+              <div className="pt-4 mt-2 border-t-2 border-[#28303F1A]">
+                <button className=" rounded-full font-semibold res_text w-full py-3.5 bg-[#28303F] text-white">
+                  View Rentals
+                </button>
+                <button className=" rounded-full w-full res_text py-3.5 text-[#28303F] ">
+                  Clear
+                </button>
+              </div>
+            </DropdownMenuContent>
+          </DropdownMenu>
+          <DropdownMenu>
+            <DropdownMenuTrigger className=" flex font-semibold items-center bg-white px-4 py-3 rounded-full gap-2 2xl:gap-8 focus:outline-none res_text">
+              Type
+              <GoChevronDown />
+            </DropdownMenuTrigger>
+            <DropdownMenuContent className="w-[300px] sm:w-[400px] rounded-3xl shadow-lg bg-white p-4 md:px-6 ml-6 mt-2">
+              <div className="flex items-center gap-2 p-4 rounded-full bg-[#28303F]/15">
+                <Checkbox className="data-[state=checked]:bg-[#28303F] border border-[#28303F]" />
+                <p className="text-sm">Apartment</p>
+              </div>
+              <div className="flex items-center gap-2 p-4 rounded-full ">
+                <Checkbox className="data-[state=checked]:bg-[#28303F] border border-[#28303F]" />
+                <p className="text-sm">Apartment</p>
+              </div>
+              <div className="flex items-center gap-2 p-4 rounded-full ">
+                <Checkbox className="data-[state=checked]:bg-[#28303F] border border-[#28303F]" />
+                <p className="text-sm">Apartment</p>
+              </div>
+              <div className="pt-4 mt-2 border-t-2 border-[#28303F1A]">
+                <button className=" rounded-full font-semibold res_text w-full py-3.5 bg-[#28303F] text-white">
+                  View Rentals
+                </button>
+                <button className=" rounded-full w-full res_text py-3.5 text-[#28303F] ">
+                  Clear
+                </button>
+              </div>
+            </DropdownMenuContent>
+          </DropdownMenu>
+          <DropdownMenu>
+            <DropdownMenuTrigger className=" flex font-semibold items-center bg-white px-4 py-3 rounded-full gap-2 2xl:gap-8 focus:outline-none res_text">
+              Pets Allowed
+              <GoChevronDown />
+            </DropdownMenuTrigger>
+            <DropdownMenuContent className="w-[300px] sm:w-[400px] rounded-3xl shadow-lg bg-white p-4 md:px-6 ml-6 mt-2">
+              <div className="flex items-center gap-2 p-4 rounded-full bg-[#28303F]/15">
+                <Checkbox className="data-[state=checked]:bg-[#28303F] border border-[#28303F]" />
+                <p className="text-sm">Dogs Allowed</p>
+              </div>
+              <div className="flex items-center gap-2 p-4 rounded-full ">
+                <Checkbox className="data-[state=checked]:bg-[#28303F] border border-[#28303F]" />
+                <p className="text-sm">Cats Allowed</p>
+              </div>
+              <div className="pt-4 mt-2 border-t-2 border-[#28303F1A]">
+                <button className=" rounded-full font-semibold res_text w-full py-3.5 bg-[#28303F] text-white">
+                  View Rentals
+                </button>
+                <button className=" rounded-full w-full res_text py-3.5 text-[#28303F] ">
+                  Clear
+                </button>
+              </div>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
+        <FIlters />
+      </div>
 
       <div className="border border-[#28303F1A] p-4 xl:p-6 rounded-[20px]">
-        <h2 className="text-xl 2xl:text-2xl text-primary-50 font-semibold mt-6">
+        <h2 className="text-xl 2xl:text-2xl text-primary-50 font-semibold ">
           Apartments For Rent In New York, USA
         </h2>
         <p className="text-primary-50 mt-2 text-xs 2xl:text-sm">
@@ -78,7 +241,7 @@ export default function ApartmentListings() {
         </p>
 
         {/* Listings and Map */}
-        <div className="grid grid-cols-1 md:grid-cols-[2fr_1fr] gap-6 mt-6">
+        <div className="grid grid-cols-1 lg:grid-cols-[2fr_1fr] gap-6 mt-6">
           {/* Apartment Listings */}
           <div className="grid grid-cols-1 md:grid-cols-2 2xl:grid-cols-3 gap-2">
             {properties.map((property) => (

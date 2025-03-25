@@ -149,6 +149,10 @@ body {
   font-family: var(--font-poppins);
 }
 
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+  /* Hide scrollbar for Chrome, Safari, and Edge */
+}
 .res_text {
   font-size: 0.75rem;
   /* Default: text-xs (12px) */
