@@ -23,11 +23,11 @@ const tabs = [
     icon: <FaLock />,
     image: "/images/password.svg",
   },
-  {
-    title: "Notifications",
-    icon: <FaBell />,
-    image: "/images/notification.svg",
-  },
+  // {
+  //   title: "Notifications",
+  //   icon: <FaBell />,
+  //   image: "/images/notification.svg",
+  // },
   {
     title: "Payment Details",
     icon: <FaCreditCard />,
