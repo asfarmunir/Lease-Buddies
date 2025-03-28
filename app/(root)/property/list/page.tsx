@@ -5,6 +5,8 @@ import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
+import Agreements from "@/components/shared/modals/Agreements";
+import { DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 
 const steps = [
   "type",
@@ -73,7 +75,7 @@ const petTypes = [
 ];
 
 export default function PropertyListingForm() {
-  const [step, setStep] = useState(10);
+  const [step, setStep] = useState(1);
   const [formData, setFormData] = useState({
     location: "",
     addressDetails: {
@@ -141,9 +143,7 @@ export default function PropertyListingForm() {
               possibilities. Let’s make finding your dream space fun and
               exciting!
             </p>
-            <button className=" px-6 py-3 rounded-full bg-primary text-white font-semibold res_text">
-              Give me a lead
-            </button>
+            <Agreements acceptTerm={setTermsAccepted} />
           </div>
         </div>
       ) : (
