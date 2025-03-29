@@ -16,7 +16,7 @@ import { GoChevronDown } from "react-icons/go";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Slider } from "@/components/ui/slider";
 import FIlters from "@/components/shared/modals/FIlters";
-
+import CheckAvailability from "@/components/shared/modals/CheckAvailability";
 const properties = [
   {
     id: 1,
@@ -230,6 +230,7 @@ export default function ApartmentListings() {
           </DropdownMenu>
         </div>
         <FIlters />
+        <CheckAvailability />
       </div>
 
       <div className="border border-[#28303F1A] p-4 xl:p-6 rounded-[20px]">

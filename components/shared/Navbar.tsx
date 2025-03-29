@@ -19,6 +19,7 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
+import Link from "next/link";
 
 const filters = [
   {
@@ -41,16 +42,18 @@ const filters = [
 const Navbar = () => {
   return (
     <nav className=" w-[95%] mx-auto my-3 flex items-center justify-between bg-[#FAFAFA]  rounded-full px-4 py-4 ">
-      <Image
-        src="/logo.svg"
-        width={100}
-        height={100}
-        alt="Lease Budd
+      <Link href={"/"}>
+        <Image
+          src="/logo.svg"
+          width={100}
+          height={100}
+          alt="Lease Budd
         ies Logo"
-        className="
+          className="
         w-[100px]  2xl:w-[120px] 
         "
-      />
+        />
+      </Link>
       <div className=" hidden md:flex items-center gap-3 xl:gap-4 2xl:gap-5">
         {filters.map((filter, index) => (
           <DropdownMenu key={index}>

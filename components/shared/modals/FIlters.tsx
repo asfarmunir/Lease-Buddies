@@ -74,7 +74,7 @@ const Filters: React.FC = () => {
         />
       </DialogTrigger>
 
-      <DialogContent className="rounded-3xl max-h-[95svh] overflow-y-auto no-scrollbar">
+      <DialogContent className="rounded-3xl max-w-xl max-h-[95svh] overflow-y-auto no-scrollbar">
         <DialogHeader>
           <DialogTitle>Filters</DialogTitle>
           <DialogDescription>
