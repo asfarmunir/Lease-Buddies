@@ -50,7 +50,7 @@ const Filters = ({ acceptTerm }: { acceptTerm: (term: boolean) => void }) => {
         </button>
       </DialogTrigger>
 
-      <DialogContent className="rounded-3xl max-h-[95svh] sm:min-w-[600px] overflow-y-auto no-scrollbar">
+      <DialogContent className="rounded-3xl max-w-2xl  max-h-[95svh] sm:min-w-[600px] overflow-y-auto no-scrollbar">
         <DialogHeader className=" w-full flex flex-col items-center">
           <DialogTitle className="text-2xl font-[500]">
             Read our Terms & Conditions

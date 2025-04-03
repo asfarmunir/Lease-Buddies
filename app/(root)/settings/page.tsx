@@ -1,16 +1,17 @@
 "use client";
 import Image from "next/image";
 import Link from "next/link";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { useSession } from "next-auth/react";
 import {
   FaFacebook,
   FaUser,
   FaLock,
-  FaBell,
   FaCreditCard,
   FaEye,
   FaEyeSlash,
 } from "react-icons/fa";
+import toast from "react-hot-toast";
 
 const tabs = [
   {
@@ -23,11 +24,6 @@ const tabs = [
     icon: <FaLock />,
     image: "/images/password.svg",
   },
-  // {
-  //   title: "Notifications",
-  //   icon: <FaBell />,
-  //   image: "/images/notification.svg",
-  // },
   {
     title: "Payment Details",
     icon: <FaCreditCard />,
@@ -57,12 +53,14 @@ type FormData = {
 };
 
 const UserSettings: React.FC = () => {
+  const { data: session } = useSession();
   const [activeTab, setActiveTab] = useState("Edit Profile");
   const [showPassword, setShowPassword] = useState({
     current: false,
     new: false,
     confirm: false,
   });
+  const [isLoading, setIsLoading] = useState(true);
   const [formData, setFormData] = useState<FormData>({
     firstName: "",
     lastName: "",
@@ -83,6 +81,46 @@ const UserSettings: React.FC = () => {
     newPassword: "",
     confirmPassword: "",
   });
+
+  useEffect(() => {
+    const fetchUserData = async () => {
+      if (session?.user?.email) {
+        try {
+          const response = await fetch("/api/user");
+          if (response.ok) {
+            const userData = await response.json();
+            setFormData({
+              firstName: userData.firstname || "",
+              lastName: userData.lastname || "",
+              email: userData.email || "",
+              facebookConnected:
+                userData.authProviders?.includes("facebook") || false,
+              streetAddress: userData.address || "",
+              apartment: userData.suitNumber || "",
+              city: userData.city || "",
+              state: userData.state || "",
+              zipCode: userData.zip || "",
+              phoneNumber: userData.phone || "",
+              username: "", // Add username field to your schema if needed
+              website: userData.personalWebsite || "",
+              bio: userData.leaseBio || "",
+              instagram: userData.instagramHandle || "",
+              twitter: userData.twitterHandle || "",
+              currentPassword: "",
+              newPassword: "",
+              confirmPassword: "",
+            });
+          }
+        } catch (error) {
+          toast.error("Failed to fetch user data");
+        } finally {
+          setIsLoading(false);
+        }
+      }
+    };
+
+    fetchUserData();
+  }, [session]);
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -108,23 +146,80 @@ const UserSettings: React.FC = () => {
     }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleProfileSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (activeTab === "Change Password") {
-      if (formData.newPassword !== formData.confirmPassword) {
-        alert("New passwords don't match!");
-        return;
-      }
-      // Handle password change logic here
-      console.log("Password change submitted", {
-        currentPassword: formData.currentPassword,
-        newPassword: formData.newPassword,
+    setIsLoading(true);
+    window.scrollTo(0, 0); // Scroll to top on form submission
+    try {
+      const response = await fetch("/api/user", {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formData),
       });
-    } else {
-      // Handle profile update logic here
-      console.log("Profile updated", formData);
+
+      if (response.ok) {
+        toast.success("Profile updated successfully");
+      } else {
+        const errorData = await response.json();
+        toast.error(errorData.error || "Failed to update profile");
+      }
+    } catch (error) {
+      toast.error("An error occurred while updating profile");
+    } finally {
+      setIsLoading(false);
     }
   };
+
+  const handlePasswordSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    window.scrollTo(0, 0); // Scroll to top on form submission
+    if (formData.newPassword !== formData.confirmPassword) {
+      toast.error("New passwords don't match!");
+      return;
+    }
+
+    setIsLoading(true);
+
+    try {
+      const response = await fetch("/api/user/password", {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          currentPassword: formData.currentPassword,
+          newPassword: formData.newPassword,
+        }),
+      });
+
+      if (response.ok) {
+        toast.success("Password updated successfully");
+        setFormData((prev) => ({
+          ...prev,
+          currentPassword: "",
+          newPassword: "",
+          confirmPassword: "",
+        }));
+      } else {
+        const errorData = await response.json();
+        toast.error(errorData.error || "Failed to update password");
+      }
+    } catch (error) {
+      toast.error("An error occurred while updating password");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  if (isLoading) {
+    return (
+      <div className="flex min-h-screen bg-gray-100 p-4 items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
+      </div>
+    );
+  }
 
   return (
     <div className="flex min-h-screen bg-gray-100 p-4">
@@ -160,10 +255,12 @@ const UserSettings: React.FC = () => {
           </ul>
         </aside>
 
-        {/* Main Content */}
         <div className="flex-1 space-y-4 xl:space-y-6">
           {activeTab === "Edit Profile" && (
-            <form onSubmit={handleSubmit} className="space-y-4 xl:space-y-6">
+            <form
+              onSubmit={handleProfileSubmit}
+              className="space-y-4 xl:space-y-6"
+            >
               <div className="flex-1 bg-white border border-primary-100 rounded-3xl p-4 2xl:p-6">
                 <h2 className="text-2xl font-semibold mb-4">
                   Personal Information
@@ -240,9 +337,10 @@ const UserSettings: React.FC = () => {
                       id="email"
                       name="email"
                       value={formData.email}
+                      disabled
                       onChange={handleChange}
                       placeholder="Email"
-                      className="bg-[#F7F7F7] rounded-full px-5 py-3 2xl:py-4 res_text border border-[#28303F1A] focus:outline-none"
+                      className="bg-[#F7F7F7] disabled:opacity-50 rounded-full px-5 py-3 2xl:py-4 res_text border border-[#28303F1A] focus:outline-none"
                     />
                   </div>
                   <div className="flex flex-col gap-2 w-full">
@@ -484,7 +582,7 @@ const UserSettings: React.FC = () => {
           )}
 
           {activeTab === "Change Password" && (
-            <form onSubmit={handleSubmit}>
+            <form onSubmit={handlePasswordSubmit}>
               <div className="flex-1 bg-white border border-primary-100 rounded-3xl p-4 2xl:p-6">
                 <h2 className="text-2xl font-semibold mb-4">Change Password</h2>
                 <div className="space-y-4">
@@ -570,7 +668,12 @@ const UserSettings: React.FC = () => {
                   <div className="flex justify-end">
                     <button
                       type="submit"
-                      className="bg-primary text-white py-3.5 res_text font-semibold px-6 rounded-full mt-6   "
+                      disabled={
+                        !formData.currentPassword ||
+                        !formData.newPassword ||
+                        !formData.confirmPassword
+                      }
+                      className="bg-primary disabled:opacity-40 text-white py-3.5 res_text font-semibold px-6 rounded-full mt-6   "
                     >
                       Update Password
                     </button>

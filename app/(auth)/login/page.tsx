@@ -5,18 +5,20 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { signIn } from "next-auth/react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
+import toast from "react-hot-toast";
+import axios from "axios";
+import { RiLoader3Line } from "react-icons/ri";
 
 const loginFormSchema = z.object({
   email: z
@@ -30,31 +32,43 @@ const loginFormSchema = z.object({
   }),
 });
 
-const signupFormSchema = z.object({
-  email: z
-    .string()
-    .min(2, {
-      message: "enter your email.",
-    })
-    .email("email must be a valid email address."),
-  password: z.string().min(6, {
-    message: "enter password.",
-  }),
-  confirmPassword: z.string().min(6, {
-    message: "enter password again.",
-  }),
-  firstName: z.string().min(2, {
-    message: "please enter your first name.",
-  }),
-  lastName: z.string().min(2, {
-    message: "please enter your last name.",
-  }),
-});
+const signupFormSchema = z
+  .object({
+    email: z
+      .string()
+      .min(2, {
+        message: "enter your email.",
+      })
+      .email("email must be a valid email address."),
+    password: z.string().min(6, {
+      message: "enter password.",
+    }),
+    confirmPassword: z.string().min(6, {
+      message: "enter password again.",
+    }),
+    firstname: z.string().min(2, {
+      message: "please enter your first name.",
+    }),
+    lastname: z.string().min(2, {
+      message: "please enter your last name.",
+    }),
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    message: "Passwords don't match",
+    path: ["confirmPassword"], // This shows the error on confirmPassword field
+  });
 
 const LoginFormSchema = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [type, setType] = useState("login");
   const [step, setStep] = useState(1);
+  const [loading, setLoading] = useState(false);
+  const [terms, setTerms] = useState({
+    terms: false,
+    privacy: false,
+    cookies: false,
+  });
+
   const loginForm = useForm<z.infer<typeof loginFormSchema>>({
     resolver: zodResolver(loginFormSchema),
     defaultValues: {
@@ -66,25 +80,59 @@ const LoginFormSchema = () => {
   const signupForm = useForm<z.infer<typeof signupFormSchema>>({
     resolver: zodResolver(signupFormSchema),
     defaultValues: {
-      email: "",
-      password: "",
-      confirmPassword: "",
-      firstName: "",
-      lastName: "",
+      email: "asfarma2815@gmail.com",
+      password: "asfarasfar",
+      confirmPassword: "asfarasfar",
+      firstname: "asfar",
+      lastname: "munir",
     },
   });
 
   // 2. Define a submit handler.
-  function onSubmit(values: z.infer<typeof loginFormSchema>) {
-    // Do something with the form values.
-    // ✅ This will be type-safe and validated.
-    console.log(values);
+  async function onSubmit(values: z.infer<typeof loginFormSchema>) {
+    setLoading(true);
+    const { email, password } = values;
+    const res = await signIn("credentials", {
+      email,
+      password,
+      redirect: false,
+    });
+    if (!res!.ok) {
+      toast.error(res!.error);
+      setLoading(false);
+      return;
+    }
+    toast.success("Logged in successfully!");
+    setLoading(false);
   }
 
-  function onSignupSubmit(values: z.infer<typeof signupFormSchema>) {
-    // Do something with the form values.
-    // ✅ This will be type-safe and validated.
-    console.log(values);
+  async function onSignupSubmit(values: z.infer<typeof signupFormSchema>) {
+    setLoading(true);
+
+    try {
+      const response = await axios.post("/api/auth/signup", values);
+      if (response.status !== 200) {
+        throw new Error("Something went wrong");
+      }
+      if (response.data.status !== 200) {
+        toast.error(response.data.message);
+        return;
+      }
+
+      const { email, password } = values;
+      //  await signIn("credentials", {
+      //    email,
+      //    password,
+      //    redirect: false,
+      //  });
+
+      toast.success("Account created successfully");
+    } catch (error) {
+      console.log(error);
+      toast.error("Something went wrong");
+    } finally {
+      setLoading(false);
+    }
   }
 
   return (
@@ -221,9 +269,14 @@ const LoginFormSchema = () => {
               </div>
               <Button
                 type="submit"
-                className=" w-full  rounded-full bg-gradient-to-b from-[#3A99D3] to-[#3A89D3] py-3 "
+                disabled={loading}
+                className=" w-full disabled:opacity-50  rounded-full bg-gradient-to-b from-[#3A99D3] to-[#3A89D3] py-3 "
               >
-                Submit
+                {loading ? (
+                  <RiLoader3Line className="animate-spin " />
+                ) : (
+                  "Sign in"
+                )}
               </Button>
               <p className="mt-4 text-xs text-center text-gray-500">
                 This site is protected by reCAPTCHA and the Google{" "}
@@ -266,7 +319,7 @@ const LoginFormSchema = () => {
                   />
                   <FormField
                     control={signupForm.control}
-                    name="firstName"
+                    name="firstname"
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel className="pl-4 text-xs md:text-sm 2xl:text-base">
@@ -285,7 +338,7 @@ const LoginFormSchema = () => {
                   />
                   <FormField
                     control={signupForm.control}
-                    name="lastName"
+                    name="lastname"
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel className="pl-4 text-xs md:text-sm 2xl:text-base">
@@ -372,7 +425,18 @@ const LoginFormSchema = () => {
                   />
                   <Button
                     type="button"
-                    onClick={() => setStep(2)}
+                    onClick={async () => {
+                      const isValid = await signupForm.trigger([
+                        "email",
+                        "firstname",
+                        "lastname",
+                        "password",
+                        "confirmPassword",
+                      ]);
+                      if (isValid) {
+                        setStep(2);
+                      }
+                    }}
                     className=" w-full  rounded-full bg-gradient-to-b from-[#3A99D3] to-[#3A89D3] py-3 2xl:py-3.5 "
                   >
                     Next
@@ -385,27 +449,52 @@ const LoginFormSchema = () => {
                       I agree to the processing of personal data according to
                       Privacy Policy
                     </p>
-                    <Checkbox defaultChecked />
+                    <Checkbox
+                      onCheckedChange={(checked) => {
+                        //@ts-ignore
+                        setTerms((prev) => ({ ...prev, privacy: checked }));
+                      }}
+                    />
                   </div>
                   <div className=" w-full p-3 2xl:p-5 3xl:p-6 bg-[#F7F7F7] rounded-[10px] border-[#FFFFFF1A] flex items-center justify-between gap-5">
                     <p className="text-xs 2xl:text-sm 3xl:text-base ">
-                      I agree to the processing of personal data according to
-                      Privacy Policy
+                      Do you want to receive news about our project Sign up to
+                      our Newsletter?
                     </p>
-                    <Checkbox defaultChecked />
+                    <Checkbox
+                      onCheckedChange={(checked) => {
+                        //@ts-ignore
+                        setTerms((prev) => ({ ...prev, terms: checked }));
+                      }}
+                    />
                   </div>
                   <div className=" w-full p-3 2xl:p-5 3xl:p-6 bg-[#F7F7F7] rounded-[10px] border-[#FFFFFF1A] flex items-center justify-between gap-5">
                     <p className="text-xs 2xl:text-sm 3xl:text-base ">
-                      I agree to the processing of personal data according to
-                      Privacy Policy
+                      According my name is correct and correspond to the
+                      government issued identification
                     </p>
-                    <Checkbox defaultChecked />
+                    <Checkbox
+                      onCheckedChange={(checked) => {
+                        //@ts-ignore
+                        setTerms((prev) => ({ ...prev, cookies: checked }));
+                      }}
+                    />
                   </div>
                   <Button
                     type="submit"
-                    className=" w-full  rounded-full bg-gradient-to-b from-[#3A99D3] to-[#3A89D3] py-3 2xl:py-3.5 "
+                    disabled={
+                      !terms.privacy ||
+                      // !terms.terms ||
+                      !terms.cookies ||
+                      loading
+                    }
+                    className=" w-full disabled:opacity-70  rounded-full bg-gradient-to-b from-[#3A99D3] to-[#3A89D3] py-3 2xl:py-3.5 "
                   >
-                    Create Account
+                    {loading ? (
+                      <RiLoader3Line className="animate-spin " />
+                    ) : (
+                      "Create Account"
+                    )}
                   </Button>
                 </div>
               )}

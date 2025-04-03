@@ -7,6 +7,8 @@ import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import Agreements from "@/components/shared/modals/Agreements";
 import { DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import toast from "react-hot-toast";
+import { useSession } from "next-auth/react";
 
 const steps = [
   "type",
@@ -75,51 +77,117 @@ const petTypes = [
 ];
 
 export default function PropertyListingForm() {
-  const [step, setStep] = useState(1);
+  const { data: session } = useSession();
+  const [step, setStep] = useState(0);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [termsAccepted, setTermsAccepted] = useState(false);
   const [formData, setFormData] = useState({
     location: "",
-    addressDetails: {
+    address: {
       address1: "",
       address2: "",
       address3: "",
       city: "",
       state: "",
       zip: "",
-      country: "",
+      country: "US",
     },
     bedrooms: 1,
     beds: 1,
     bathrooms: 1,
     balcony: 1,
     squareFeet: "",
-    amenities: [],
-    petsAllowed: [],
-    photos: [],
+    amenities: [] as string[],
+    petsAllowed: [] as string[],
+    photos: [] as string[],
     title: "",
     type: "",
-    audience: "",
+    audience: "Any",
     description: "",
     price: 0,
     currency: "USD",
     contactDetails: {
-      name: "",
-      email: "",
+      name: session?.user?.name || "",
+      email: session?.user?.email || "",
       phoneNumber: "",
     },
   });
-  const [termsAccepted, setTermsAccepted] = useState(false);
 
   const handleNext = () => step < steps.length - 1 && setStep(step + 1);
   const handleBack = () => step > 0 && setStep(step - 1);
-  const handleChange = (field: any, value: any) =>
-    setFormData({ ...formData, [field]: value });
-  const toggleAmenity = (amenity: any) => {
-    setFormData((prev: any) => {
-      const newAmenities = prev.amenities.includes(amenity)
-        ? prev.amenities.filter((item: any) => item !== amenity)
-        : [...prev.amenities, amenity];
-      return { ...prev, amenities: newAmenities };
-    });
+
+  const handleChange = (field: string, value: any) => {
+    setFormData((prev) => ({ ...prev, [field]: value }));
+  };
+
+  const handleNestedChange = (
+    parentField: string,
+    field: string,
+    value: any
+  ) => {
+    setFormData((prev) => ({
+      ...prev,
+      [parentField]: {
+        //@ts-ignore
+        ...prev[parentField as keyof typeof prev],
+        [field]: value,
+      },
+    }));
+  };
+
+  const toggleAmenity = (amenity: string) => {
+    setFormData((prev) => ({
+      ...prev,
+      amenities: prev.amenities.includes(amenity)
+        ? prev.amenities.filter((item) => item !== amenity)
+        : [...prev.amenities, amenity],
+    }));
+  };
+
+  const togglePetPolicy = (policy: string) => {
+    setFormData((prev) => ({
+      ...prev,
+      petsAllowed: prev.petsAllowed.includes(policy)
+        ? prev.petsAllowed.filter((item) => item !== policy)
+        : [...prev.petsAllowed, policy],
+    }));
+  };
+
+  const handleSubmit = async () => {
+    if (step !== steps.length - 1) {
+      handleNext();
+      return;
+    }
+
+    setIsSubmitting(true);
+
+    try {
+      // Basic validation
+      if (!formData.title || !formData.description || formData.price <= 0) {
+        throw new Error("Please fill all required fields");
+      }
+
+      const response = await fetch("/api/properties", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formData),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || "Failed to create listing");
+      }
+
+      const result = await response.json();
+      toast.success("Property listed successfully!");
+      // Reset form or redirect as needed
+    } catch (error: any) {
+      toast.error(error.message || "An error occurred");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -259,11 +327,11 @@ export default function PropertyListingForm() {
                   </label>
                   <Input
                     placeholder="Enter country"
-                    value={formData.addressDetails.country}
+                    value={formData.address.country}
                     className="bg-[#F7F7F7] text-xs md:text-sm 3xl:text-base rounded-full border border-[#28303F1A] py-7 2xl:py-8 sm:px-5 w-full text-[#28303FCC]"
                     onChange={(e) =>
-                      handleChange("addressDetails", {
-                        ...formData.addressDetails,
+                      handleChange("address", {
+                        ...formData.address,
                         country: e.target.value,
                       })
                     }
@@ -278,11 +346,11 @@ export default function PropertyListingForm() {
                   </label>
                   <Input
                     placeholder="Enter address line 1"
-                    value={formData.addressDetails.address1}
+                    value={formData.address.address1}
                     className="bg-[#F7F7F7] text-xs md:text-sm 3xl:text-base rounded-full border border-[#28303F1A] py-7 2xl:py-8 sm:px-5 w-full text-[#28303FCC]"
                     onChange={(e) =>
-                      handleChange("addressDetails", {
-                        ...formData.addressDetails,
+                      handleChange("address", {
+                        ...formData.address,
                         address1: e.target.value,
                       })
                     }
@@ -297,11 +365,11 @@ export default function PropertyListingForm() {
                   </label>
                   <Input
                     placeholder="Enter address line 2 (optional)"
-                    value={formData.addressDetails.address2}
+                    value={formData.address.address2}
                     className="bg-[#F7F7F7] text-xs md:text-sm 3xl:text-base rounded-full border border-[#28303F1A] py-7 2xl:py-8 sm:px-5 w-full text-[#28303FCC]"
                     onChange={(e) =>
-                      handleChange("addressDetails", {
-                        ...formData.addressDetails,
+                      handleChange("address", {
+                        ...formData.address,
                         address2: e.target.value,
                       })
                     }
@@ -316,11 +384,11 @@ export default function PropertyListingForm() {
                   </label>
                   <Input
                     placeholder="Enter address line 3 (optional)"
-                    value={formData.addressDetails.address3}
+                    value={formData.address.address3}
                     className="bg-[#F7F7F7] text-xs md:text-sm 3xl:text-base rounded-full border border-[#28303F1A] py-7 2xl:py-8 sm:px-5 w-full text-[#28303FCC]"
                     onChange={(e) =>
-                      handleChange("addressDetails", {
-                        ...formData.addressDetails,
+                      handleChange("address", {
+                        ...formData.address,
                         address3: e.target.value,
                       })
                     }
@@ -335,11 +403,11 @@ export default function PropertyListingForm() {
                   </label>
                   <Input
                     placeholder="Enter city"
-                    value={formData.addressDetails.city}
+                    value={formData.address.city}
                     className="bg-[#F7F7F7] text-xs md:text-sm 3xl:text-base rounded-full border border-[#28303F1A] py-7 2xl:py-8 sm:px-5 w-full text-[#28303FCC]"
                     onChange={(e) =>
-                      handleChange("addressDetails", {
-                        ...formData.addressDetails,
+                      handleChange("address", {
+                        ...formData.address,
                         city: e.target.value,
                       })
                     }
@@ -354,11 +422,11 @@ export default function PropertyListingForm() {
                   </label>
                   <Input
                     placeholder="Enter state/province"
-                    value={formData.addressDetails.state}
+                    value={formData.address.state}
                     className="bg-[#F7F7F7] text-xs md:text-sm 3xl:text-base rounded-full border border-[#28303F1A] py-7 2xl:py-8 sm:px-5 w-full text-[#28303FCC]"
                     onChange={(e) =>
-                      handleChange("addressDetails", {
-                        ...formData.addressDetails,
+                      handleChange("address", {
+                        ...formData.address,
                         state: e.target.value,
                       })
                     }
@@ -373,11 +441,11 @@ export default function PropertyListingForm() {
                   </label>
                   <Input
                     placeholder="Enter postal code (otpional)"
-                    value={formData.addressDetails.zip}
+                    value={formData.address.zip}
                     className="bg-[#F7F7F7] text-xs md:text-sm 3xl:text-base rounded-full border border-[#28303F1A] py-7 2xl:py-8 sm:px-5 w-full text-[#28303FCC]"
                     onChange={(e) =>
-                      handleChange("addressDetails", {
-                        ...formData.addressDetails,
+                      handleChange("address", {
+                        ...formData.address,
                         zip: e.target.value,
                       })
                     }
@@ -845,11 +913,15 @@ export default function PropertyListingForm() {
               Back
             </Button>
             <Button
-              className=" bg-primary text-white px-8 py-3.5 rounded-full font-semibold"
-              onClick={handleNext}
-              disabled={step === steps.length - 1}
+              className="bg-primary text-white px-8 py-3.5 rounded-full font-semibold"
+              onClick={step === steps.length - 1 ? handleSubmit : handleNext}
+              disabled={step === steps.length - 1 && isSubmitting}
             >
-              Next
+              {step === steps.length - 1
+                ? isSubmitting
+                  ? "Submitting..."
+                  : "Submit"
+                : "Next"}
             </Button>
           </div>
         </>

@@ -1,3 +1,4 @@
+"use client";
 import Image from "next/image";
 import React from "react";
 import {
@@ -20,6 +21,7 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 import Link from "next/link";
+import { useSession } from "next-auth/react";
 
 const filters = [
   {
@@ -40,6 +42,7 @@ const filters = [
   },
 ];
 const Navbar = () => {
+  const session = useSession();
   return (
     <nav className=" w-[95%] mx-auto my-3 flex items-center justify-between bg-[#FAFAFA]  rounded-full px-4 py-4 ">
       <Link href={"/"}>
@@ -54,38 +57,54 @@ const Navbar = () => {
         "
         />
       </Link>
-      <div className=" hidden md:flex items-center gap-3 xl:gap-4 2xl:gap-5">
-        {filters.map((filter, index) => (
-          <DropdownMenu key={index}>
-            <DropdownMenuTrigger className=" flex items-center gap-2 2xl:gap-3 focus:outline-none res_text">
-              {filter.title}
-              <GoChevronDown />
+      {session.status === "authenticated" ? (
+        <div className=" hidden md:flex items-center gap-3 xl:gap-4 2xl:gap-5">
+          {filters.map((filter, index) => (
+            <DropdownMenu key={index}>
+              <DropdownMenuTrigger className=" flex items-center gap-2 2xl:gap-3 focus:outline-none res_text">
+                {filter.title}
+                <GoChevronDown />
+              </DropdownMenuTrigger>
+              <DropdownMenuContent>
+                <DropdownMenuItem>Filters </DropdownMenuItem>
+                <DropdownMenuItem>Filters </DropdownMenuItem>
+                <DropdownMenuItem>Filters </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          ))}
+          <button className=" res_text text-primary font-semibold">
+            Advertise
+          </button>
+          <button className=" res_text bg-primary rounded-full p-4 py-2.5 text-white  ">
+            Post a Listing
+          </button>
+          <DropdownMenu>
+            <DropdownMenuTrigger className=" hidden  bg-white p-2.5 rounded-full md:flex items-center gap-2  focus:outline-none res_text">
+              <Image src="/user.svg" width={20} height={20} alt="User" />
+              <GrMenu className="text-lg" />
             </DropdownMenuTrigger>
             <DropdownMenuContent>
-              <DropdownMenuItem>Filters </DropdownMenuItem>
-              <DropdownMenuItem>Filters </DropdownMenuItem>
-              <DropdownMenuItem>Filters </DropdownMenuItem>
+              <DropdownMenuItem>settings </DropdownMenuItem>
+              <DropdownMenuItem>settings </DropdownMenuItem>
+              <DropdownMenuItem>settings </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
-        ))}
-        <button className=" res_text text-primary font-semibold">
-          Advertise
-        </button>
-        <button className=" res_text bg-primary rounded-full p-4 py-2.5 text-white  ">
-          Post a Listing
-        </button>
-        <DropdownMenu>
-          <DropdownMenuTrigger className=" hidden  bg-white p-2.5 rounded-full md:flex items-center gap-2  focus:outline-none res_text">
-            <Image src="/user.svg" width={20} height={20} alt="User" />
-            <GrMenu className="text-lg" />
-          </DropdownMenuTrigger>
-          <DropdownMenuContent>
-            <DropdownMenuItem>settings </DropdownMenuItem>
-            <DropdownMenuItem>settings </DropdownMenuItem>
-            <DropdownMenuItem>settings </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
-      </div>
+        </div>
+      ) : (
+        <div className=" hidden md:flex items-center gap-3 xl:gap-4 2xl:gap-5">
+          <Link href={"/login"}>
+            <button className=" res_text text-primary font-semibold">
+              Login
+            </button>
+          </Link>
+          <Link href={"/login"}>
+            <button className=" res_text bg-primary font-semibold rounded-full p-4 py-2.5 text-white  ">
+              Sign Up
+            </button>
+          </Link>
+        </div>
+      )}
+
       <Sheet>
         <SheetTrigger className=" md:hidden">
           <GrMenu className="text-lg" />
