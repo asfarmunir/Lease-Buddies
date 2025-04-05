@@ -9,6 +9,7 @@ import Agreements from "@/components/shared/modals/Agreements";
 import { DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import toast from "react-hot-toast";
 import { useSession } from "next-auth/react";
+import { RiLoader3Line } from "react-icons/ri";
 
 const steps = [
   "type",
@@ -57,7 +58,7 @@ const audienceTypes = [
     description: "Premium and high-end choices.",
   },
   {
-    title: "Any ",
+    title: "Any",
     description: "No price preference, explore all options.",
   },
 ];
@@ -75,6 +76,44 @@ const petTypes = [
     description: "Filters locations with a strict no-pets policy.",
   },
 ];
+const amenitiesTypes = [
+  "Air Conditioning",
+  "Carpet",
+  "Business Center",
+  "Balcony",
+  "Assigned Parking",
+];
+
+const amenitiesCategories = {
+  interior: [
+    { name: "Air Conditioning", included: true },
+    { name: "Hardwood Floors", included: true },
+    { name: "Walk-in Closet", included: true },
+    { name: "Carpet", included: true },
+    { name: "Fireplace", included: true },
+  ],
+  outdoor: [
+    { name: "Balcony", included: true },
+    { name: "Patio", included: true },
+    { name: "Garden", included: true },
+    { name: "Swimming Pool", included: true },
+    { name: "Garage", included: true },
+  ],
+  utilities: [
+    { name: "Water Included", included: true },
+    { name: "Electricity Included", included: true },
+    { name: "Gas Included", included: true },
+    { name: "Trash Removal", included: true },
+    { name: "Recycling", included: true },
+  ],
+  otherFeatures: [
+    { name: "Wheelchair Access", included: true },
+    { name: "Elevator", included: true },
+    { name: "Gym", included: true },
+    { name: "Laundry Facilities", included: true },
+    { name: "Security System", included: true },
+  ],
+};
 
 export default function PropertyListingForm() {
   const { data: session } = useSession();
@@ -97,12 +136,17 @@ export default function PropertyListingForm() {
     bathrooms: 1,
     balcony: 1,
     squareFeet: "",
-    amenities: [] as string[],
+    amenities: {
+      interior: [],
+      outdoor: [],
+      utilities: [],
+      otherFeatures: [],
+    },
     petsAllowed: [] as string[],
     photos: [] as string[],
     title: "",
     type: "",
-    audience: "Any",
+    audience: "",
     description: "",
     price: 0,
     currency: "USD",
@@ -113,7 +157,95 @@ export default function PropertyListingForm() {
     },
   });
 
-  const handleNext = () => step < steps.length - 1 && setStep(step + 1);
+  const validateCurrentStep = () => {
+    switch (steps[step]) {
+      case "type":
+        return !!formData.type; // Must select a property type
+      case "audience":
+        return !!formData.audience; // Must select an audience
+      case "Location":
+        return !!formData.location.trim(); // Location must not be empty
+      case "Address":
+        return (
+          !!formData.address.address1.trim() &&
+          !!formData.address.city.trim() &&
+          !!formData.address.state.trim() &&
+          !!formData.address.zip.trim()
+        );
+      case "Basics":
+        return !!formData.squareFeet.trim(); // Square feet must be provided
+      case "Amenities":
+        return true; // No required fields (all optional)
+      case "Pet Policy":
+        return true; // No required fields (all optional)
+      case "Photos":
+        return formData.photos.length >= 5; // At least 5 photos
+      case "Title":
+        return !!formData.title.trim() && formData.title.length <= 32;
+      case "Description":
+        return (
+          !!formData.description.trim() && formData.description.length <= 500
+        );
+      case "Price":
+        return formData.price > 0; // Price must be greater than 0
+      case "Contact":
+        return (
+          !!formData.contactDetails.name.trim() &&
+          !!formData.contactDetails.email.trim() &&
+          !!formData.contactDetails.phoneNumber.trim()
+        );
+      default:
+        return true;
+    }
+  };
+
+  const handleNext = () => {
+    if (!validateCurrentStep()) {
+      // Show error message based on current step
+      showValidationError();
+      return;
+    }
+    if (step < steps.length - 1) {
+      setStep(step + 1);
+    }
+  };
+
+  const showValidationError = () => {
+    switch (steps[step]) {
+      case "type":
+        toast.error("Please select a property type");
+        break;
+      case "audience":
+        toast.error("Please select an audience type");
+        break;
+      case "Location":
+        toast.error("Please enter a location");
+        break;
+      case "Address":
+        toast.error("Please add required information");
+        break;
+      case "Basics":
+        toast.error("Please enter square footage");
+        break;
+      case "Photos":
+        toast.error("Please upload at least 5 photos");
+        break;
+      case "Title":
+        toast.error("Please enter a title");
+        break;
+      case "Description":
+        toast.error("Please enter a description");
+        break;
+      case "Price":
+        toast.error("Please enter a valid price");
+        break;
+      case "Contact":
+        toast.error("Please complete all contact information");
+        break;
+      default:
+        toast.error("Please complete all required fields");
+    }
+  };
   const handleBack = () => step > 0 && setStep(step - 1);
 
   const handleChange = (field: string, value: any) => {
@@ -135,15 +267,34 @@ export default function PropertyListingForm() {
     }));
   };
 
-  const toggleAmenity = (amenity: string) => {
-    setFormData((prev) => ({
-      ...prev,
-      amenities: prev.amenities.includes(amenity)
-        ? prev.amenities.filter((item) => item !== amenity)
-        : [...prev.amenities, amenity],
-    }));
-  };
+  const toggleAmenity = (
+    category: keyof typeof formData.amenities,
+    amenityName: string
+  ) => {
+    setFormData((prev) => {
+      const categoryAmenities = [...prev.amenities[category]];
+      const existingIndex = categoryAmenities.findIndex(
+        //@ts-ignore
+        (a) => a.name === amenityName
+      );
 
+      if (existingIndex >= 0) {
+        // Remove if already exists
+        categoryAmenities.splice(existingIndex, 1);
+      } else {
+        //@ts-ignore
+        categoryAmenities.push({ name: amenityName, included: true });
+      }
+
+      return {
+        ...prev,
+        amenities: {
+          ...prev.amenities,
+          [category]: categoryAmenities,
+        },
+      };
+    });
+  };
   const togglePetPolicy = (policy: string) => {
     setFormData((prev) => ({
       ...prev,
@@ -153,8 +304,74 @@ export default function PropertyListingForm() {
     }));
   };
 
+  const [uploading, setUploading] = useState(false);
+
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (!files) return;
+
+    // Check total images count
+    const totalImages = formData.photos.length + files.length;
+    if (totalImages > 10) {
+      toast.error("You can upload a maximum of 10 photos");
+      return;
+    }
+
+    setUploading(true);
+
+    try {
+      const newImageUrls = await uploadImagesToCloudinary(files);
+      setFormData((prev) => ({
+        ...prev,
+        photos: [...prev.photos, ...newImageUrls],
+      }));
+    } catch (error) {
+      console.error("Error uploading images:", error);
+      toast.error("Failed to upload some images");
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  const uploadImagesToCloudinary = async (
+    files: FileList
+  ): Promise<string[]> => {
+    const uploadPromises = Array.from(files).map((file) => {
+      const data = new FormData();
+      data.append("file", file);
+      data.append("upload_preset", "bluepro");
+      data.append("cloud_name", "dbfn18wm7");
+
+      return fetch("https://api.cloudinary.com/v1_1/dbfn18wm7/upload", {
+        method: "POST",
+        body: data,
+      })
+        .then((res) => res.json())
+        .then((data) => data.secure_url)
+        .catch((error) => {
+          console.error("Error uploading image:", error);
+          return null;
+        });
+    });
+
+    const results = await Promise.all(uploadPromises);
+    return results.filter((url) => url !== null) as string[];
+  };
+
+  const removeImage = (index: number) => {
+    setFormData((prev) => {
+      const newPhotos = [...prev.photos];
+      newPhotos.splice(index, 1);
+      return { ...prev, photos: newPhotos };
+    });
+  };
+
   const handleSubmit = async () => {
     if (step !== steps.length - 1) {
+      if (step === 7 && formData.photos.length < 5) {
+        toast.error("Please upload at least 5 photos");
+        return;
+      }
       handleNext();
       return;
     }
@@ -167,12 +384,19 @@ export default function PropertyListingForm() {
         throw new Error("Please fill all required fields");
       }
 
+      if (formData.photos.length < 5) {
+        throw new Error("Please upload at least 5 photos");
+      }
+
       const response = await fetch("/api/properties", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(formData),
+        body: JSON.stringify({
+          ...formData,
+          featuredImage: formData.photos[0], // Set first image as featured
+        }),
       });
 
       if (!response.ok) {
@@ -601,7 +825,7 @@ export default function PropertyListingForm() {
                   <input
                     placeholder="Enter Listing’s Square feet"
                     value={formData.squareFeet}
-                    className=" bg-transparent focus:outline-none"
+                    className=" bg-transparent focus:outline-none w-full"
                     onChange={(e) => handleChange("squareFeet", e.target.value)}
                   />
                 </div>
@@ -615,39 +839,46 @@ export default function PropertyListingForm() {
                 <p className="res_text text-[#28303FCC] text-center">
                   What extras to offer a potential renter?
                 </p>
-                <div className=" w-full my-4 space-y-2">
-                  <div
-                    className={`w-full  flex items-center justify-between gap-2 px-4 xl:px-8 py-5 res_text rounded-full text-left 
-                    ${
-                      //@ts-ignore
-                      formData.amenities.includes("Air Conditioning")
-                        ? "bg-[#28303F1A]"
-                        : "bg-[#F7F7F7]"
-                    }
-                           `}
-                  >
-                    <p className=" font-[500]">Air Conditioning</p>
-                    <Checkbox
-                      className="data-[state=checked]:bg-[#28303F] border border-[#28303F]"
-                      onCheckedChange={() => toggleAmenity("Air Conditioning")}
-                    />
-                  </div>
-                  <div
-                    className={`w-full  flex items-center justify-between gap-2 px-4 xl:px-8 py-5 res_text rounded-full text-left 
-                    ${
-                      //@ts-ignore
-                      formData.amenities.includes("Carpet")
-                        ? "bg-[#28303F1A]"
-                        : "bg-[#F7F7F7]"
-                    }
-                           `}
-                  >
-                    <p className=" font-[500]">Carpets</p>
-                    <Checkbox
-                      className="data-[state=checked]:bg-[#28303F] border border-[#28303F]"
-                      onCheckedChange={() => toggleAmenity("Air Conditioning")}
-                    />
-                  </div>
+
+                <div className="w-full my-4 space-y-6">
+                  {Object.entries(amenitiesCategories).map(
+                    ([category, items]) => (
+                      <div key={category} className="space-y-3">
+                        <h3 className="text-lg font-semibold capitalize">
+                          {category.replace(/([A-Z])/g, " $1")}{" "}
+                          {/* Convert camelCase to words */}
+                        </h3>
+                        <div className="grid grid-cols-1 gap-3">
+                          {items.map((item, index) => (
+                            <div
+                              key={index}
+                              className={`flex items-center justify-between p-4 2xl:p-6 rounded-full cursor-pointer transition-colors ${
+                                formData.amenities[
+                                  category as keyof typeof formData.amenities
+                                ].some((a: any) => a.name === item.name)
+                                  ? "bg-primary/15 border border-primary/30"
+                                  : "bg-[#F7F7F7] border border-transparent"
+                              }`}
+                              onClick={() =>
+                                toggleAmenity(
+                                  category as keyof typeof formData.amenities,
+                                  item.name
+                                )
+                              }
+                            >
+                              <span className="font-medium">{item.name}</span>
+                              <Checkbox
+                                checked={formData.amenities[
+                                  category as keyof typeof formData.amenities
+                                ].some((a: any) => a.name === item.name)}
+                                className="data-[state=checked]:bg-primary border-primary"
+                              />
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )
+                  )}
                 </div>
               </div>
             )}
@@ -710,8 +941,103 @@ export default function PropertyListingForm() {
                   Rental Unit
                 </h2>
                 <p className="res_text text-[#28303FCC] text-center">
-                  you can add your house photos from here.
+                  {formData.photos.length > 0
+                    ? `You've added ${formData.photos.length} photos (min 5, max 10)`
+                    : "You can add your house photos from here (min 5, max 10)."}
                 </p>
+                {uploading && (
+                  <div className="fixed inset-0 bg-black bg-opacity-50 flex flex-col items-center justify-center z-50">
+                    <div className="bg-white/80 p-6 rounded-lg shadow-lg">
+                      <p className="res_text">Uploading Images...</p>
+                      <RiLoader3Line className="text-5xl text-primary mx-auto mt-3 animate-spin" />
+                    </div>
+                  </div>
+                )}
+                <div className="mt-6 w-full">
+                  {formData.photos.length === 0 ? (
+                    <div className="relative ">
+                      <Image
+                        src="/images/upload.svg"
+                        width={700}
+                        height={700}
+                        alt="upload"
+                        className="mx-auto mb-4"
+                      />
+                      <input
+                        type="file"
+                        accept="image/*"
+                        multiple
+                        onChange={handleImageUpload}
+                        className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                      />
+                    </div>
+                  ) : (
+                    <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                      {formData.photos.map((photo, index) => (
+                        <div key={index} className="relative group">
+                          <img
+                            src={photo}
+                            alt={`Property ${index + 1}`}
+                            className="w-full h-40 object-cover rounded-lg"
+                          />
+                          <button
+                            onClick={() => removeImage(index)}
+                            className="absolute top-2 right-2 bg-red-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
+                          >
+                            <svg
+                              xmlns="http://www.w3.org/2000/svg"
+                              className="h-4 w-4"
+                              viewBox="0 0 20 20"
+                              fill="currentColor"
+                            >
+                              <path
+                                fillRule="evenodd"
+                                d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
+                                clipRule="evenodd"
+                              />
+                            </svg>
+                          </button>
+                        </div>
+                      ))}
+                      {formData.photos.length < 10 && (
+                        <div className="relative border-2 h-40 border-dashed border-gray-300 rounded-lg flex items-center justify-center">
+                          <input
+                            type="file"
+                            accept="image/*"
+                            multiple
+                            onChange={handleImageUpload}
+                            className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                          />
+                          <div className="p-4 text-center">
+                            <svg
+                              xmlns="http://www.w3.org/2000/svg"
+                              className="h-8 w-8 mx-auto text-gray-400"
+                              fill="none"
+                              viewBox="0 0 24 24"
+                              stroke="currentColor"
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth={2}
+                                d="M12 6v6m0 0v6m0-6h6m-6 0H6"
+                              />
+                            </svg>
+                            <p className="res_text text-sm text-[#28303FCC]">
+                              Add more photos
+                            </p>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </div>
+
+                {formData.photos.length > 0 && formData.photos.length < 5 && (
+                  <p className="text-red-500 res_text mt-4">
+                    Please add at least {5 - formData.photos.length} more photos
+                  </p>
+                )}
               </div>
             )}
             {step === 8 && (
@@ -768,7 +1094,7 @@ export default function PropertyListingForm() {
                   />
                   <div className="flex items-center justify-end">
                     <p className="res_text font-[500] text-primary-50">
-                      {formData.description.length} / 32
+                      {formData.description.length} / 500
                     </p>
                   </div>
                 </div>
@@ -812,10 +1138,13 @@ export default function PropertyListingForm() {
                       </option>
                     </select>
                     <p className="text-lg font-semibold">
-                      {formData.currency === "USD" ? "$" : "C"}
+                      {formData.currency === "USD" ? "$" : "CA$"}
                     </p>
                     <input
                       placeholder="Enter price"
+                      type="number"
+                      min={0}
+                      max={1000000}
                       value={formData.price === 0 ? "" : formData.price}
                       className="bg-transparent w-24 focus:outline-none text-lg font-semibold"
                       onChange={(e) => handleChange("price", e.target.value)}

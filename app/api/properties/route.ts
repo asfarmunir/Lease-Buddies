@@ -46,7 +46,6 @@ export async function GET(request: Request) {
 
     const { searchParams } = new URL(request.url);
     
-    // Extract all filter parameters
     const filters: any = {
       isActive: true
     };
@@ -81,6 +80,16 @@ export async function GET(request: Request) {
       }
     }
 
+    // Beds filter
+    const beds = searchParams.get('beds');
+    if (beds) {
+      if (beds === '4+') {
+        filters.beds = { $gte: 4 };
+      } else {
+        filters.beds = parseInt(beds);
+      }
+    }
+
     // Bathrooms filter
     const bathrooms = searchParams.get('bathrooms');
     if (bathrooms) {
@@ -88,6 +97,16 @@ export async function GET(request: Request) {
         filters.bathrooms = { $gte: 4 };
       } else {
         filters.bathrooms = parseInt(bathrooms);
+      }
+    }
+
+    // Balcony filter
+    const balcony = searchParams.get('balcony');
+    if (balcony) {
+      if (balcony === '4+') {
+        filters.balcony = { $gte: 4 };
+      } else {
+        filters.balcony = parseInt(balcony);
       }
     }
 
@@ -106,10 +125,15 @@ export async function GET(request: Request) {
       filters.petsAllowed = { $in: petsAllowed };
     }
 
-    // Amenities filter
+    // Amenities filter - updated for new schema
     const amenities = searchParams.getAll('amenities');
     if (amenities.length > 0) {
-      filters.amenities = { $all: amenities };
+      filters.$or = [
+        { 'amenities.interior.name': { $in: amenities } },
+        { 'amenities.outdoor.name': { $in: amenities } },
+        { 'amenities.utilities.name': { $in: amenities } },
+        { 'amenities.otherFeatures.name': { $in: amenities } }
+      ];
     }
 
     // Square feet filter

@@ -19,6 +19,8 @@ import {
 import toast from "react-hot-toast";
 import axios from "axios";
 import { RiLoader3Line } from "react-icons/ri";
+import { useRouter } from "next/navigation";
+import Link from "next/link";
 
 const loginFormSchema = z.object({
   email: z
@@ -69,6 +71,7 @@ const LoginFormSchema = () => {
     cookies: false,
   });
 
+  const router = useRouter();
   const loginForm = useForm<z.infer<typeof loginFormSchema>>({
     resolver: zodResolver(loginFormSchema),
     defaultValues: {
@@ -76,7 +79,6 @@ const LoginFormSchema = () => {
       password: "",
     },
   });
-
   const signupForm = useForm<z.infer<typeof signupFormSchema>>({
     resolver: zodResolver(signupFormSchema),
     defaultValues: {
@@ -104,6 +106,7 @@ const LoginFormSchema = () => {
     }
     toast.success("Logged in successfully!");
     setLoading(false);
+    router.push("/home");
   }
 
   async function onSignupSubmit(values: z.infer<typeof signupFormSchema>) {
@@ -118,15 +121,9 @@ const LoginFormSchema = () => {
         toast.error(response.data.message);
         return;
       }
-
       const { email, password } = values;
-      //  await signIn("credentials", {
-      //    email,
-      //    password,
-      //    redirect: false,
-      //  });
-
       toast.success("Account created successfully");
+      router.push("/welcome");
     } catch (error) {
       console.log(error);
       toast.error("Something went wrong");
@@ -260,12 +257,12 @@ const LoginFormSchema = () => {
                     Remember password
                   </label>
                 </div>
-                <a
-                  href="#"
+                <Link
+                  href="/forget-password"
                   className="font-semibold text-[#28303F] text-xs 2xl:text-sm"
                 >
                   Forgot password?
-                </a>
+                </Link>
               </div>
               <Button
                 type="submit"

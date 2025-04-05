@@ -21,8 +21,9 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 import Link from "next/link";
-import { useSession } from "next-auth/react";
-
+import { signOut, useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
+import toast from "react-hot-toast";
 const filters = [
   {
     title: "Apartments for rent",
@@ -43,6 +44,17 @@ const filters = [
 ];
 const Navbar = () => {
   const session = useSession();
+  const router = useRouter();
+  const signOutUser = async () => {
+    await signOut({
+      redirect: false,
+      callbackUrl: "/login",
+    });
+    toast.success("Signed out successfully!");
+    router.refresh();
+    router.replace("/login");
+  };
+
   return (
     <nav className=" w-[95%] mx-auto my-3 flex items-center justify-between bg-[#FAFAFA]  rounded-full px-4 py-4 ">
       <Link href={"/"}>
@@ -75,18 +87,35 @@ const Navbar = () => {
           <button className=" res_text text-primary font-semibold">
             Advertise
           </button>
-          <button className=" res_text bg-primary rounded-full p-4 py-2.5 text-white  ">
-            Post a Listing
-          </button>
+          <Link href={"/property/list"}>
+            <button className=" res_text bg-primary rounded-full p-4 py-2.5 text-white  ">
+              Post a Listing
+            </button>
+          </Link>
           <DropdownMenu>
             <DropdownMenuTrigger className=" hidden  bg-white p-2.5 rounded-full md:flex items-center gap-2  focus:outline-none res_text">
               <Image src="/user.svg" width={20} height={20} alt="User" />
               <GrMenu className="text-lg" />
             </DropdownMenuTrigger>
-            <DropdownMenuContent>
-              <DropdownMenuItem>settings </DropdownMenuItem>
-              <DropdownMenuItem>settings </DropdownMenuItem>
-              <DropdownMenuItem>settings </DropdownMenuItem>
+            <DropdownMenuContent className="mt-1 mr-6">
+              <DropdownMenuItem
+                onClick={() => router.push("/profile")}
+                className="res_text font-[500] pb-2 border-slate-200 pt-2 rounded-none  border-b"
+              >
+                Profile
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={() => router.push("/settings")}
+                className="res_text font-[500] pb-2 border-slate-200 pt-2 rounded-none  border-b"
+              >
+                settings{" "}
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={signOutUser}
+                className="res_text font-[500] pb-2 pt-2 rounded-none  "
+              >
+                logout{" "}
+              </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
         </div>

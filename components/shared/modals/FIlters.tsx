@@ -12,8 +12,8 @@ import { Checkbox } from "../../ui/checkbox";
 
 interface FiltersModalProps {
   onApplyFilters: (filters: {
-    price: "Affordable" | "Luxury" | "Any";
-    popular: string[];
+    audience?: "Affordable" | "Luxury" | "Any";
+    amenities?: string[];
     squareFeet?: string;
   }) => void;
   onClearFilters: () => void;
@@ -24,61 +24,81 @@ interface FiltersModalProps {
   };
 }
 
+const amenityCategories = {
+  interior: [
+    "Air Conditioning",
+    "Hardwood Floors",
+    "Walk-in Closet",
+    "Carpet",
+    "Fireplace",
+  ],
+  outdoor: ["Balcony", "Patio", "Garden", "Swimming Pool", "Garage"],
+  utilities: [
+    "Water Included",
+    "Electricity Included",
+    "Gas Included",
+    "Trash Removal",
+    "Recycling",
+  ],
+  otherFeatures: [
+    "Wheelchair Access",
+    "Elevator",
+    "Gym",
+    "Laundry Facilities",
+    "Security System",
+  ],
+};
+
 const Filters: React.FC<FiltersModalProps> = ({
   onApplyFilters,
   onClearFilters,
   appliedFilters,
 }) => {
-  // Initialize temp filters with applied filters
   const [tempFilters, setTempFilters] = useState({
-    price: "Any" as "Affordable" | "Luxury" | "Any",
-    popular: [] as string[],
+    audience: "Any" as "Affordable" | "Luxury" | "Any",
+    amenities: [] as string[],
     squareFeet: "",
   });
 
-  // Sync with applied filters when they change
   useEffect(() => {
     setTempFilters({
-      price: appliedFilters.audience || "Any",
-      popular: appliedFilters.amenities || [],
+      audience: appliedFilters.audience || "Any",
+      amenities: appliedFilters.amenities || [],
       squareFeet: appliedFilters.squareFeet || "",
     });
   }, [appliedFilters]);
 
-  // Handle popular filter toggle
-  const togglePopularFilter = (filter: string) => {
+  const toggleAmenity = (amenity: string) => {
     setTempFilters((prev) => ({
       ...prev,
-      popular: prev.popular.includes(filter)
-        ? prev.popular.filter((f) => f !== filter)
-        : [...prev.popular, filter],
+      amenities: prev.amenities.includes(amenity)
+        ? prev.amenities.filter((a) => a !== amenity)
+        : [...prev.amenities, amenity],
     }));
   };
 
-  // Handle price selection
-  const selectPrice = (price: "Affordable" | "Luxury" | "Any") => {
-    setTempFilters((prev) => ({ ...prev, price }));
+  const selectAudience = (audience: "Affordable" | "Luxury" | "Any") => {
+    setTempFilters((prev) => ({ ...prev, audience }));
   };
 
-  // Handle square feet change
   const handleSquareFeetChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setTempFilters((prev) => ({ ...prev, squareFeet: e.target.value }));
   };
 
-  // Apply filters
   const applyFilters = () => {
     onApplyFilters({
-      price: tempFilters.price,
-      popular: tempFilters.popular,
+      audience: tempFilters.audience,
+      amenities: tempFilters.amenities.length
+        ? tempFilters.amenities
+        : undefined,
       squareFeet: tempFilters.squareFeet || undefined,
     });
   };
 
-  // Clear all filters
   const clearAllFilters = () => {
     setTempFilters({
-      price: "Any",
-      popular: [],
+      audience: "Any",
+      amenities: [],
       squareFeet: "",
     });
     onClearFilters();
@@ -94,7 +114,6 @@ const Filters: React.FC<FiltersModalProps> = ({
           alt="Filter"
           className="w-[45px] 2xl:w-[50px] 3xl:w-[60px]"
         />
-        {/* Show indicator if any modal filters are applied */}
         {(appliedFilters.audience ||
           appliedFilters.amenities?.length ||
           appliedFilters.squareFeet) && (
@@ -110,51 +129,51 @@ const Filters: React.FC<FiltersModalProps> = ({
           </DialogDescription>
         </DialogHeader>
 
-        {/* Popular Filters */}
-        <div className="mt-4 border-y border-[#28303F1A] py-5">
-          <h3 className="font-medium text-gray-700">Amenities</h3>
-          <div className="flex flex-col gap-2 mt-2">
-            {[
-              "Air Conditioning",
-              "Carpet",
-              "Business Center",
-              "Balcony",
-              "Assigned Parking",
-            ].map((filter) => (
-              <div
-                key={filter}
-                className={`w-full border px-4 res_text py-3 rounded-full text-left flex items-center gap-2 cursor-pointer ${
-                  tempFilters.popular.includes(filter)
-                    ? "bg-gray-200"
-                    : "bg-white"
-                }`}
-                onClick={() => togglePopularFilter(filter)}
-              >
-                <Checkbox
-                  checked={tempFilters.popular.includes(filter)}
-                  className="data-[state=checked]:bg-[#28303F] border border-[#28303F]"
-                />
-                <span>{filter}</span>
-              </div>
-            ))}
+        {/* Amenities by Category */}
+        {Object.entries(amenityCategories).map(([category, amenities]) => (
+          <div key={category} className="mt-4 border-y border-[#28303F1A] py-5">
+            <h3 className="font-medium text-gray-700 capitalize">
+              {category.replace(/([A-Z])/g, " $1")}
+            </h3>
+            <div className="flex flex-col gap-2 mt-2">
+              {amenities.map((amenity) => (
+                <div
+                  key={amenity}
+                  className={`w-full border px-4 res_text py-3 rounded-full text-left flex items-center gap-2 cursor-pointer ${
+                    tempFilters.amenities.includes(amenity)
+                      ? "bg-gray-200"
+                      : "bg-white"
+                  }`}
+                  onClick={() => toggleAmenity(amenity)}
+                >
+                  <Checkbox
+                    checked={tempFilters.amenities.includes(amenity)}
+                    className="data-[state=checked]:bg-[#28303F] border border-[#28303F]"
+                  />
+                  <span>{amenity}</span>
+                </div>
+              ))}
+            </div>
           </div>
-        </div>
+        ))}
 
         {/* Price Category */}
         <div className="border-b pb-5 pt-1 border-[#28303F1A]">
           <h3 className="font-medium text-gray-700 pb-2">Price Category</h3>
           <div className="flex justify-between mt-2">
-            {["Affordable", "Luxury", "Any"].map((price) => (
+            {["Affordable", "Luxury", "Any"].map((audience) => (
               <button
-                key={price}
+                key={audience}
                 className={`px-8 py-3 flex-grow text-black res_text rounded-full ${
-                  tempFilters.price === price ? "bg-gray-100 font-semibold" : ""
+                  tempFilters.audience === audience
+                    ? "bg-gray-100 font-semibold"
+                    : ""
                 }`}
                 onClick={() =>
-                  selectPrice(price as "Affordable" | "Luxury" | "Any")
+                  selectAudience(audience as "Affordable" | "Luxury" | "Any")
                 }
               >
-                {price}
+                {audience}
               </button>
             ))}
           </div>

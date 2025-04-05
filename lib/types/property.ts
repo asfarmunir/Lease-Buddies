@@ -1,3 +1,15 @@
+interface AmenityItem {
+  name: string;
+  included: boolean;
+}
+
+interface Amenities {
+  interior: AmenityItem[];
+  outdoor: AmenityItem[];
+  utilities: AmenityItem[];
+  otherFeatures: AmenityItem[];
+}
+
 export interface Property {
   _id: string;
   title: string;
@@ -19,7 +31,7 @@ export interface Property {
   bathrooms: number;
   balcony: number;
   squareFeet?: string;
-  amenities: string[];
+  amenities: Amenities;
   petsAllowed: string[];
   photos: string[];
   featuredImage?: string;

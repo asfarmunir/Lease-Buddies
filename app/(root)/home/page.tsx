@@ -18,6 +18,7 @@ import { Slider } from "@/components/ui/slider";
 import FIlters from "@/components/shared/modals/FIlters";
 import { useSearchParams, useRouter, usePathname } from "next/navigation";
 import { FilterOptions, Property } from "@/lib/types/property";
+import Link from "next/link";
 
 const mapMarkers = [
   { id: 1, price: "$1200", x: "left-10", y: "top-10" },
@@ -489,20 +490,19 @@ export default function ApartmentListings() {
         </div>
         <FIlters
           onApplyFilters={(filters) => {
-            // Create new URLSearchParams with current filters
             const params = new URLSearchParams(searchParams.toString());
 
             // Update audience filter
-            if (filters.price && filters.price !== "Any") {
-              params.set("audience", filters.price);
+            if (filters.audience && filters.audience !== "Any") {
+              params.set("audience", filters.audience);
             } else {
               params.delete("audience");
             }
 
             // Update amenities filters
             params.delete("amenities");
-            if (filters.popular && filters.popular.length > 0) {
-              filters.popular.forEach((amenity) =>
+            if (filters.amenities && filters.amenities.length > 0) {
+              filters.amenities.forEach((amenity) =>
                 params.append("amenities", amenity)
               );
             }
@@ -514,7 +514,6 @@ export default function ApartmentListings() {
               params.delete("squareFeet");
             }
 
-            // Push the new URL
             router.push(`${pathname}?${params.toString()}`);
           }}
           onClearFilters={() => {
@@ -665,17 +664,19 @@ function PropertyCard({ property }: { property: Property }) {
             {property.squareFeet || "N/A"} SqFt
           </p>
         </div>
-        <div className="mt-3 flex gap-3 border-t border-[#28303F1A] pt-3">
-          <button className="px-1 py-2 flex items-center res_text gap-1.5 rounded-lg">
-            <Image
-              src="/images/calendar.svg"
-              alt="Phone"
-              width={20}
-              height={20}
-              className="-mt-0.5"
-            />
-            Tour
-          </button>
+        <div className="mt-3 flex items-center gap-3 border-t border-[#28303F1A] pt-3">
+          <Link href={`/property/${property._id}`} className="">
+            <button className="px-1 py-2 flex items-center res_text gap-1.5 rounded-lg">
+              <Image
+                src="/images/calendar.svg"
+                alt="Phone"
+                width={20}
+                height={20}
+                className="-mt-0.5"
+              />
+              Tour
+            </button>
+          </Link>
           <button className="bg-[#3A99D3] flex-grow res_text text-white px-4 xl:px-6 py-[14px] rounded-full font-semibold">
             Check Availability
           </button>

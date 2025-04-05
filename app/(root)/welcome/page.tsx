@@ -1,4 +1,5 @@
 import Image from "next/image";
+import Link from "next/link";
 import React from "react";
 
 const types = [
@@ -8,7 +9,7 @@ const types = [
     description:
       "Condos, apartments, townhomes, scattered site portfolio, etc.",
     image: "/images/individual.svg",
-    url: "/",
+    url: "/property/list",
   },
   {
     subTitle: "10 - 50+ UNITS",
@@ -16,7 +17,7 @@ const types = [
     description:
       "Condos, apartments, townhomes, scattered site portfolio, etc.",
     image: "/images/broker.svg",
-    url: "/",
+    url: "/property/list",
   },
   {
     subTitle: "Looking for a home?",
@@ -24,7 +25,7 @@ const types = [
     description:
       "Let landlords reach out to you with the best deals following your criteria.",
     image: "/images/renter.svg",
-    url: "/",
+    url: "/property/find-home",
   },
 ];
 
@@ -46,8 +47,10 @@ const Page = () => {
             key={index}
             className=" border p-4 2xl:p-6 3xl:p-8 border-primary-100 rounded-2xl bg-[#FEFEFE]"
           >
-            <Image src={type.image} width={500} height={500} alt="hehe" />
-            <div className=" flex flex-col items-center mt-4 w-full">
+            <div className=" flex items-center justify-center w-full h-[200px] 2xl:h-[250px] 3xl:h-[300px] bg-[#F5F5F5]/10 rounded-2xl">
+              <Image src={type.image} width={500} height={500} alt="hehe" />
+            </div>
+            <div className=" flex flex-col items-center mt-8 2xl:mt-5 w-full">
               <p className="res_text font-semibold mb-2">{type.subTitle}</p>
               <h3 className=" font-bold text-lg 2xl:text-xl mb-1">
                 {type.title}
@@ -55,9 +58,11 @@ const Page = () => {
               <p className="res_text text-center text-[#28303FCC]">
                 {type.description}
               </p>
-              <button className=" bg-primary py-3 rounded-full w-full text-white mt-5 res_text font-semibold">
-                Get Started
-              </button>
+              <Link href={type.url} className=" w-full">
+                <button className=" bg-primary py-3 rounded-full w-full text-white mt-5 res_text font-semibold">
+                  Get Started
+                </button>
+              </Link>
             </div>
           </div>
         ))}

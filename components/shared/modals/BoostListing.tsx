@@ -1,4 +1,4 @@
-import { properties } from "@/app/(root)/profile/page";
+// import { properties } from "@/app/(root)/profile/page";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -46,7 +46,7 @@ const BoostListing = () => {
             </div>
           </div>
           <div className="grid grid-cols-1 mt-6 md:grid-cols-3 gap-2 xl:gap-4 2xl:gap-6">
-            {properties.map((property) => (
+            {/* {properties.map((property) => (
               <div
                 key={property.id}
                 className="bg-white rounded-[16px]  overflow-hidden"
@@ -97,7 +97,7 @@ const BoostListing = () => {
                   </div>
                 </div>
               </div>
-            ))}
+            ))} */}
           </div>
           <div className="flex justify-between  mt-4">
             <Button className="bg-[#D4D4D41A] px-8 hover:text-white py-3.5 text-primary-200 rounded-full border border-primary-100 font-semibold">

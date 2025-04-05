@@ -32,16 +32,24 @@ const PropertySchema = new Schema(
     balcony: { type: Number, required: true, min: 0 },
     squareFeet: { type: String },
     
-    amenities: [{ 
-      type: String,
-      enum: [
-        "Air Conditioning",
-        "Carpet",
-        "Business Center",
-        "Balcony",
-        "Assigned Parking",
-      ] 
-    }],
+    amenities: {
+      interior: [{
+        name: { type: String, required: true },
+        included: { type: Boolean, default: true }
+      }],
+      outdoor: [{
+        name: { type: String, required: true },
+        included: { type: Boolean, default: true }
+      }],
+      utilities: [{
+        name: { type: String, required: true },
+        included: { type: Boolean, default: true }
+      }],
+      otherFeatures: [{
+        name: { type: String, required: true },
+        included: { type: Boolean, default: true }
+      }]
+    },
     
     petsAllowed: [{ 
       type: String,
