@@ -10,7 +10,10 @@ import { DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import toast from "react-hot-toast";
 import { useSession } from "next-auth/react";
 import { RiLoader3Line } from "react-icons/ri";
-
+import GooglePlacesAutocomplete from "react-google-autocomplete";
+import LocationInput from "@/components/shared/AutoCompleteField";
+import { GoogleMap, LoadScript, Marker } from "@react-google-maps/api";
+import { useLoadScript } from "@react-google-maps/api";
 const steps = [
   "type",
   "audience",
@@ -116,10 +119,15 @@ const amenitiesCategories = {
 };
 
 export default function PropertyListingForm() {
+  const { isLoaded, loadError } = useLoadScript({
+    googleMapsApiKey: process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || "",
+    libraries: ["places"],
+  });
+
   const { data: session } = useSession();
   const [step, setStep] = useState(0);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [termsAccepted, setTermsAccepted] = useState(false);
+  const [termsAccepted, setTermsAccepted] = useState(true);
   const [formData, setFormData] = useState({
     location: "",
     address: {
@@ -130,6 +138,9 @@ export default function PropertyListingForm() {
       state: "",
       zip: "",
       country: "US",
+      lat: 0, // Add latitude
+      lng: 0, // Add longitude
+      formattedAddress: "", // Add formatted address
     },
     bedrooms: 1,
     beds: 1,
@@ -164,7 +175,11 @@ export default function PropertyListingForm() {
       case "audience":
         return !!formData.audience; // Must select an audience
       case "Location":
-        return !!formData.location.trim(); // Location must not be empty
+        return (
+          !!formData.location.trim() &&
+          formData.address.lat !== 0 &&
+          formData.address.lng !== 0
+        );
       case "Address":
         return (
           !!formData.address.address1.trim() &&
@@ -388,6 +403,8 @@ export default function PropertyListingForm() {
         throw new Error("Please upload at least 5 photos");
       }
 
+      console.log("Form data before submission:", formData);
+
       const response = await fetch("/api/properties", {
         method: "POST",
         headers: {
@@ -415,6 +432,7 @@ export default function PropertyListingForm() {
   };
 
   return (
+    // <GoogleMapsWrapper>
     <div className=" w-full wrapper mb-8">
       {!termsAccepted ? (
         <div className="flex my-12 xl:my-20 items-center gap-4 xl:gap-6 2xl:gap-12 justify-center w-full">
@@ -522,16 +540,109 @@ export default function PropertyListingForm() {
             {step === 2 && (
               <div className="flex flex-col items-center gap-3">
                 <h2 className="text-xl 2xl:text-2xl font-semibold text-primary-50 3xl:text-3xl">
-                  Where’s your place located?
+                  Where's your place located?
                 </h2>
                 <p className="res_text text-[#28303FCC] text-center">
-                  Please enter your property location from here.
+                  Start typing your address and select from Google suggestions
                 </p>
-                <Input
-                  placeholder="Enter your location"
-                  value={formData.location}
-                  onChange={(e) => handleChange("location", e.target.value)}
-                />
+
+                <div className="w-full">
+                  {loadError ? (
+                    <div className="text-red-500">
+                      Error loading maps. Please refresh the page.
+                    </div>
+                  ) : !isLoaded ? (
+                    <div className="flex justify-center items-center h-20">
+                      <RiLoader3Line className="animate-spin text-2xl" />
+                    </div>
+                  ) : (
+                    <>
+                      <LocationInput
+                        onPlaceSelected={(place) => {
+                          if (place) {
+                            const city = place.address_components?.find(
+                              (component) =>
+                                component.types.includes("locality")
+                            )?.long_name;
+
+                            const state = place.address_components?.find(
+                              (component) =>
+                                component.types.includes(
+                                  "administrative_area_level_1"
+                                )
+                            )?.short_name;
+
+                            const zip = place.address_components?.find(
+                              (component) =>
+                                component.types.includes("postal_code")
+                            )?.long_name;
+
+                            const country = place.address_components?.find(
+                              (component) => component.types.includes("country")
+                            )?.short_name;
+
+                            const streetNumber = place.address_components?.find(
+                              (component) =>
+                                component.types.includes("street_number")
+                            )?.long_name;
+
+                            const route = place.address_components?.find(
+                              (component) => component.types.includes("route")
+                            )?.long_name;
+
+                            const address1 =
+                              streetNumber && route
+                                ? `${streetNumber} ${route}`
+                                : place.formatted_address || "";
+
+                            const address = {
+                              address1,
+                              address2: "",
+                              address3: "",
+                              city: city || "",
+                              state: state || "",
+                              zip: zip || "",
+                              country: country || "US",
+                              lat: place.geometry?.location?.lat() || 0,
+                              lng: place.geometry?.location?.lng() || 0,
+                              formattedAddress: place.formatted_address || "",
+                            };
+
+                            handleChange(
+                              "location",
+                              place.formatted_address || ""
+                            );
+                            handleChange("address", address);
+                          }
+                        }}
+                      />
+
+                      {/* Show selected location on a small map preview */}
+                      {formData.address.lat && formData.address.lng ? (
+                        <div className="mt-4 h-60 xl:h-80 rounded-lg overflow-hidden">
+                          <GoogleMap
+                            zoom={15}
+                            center={{
+                              lat: formData.address.lat,
+                              lng: formData.address.lng,
+                            }}
+                            mapContainerStyle={{
+                              width: "100%",
+                              height: "100%",
+                            }}
+                          >
+                            <Marker
+                              position={{
+                                lat: formData.address.lat,
+                                lng: formData.address.lng,
+                              }}
+                            />
+                          </GoogleMap>
+                        </div>
+                      ) : null}
+                    </>
+                  )}
+                </div>
               </div>
             )}
             {step === 3 && (
@@ -1146,7 +1257,7 @@ export default function PropertyListingForm() {
                       min={0}
                       max={1000000}
                       value={formData.price === 0 ? "" : formData.price}
-                      className="bg-transparent w-24 focus:outline-none text-lg font-semibold"
+                      className="bg-transparent w-24 xl:w-40 focus:outline-none text-lg font-semibold"
                       onChange={(e) => handleChange("price", e.target.value)}
                     />
                   </div>
@@ -1256,5 +1367,6 @@ export default function PropertyListingForm() {
         </>
       )}
     </div>
+    // </GoogleMapsWrapper>
   );
 }

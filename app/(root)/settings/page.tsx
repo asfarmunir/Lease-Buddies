@@ -268,7 +268,15 @@ const UserSettings: React.FC = () => {
 
                 {/* Profile Picture */}
                 <div className="flex items-center gap-4">
-                  <div className="w-20 h-20 bg-[#D9D9D9] rounded-full"></div>
+                  <div className="w-20 h-20 bg-[#D9D9D9] rounded-full">
+                    <Image
+                      src={session?.user?.image || "/user.svg"}
+                      alt="Profile"
+                      width={80}
+                      height={80}
+                      className="object-cover w-full h-full rounded-full"
+                    />
+                  </div>
                   <div>
                     <button
                       type="button"

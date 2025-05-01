@@ -40,7 +40,7 @@ const PropertyDetails: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="wrapper mx-auto p-4 md:p-8 flex justify-center">
+      <div className="wrapper mx-auto h-80 items-center p-4 md:p-8 flex justify-center">
         <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
       </div>
     );
@@ -58,7 +58,7 @@ const PropertyDetails: React.FC = () => {
     <div className=" wrapper mx-auto p-4 md:p-8">
       {/* Image Gallery */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-        <div className=" bg-red-50">
+        <div className=" bg-slate-50">
           <Image
             src={selectedImage}
             alt="Property"
@@ -72,7 +72,7 @@ const PropertyDetails: React.FC = () => {
             <Image
               key={index}
               src={img}
-              alt={`Thumbnail ${index}`}
+              alt={`Image-${index}`}
               width={150}
               height={100}
               className={`rounded-lg h-[200px] 2xl:h-[280px] cursor-pointer w-full   object-cover `}

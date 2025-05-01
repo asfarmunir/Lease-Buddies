@@ -25,7 +25,15 @@ export interface Property {
     state: string;
     zip: string;
     country: string;
+    lat: number;
+    lng: number;
+    formattedAddress: string;
+    placeId?: string; // Optional: store Google Places ID for reference
   };
+  locationGeo: {
+    type: "Point"; // Fixed to 'Point' for GeoJSON
+    coordinates: [number, number]; // [lng, lat] format for GeoJSON
+  },
   bedrooms: number;
   beds: number;
   bathrooms: number;

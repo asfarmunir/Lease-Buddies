@@ -1,4 +1,32 @@
 import { Schema, model, models } from "mongoose";
+
+export interface User {
+  _id: string;
+  email: string;
+  firstname?: string;
+  lastname?: string;
+  password?: string;
+  zip?: string;
+  profileImage?: string;
+  authProviders?: string[];
+  resetToken?: string;
+  resetTokenExpiry?: Date;
+  instagramHandle?: string;
+  twitterHandle?: string;
+  personalWebsite?: string;
+  leaseBio?: string;
+  address?: string;
+  city?: string;
+  state?: string;
+  country?: string;
+  phone?: string;
+  suitNumber?: string;
+  isVerified?: boolean;
+    favorites?: Schema.Types.ObjectId[]; // Array of property IDs
+
+
+}
+
 const UserSchema = new Schema(
   {
     email: { type: String, required: true, unique: true },
@@ -21,7 +49,10 @@ const UserSchema = new Schema(
     phone: { type: String, required: false },
     suitNumber: { type: String, required: false },
     isVerified: { type: Boolean, required: false },
-    
+     favorites: [{ 
+      type: Schema.Types.ObjectId, 
+      ref: "Property" 
+    }],
 
   },
   { timestamps: true }

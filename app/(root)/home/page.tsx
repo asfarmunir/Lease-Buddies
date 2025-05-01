@@ -1,15 +1,12 @@
 "use client";
 import { useState, useEffect } from "react";
 import Image from "next/image";
-import { FaBath, FaBed, FaRulerCombined, FaStar } from "react-icons/fa";
+import { FaHeart, FaStar } from "react-icons/fa";
 import { IoMdHeartEmpty } from "react-icons/io";
 import { HiOutlineShieldCheck } from "react-icons/hi2";
 import {
   DropdownMenu,
   DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { GoChevronDown } from "react-icons/go";
@@ -19,15 +16,9 @@ import FIlters from "@/components/shared/modals/FIlters";
 import { useSearchParams, useRouter, usePathname } from "next/navigation";
 import { FilterOptions, Property } from "@/lib/types/property";
 import Link from "next/link";
-
-const mapMarkers = [
-  { id: 1, price: "$1200", x: "left-10", y: "top-10" },
-  { id: 2, price: "$1000", x: "left-24", y: "top-32" },
-  { id: 3, price: "$370", x: "left-40", y: "top-48" },
-  { id: 4, price: "$2000", x: "left-60", y: "top-20" },
-  { id: 5, price: "$1800", x: "left-80", y: "top-40" },
-];
-
+import PropertiesMap from "@/components/shared/PropertiesMap";
+import { useSession } from "next-auth/react";
+import toast from "react-hot-toast";
 export default function ApartmentListings() {
   const [properties, setProperties] = useState<Property[]>([]);
   const [loading, setLoading] = useState(true);
@@ -538,7 +529,8 @@ export default function ApartmentListings() {
           Apartments For Rent In New York, USA
         </h2>
         <p className="text-primary-50 mt-2 text-xs 2xl:text-sm">
-          {properties.length} {properties.length === 1 ? "Home" : "Homes"}
+          {properties.length}{" "}
+          {properties.length === 1 ? "Property" : "Properties"}
         </p>
 
         {/* Listings and Map */}
@@ -551,7 +543,7 @@ export default function ApartmentListings() {
           </div>
 
           {/* Map Section */}
-          <div
+          {/* <div
             className="relative w-full bg-gray-200 h-[700px] rounded-lg overflow-hidden"
             style={{
               backgroundImage: "url('/images/map.png')",
@@ -573,7 +565,19 @@ export default function ApartmentListings() {
             <button className="absolute bottom-2 left-2 bg-white px-4 py-2 rounded-lg shadow">
               Refresh Map
             </button>
-          </div>
+          </div> */}
+          <PropertiesMap
+            properties={properties}
+            // userLocation={userLocation} // Optional: pass user location if you have it
+            onLocationChange={(location) => {
+              // Handle location changes if needed
+            }}
+            onBoundsChange={async (bounds) => {
+              // Optional: implement bounds-based filtering
+              // This will be called when the map is moved/zoomed
+              // You can use the bounds to fetch properties in the visible area
+            }}
+          />
         </div>
       </div>
     </div>
@@ -582,8 +586,67 @@ export default function ApartmentListings() {
 
 // Property Card Component
 function PropertyCard({ property }: { property: Property }) {
+  const [isFavorited, setIsFavorited] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const { data: session } = useSession();
+
+  const router = useRouter();
+
+  useEffect(() => {
+    // Check if property is in user's favorites when component mounts
+    const checkFavoriteStatus = async () => {
+      //@ts-ignore
+      if (session?.user?.id) {
+        try {
+          const response = await fetch("/api/user/favorites");
+          if (response.ok) {
+            const data = await response.json();
+            setIsFavorited(
+              data.favorites.some((fav: any) => fav._id === property._id)
+            );
+          }
+        } catch (error) {
+          console.error("Failed to check favorite status:", error);
+        }
+      }
+    };
+    checkFavoriteStatus();
+  }, [session, property._id]);
+
+  const toggleFavorite = async () => {
+    if (!session) {
+      // Redirect to login if not authenticated
+      router.push("/login");
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      const response = await fetch("/api/user/favorites", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ propertyId: property._id }),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        setIsFavorited(data.isFavorited);
+        toast.success(
+          data.isFavorited ? "Added to favorites!" : "Removed from favorites"
+        );
+      }
+    } catch (error) {
+      toast.error("Failed to update favorites");
+      console.error("Error updating favorites:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   return (
-    <div className="bg-white rounded-[16px] overflow-hidden">
+    <div className="bg-white rounded-[16px]   overflow-hidden">
       <div className="relative">
         <Image
           src={
@@ -606,8 +669,21 @@ function PropertyCard({ property }: { property: Property }) {
             </span>
           )}
         </div>
-        <button className="absolute top-2 right-2 text-white bg-black/20 hover:bg-black/50 p-2 rounded-full">
-          <IoMdHeartEmpty size={20} />
+        <button
+          onClick={toggleFavorite}
+          disabled={isLoading}
+          className={`absolute top-2 right-2 p-2 rounded-full ${
+            isFavorited
+              ? "text-red-500 bg-white/90 hover:bg-white"
+              : "text-white bg-black/20 hover:bg-black/50"
+          }`}
+        >
+          {isFavorited ? <FaHeart size={20} /> : <IoMdHeartEmpty size={20} />}
+          {isLoading && (
+            <div className="absolute inset-0 flex items-center justify-center">
+              <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+            </div>
+          )}
         </button>
       </div>
       <div className="p-4 border border-[#28303F1A] rounded-[16px] -mt-4 bg-white relative">
@@ -621,16 +697,16 @@ function PropertyCard({ property }: { property: Property }) {
             4.3
           </p>
         </div>
-        <div className="flex items-end py-4 justify-between">
+        <div className="flex items-start py-4 justify-between">
           <div>
             <h3 className="text-lg font-semibold">{property.title}</h3>
-            <p className="text-xs 3xl:text-sm text-gray-500">
+            <p className="text-xs 3xl:text-sm text-ellipsis  text-gray-500">
               {property.address.city}, {property.address.state}
             </p>
           </div>
-          <p className="bg-[#3A99D31A] text-[#0479B7] px-2 2xl:px-2.5 py-2 border border-[#0077B61A] text-[11px] 3xl:text-xs rounded-full">
+          {/* <p className="bg-[#3A99D31A] text-nowrap text-[#0479B7] px-2 2xl:px-2.5 py-2 border border-[#0077B61A] text-[11px] 3xl:text-xs rounded-full">
             Quick Look
-          </p>
+          </p> */}
         </div>
         <div className="flex items-center p-1 bg-[#F7F7F7] rounded-full gap-1 text-gray-700 text-[12px] 2xl:text-[10px] 3xl:text-sm mt-2">
           <p className="bg-white flex-1 border border-[#28303F1A] rounded-full flex items-center gap-1.5 pl-0.5 py-0.5 pr-3">

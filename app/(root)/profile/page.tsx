@@ -3,61 +3,44 @@
 import Image from "next/image";
 import Link from "next/link";
 import React, { useEffect, useState } from "react";
-import { FaRegHeart, FaStar } from "react-icons/fa";
+import { FaRegHeart, FaStar, FaHeart } from "react-icons/fa";
 import { AiOutlineMessage } from "react-icons/ai";
 import { BsThreeDots } from "react-icons/bs";
 import { BiSolidWalletAlt } from "react-icons/bi";
 import { MdOutlineRemoveRedEye } from "react-icons/md";
 import { FiShare2 } from "react-icons/fi";
-import { IoMdHeartEmpty } from "react-icons/io";
+import { IoIosArrowBack, IoMdHeartEmpty } from "react-icons/io";
 import BoostListing from "@/components/shared/modals/BoostListing";
 import { useSession } from "next-auth/react";
-
-interface Property {
-  id: string;
-  title: string;
-  location: string;
-  beds: number;
-  baths: number;
-  size: string;
-  rating: number;
-  price: string;
-  tags: string[];
-  verified: boolean;
-  featuredImage: string;
-}
-
-interface User {
-  _id: string;
-  firstname: string;
-  lastname: string;
-  profileImage: string;
-  leaseBio: string;
-  instagramHandle?: string;
-  twitterHandle?: string;
-  personalWebsite?: string;
-  createdAt: string;
-  email: string;
-}
+import { ProfileImageUpload } from "@/components/shared/ProfileImageUpload";
+import toast from "react-hot-toast";
+import { Property } from "@/lib/types/property";
+import { User } from "@/lib/database/models/user.model";
 
 const Profile = () => {
   const session = useSession();
-  console.log("🚀 ~ Profile ~ session:", session);
-
+  const [activeTab, setActiveTab] = useState<"listings" | "favorites">(
+    "listings"
+  );
   const [user, setUser] = useState<User | null>(null);
   const [properties, setProperties] = useState<Property[]>([]);
+  console.log("🚀 ~ Profile ~ properties:", properties);
+  const [favorites, setFavorites] = useState<Property[]>([]);
   const [loading, setLoading] = useState({
     user: true,
     properties: true,
+    favorites: true,
   });
   const [error, setError] = useState({
     user: null,
     properties: null,
+    favorites: null,
   });
 
   useEffect(() => {
     const fetchUserData = async () => {
       try {
+        //@ts-ignore
         const response = await fetch(`/api/user/${session.data?.user.id}`);
         if (!response.ok) {
           throw new Error("Failed to fetch user data");
@@ -74,6 +57,7 @@ const Profile = () => {
     const fetchPropertiesData = async () => {
       try {
         const response = await fetch(
+          //@ts-ignore
           `/api/user/${session.data?.user.id}/properties`
         );
         if (!response.ok) {
@@ -88,18 +72,96 @@ const Profile = () => {
       }
     };
 
+    const fetchFavoritesData = async () => {
+      try {
+        const response = await fetch("/api/user/favorites");
+        if (!response.ok) {
+          throw new Error("Failed to fetch favorites data");
+        }
+        const data = await response.json();
+        setFavorites(data.favorites);
+      } catch (err: any) {
+        setError((prev) => ({ ...prev, favorites: err.message }));
+      } finally {
+        setLoading((prev) => ({ ...prev, favorites: false }));
+      }
+    };
+
     if (session.status === "authenticated") {
       fetchUserData();
       fetchPropertiesData();
+      fetchFavoritesData();
     }
   }, [session.status]);
 
-  if (loading.user || loading.properties) {
+  const handleImageUpload = async (imageUrl: string) => {
+    try {
+      const response = await fetch("/api/user/update-profile-image", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          //@ts-ignore
+          userId: session.data?.user.id,
+          imageUrl,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to update profile image");
+      }
+
+      const data = await response.json();
+      setUser((prev) =>
+        prev ? { ...prev, profileImage: data.profileImage } : null
+      );
+    } catch (error) {
+      console.error("Error updating profile image:", error);
+      throw error;
+    }
+  };
+
+  const toggleFavorite = async (propertyId: string) => {
+    try {
+      const response = await fetch("/api/user/favorites", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ propertyId }),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        // Update favorites list
+        const updatedFavorites = data.isFavorited
+          ? [...favorites, properties.find((p) => p._id === propertyId)!]
+          : favorites.filter((p) => p._id !== propertyId);
+        setFavorites(updatedFavorites);
+
+        toast.success(
+          data.isFavorited ? "Added to favorites!" : "Removed from favorites"
+        );
+      }
+    } catch (error) {
+      toast.error("Failed to update favorites");
+      console.error("Error updating favorites:", error);
+    }
+  };
+
+  if (loading.user || loading.properties || loading.favorites) {
     return (
       <div className="w-full bg-[#EFEFEF] p-5">
         <div className="bg-white rounded-[20px] p-4 md:p-5 wrapper 2xl:p-6 w-full">
           <div className="flex justify-center items-center h-80 flex-col animate-pulse">
-            <Image src="/logo.png" alt="profile" width={70} height={70} />
+            <Image
+              src="/logo.png"
+              alt="profile"
+              priority
+              width={70}
+              height={70}
+            />
             <p className="res_text mt-3 font-semibold">Getting Things Ready</p>
           </div>
         </div>
@@ -107,25 +169,30 @@ const Profile = () => {
     );
   }
 
-  if (error.user || error.properties) {
+  if (error.user || error.properties || error.favorites) {
     return (
       <div className="w-full bg-[#EFEFEF] p-5">
         <div className="bg-white rounded-[20px] p-4 md:p-5 wrapper 2xl:p-6 w-full">
           <div className="flex justify-center items-center h-64 text-red-500">
-            <p>{error.user || error.properties}</p>
+            <p>{error.user || error.properties || error.favorites}</p>
           </div>
         </div>
       </div>
     );
   }
 
+  //@ts-ignore
   const memberSince = user ? new Date(user.createdAt).getFullYear() : 2024;
   const fullName = user
     ? `${user.firstname} ${user.lastname}`
     : "George Chichua";
   const bio =
     user?.leaseBio ||
-    "Im a wanderer at heart, always seeking new horizons and embracing the world's wonders";
+    "I'm a wanderer at heart, always seeking new horizons and embracing the world's wonders";
+
+  const currentProperties = activeTab === "listings" ? properties : favorites;
+  const noItemsMessage =
+    activeTab === "listings" ? "No properties listed yet" : "No favorites yet";
 
   return (
     <div className="w-full bg-[#EFEFEF] p-5">
@@ -141,18 +208,11 @@ const Profile = () => {
         </div>
         <div className="w-full flex flex-col gap-5 md:flex-row items-center md:items-start mt-5 justify-between">
           <div className="flex flex-col md:flex-row items-center gap-4">
-            <div className="-mt-12 md:-mt-20">
-              <Image
-                src={user?.profileImage || "/user.svg"}
-                alt="profile"
-                width={140}
-                height={140}
-                className="object-cover rounded-full border-2 border-white"
-              />
-            </div>
+            <ProfileImageUpload user={user} onImageUpload={handleImageUpload} />
+
             <div className="flex flex-col gap-3">
               <h1 className="text-[20px] flex flex-col md:flex-row gap-2 items-center font-semibold">
-                <p>{fullName}</p>
+                <p className="capitalize">{fullName}</p>
                 <p className="bg-[#F7F7F7] border text-[9px] 2xl:text-[11px] mb-1 ml-3 text-primary-200 font-thin border-[#28303F1A] px-3 py-1.5 rounded-full">
                   LeaseBuddi member since {memberSince}
                 </p>
@@ -161,30 +221,16 @@ const Profile = () => {
                 {bio}
               </p>
               <div className="flex mt-2 justify-center md:justify-start items-center gap-2.5">
-                <button>
-                  <Image
-                    src="/images/fb.svg"
-                    alt="location"
-                    width={35}
-                    height={35}
-                  />
-                </button>
-                <button>
-                  <Image
-                    src="/images/insta.svg"
-                    alt="location"
-                    width={35}
-                    height={35}
-                  />
-                </button>
-                <button>
-                  <Image
-                    src="/images/yt.svg"
-                    alt="location"
-                    width={35}
-                    height={35}
-                  />
-                </button>
+                {user?.instagramHandle && (
+                  <Link href={user.instagramHandle}>
+                    <Image
+                      src="/images/insta.svg"
+                      alt="location"
+                      width={35}
+                      height={35}
+                    />
+                  </Link>
+                )}
               </div>
             </div>
           </div>
@@ -203,19 +249,24 @@ const Profile = () => {
                 </p>
               </div>
             </Link>
-            <Link href={"#"}>
-              <p className="bg-[#F7F7F7] border res_text text-primary-200 font-medium border-[#28303F1A] px-3 2xl:px-4 py-2 xl:py-3.5 2xl:py-4 flex items-center gap-2 rounded-full">
-                <FaRegHeart className="text-lg" />
-                Favorites
-              </p>
-            </Link>
-            <Link href={"#"}>
-              <p className="bg-[#F7F7F7] border res_text text-primary-200 font-medium border-[#28303F1A] px-3 2xl:px-4 py-2 xl:py-3.5 2xl:py-4 flex items-center gap-2 rounded-full">
-                <AiOutlineMessage className="text-xl" />
-                Inbox
-              </p>
-            </Link>
-            <Link href={"#"}>
+            <button
+              onClick={() => setActiveTab("favorites")}
+              className={`bg-[#F7F7F7] border res_text font-medium border-[#28303F1A] px-3 2xl:px-4 py-2 xl:py-3.5 2xl:py-4 flex items-center gap-2 rounded-full ${
+                activeTab === "favorites" ? "bg-blue-100 border-blue-300" : ""
+              }`}
+            >
+              <FaRegHeart className="text-lg" />
+              Favorites
+            </button>
+            <button
+              className={`bg-[#F7F7F7] border res_text font-medium border-[#28303F1A] px-3 2xl:px-4 py-2 xl:py-3.5 2xl:py-4 flex items-center gap-2 rounded-full ${
+                false ? "bg-blue-100 border-blue-300" : ""
+              }`}
+            >
+              <AiOutlineMessage className="text-xl" />
+              Inbox
+            </button>
+            <Link href={"/settings"}>
               <p className="bg-[#F7F7F7] border res_text text-primary-200 font-medium border-[#28303F1A] px-3 2xl:px-4 py-2 xl:py-3.5 2xl:py-4 flex items-center gap-2 rounded-full">
                 <BsThreeDots className="text-xl" />
                 Edit Profile
@@ -225,21 +276,38 @@ const Profile = () => {
         </div>
         <div className="w-full p-4 xl:p-6 2xl:px-8 mt-12 border border-[#28303F1A] rounded-2xl">
           <div className="w-full flex items-center justify-between gap-3 flex-col md:flex-row">
-            <div>
-              <h2 className="text-lg 2xl:text-2xl font-semibold">
-                Your listings
-              </h2>
-              <p className="text-primary-200 font-normal text-sm 2xl:text-base mt-2">
-                You can see your boost listing from here.
-              </p>
+            <div className="flex items-start  gap-3">
+              {activeTab === "favorites" && (
+                <button
+                  onClick={() => setActiveTab("listings")}
+                  className="text-primary-200 hover:text-primary-100 transition-all duration-300 bg-slate-50 text-2xl rounded-full border p-1"
+                >
+                  <IoIosArrowBack />
+                </button>
+              )}
+              <div>
+                <div className="flex items-center gap-2">
+                  <h2 className="text-lg 2xl:text-2xl font-semibold">
+                    {activeTab === "listings"
+                      ? "Your listings"
+                      : "Your favorites"}
+                  </h2>
+                </div>
+                <p className="text-primary-200 font-normal text-sm 2xl:text-base mt-2">
+                  {activeTab === "listings"
+                    ? "You can see your boost listing from here."
+                    : "All properties you have favorited"}
+                </p>
+              </div>
             </div>
-            <BoostListing />
+
+            {activeTab === "listings" && <BoostListing />}
           </div>
           <div className="grid grid-cols-1 mt-6 md:grid-cols-2 2xl:grid-cols-3 gap-2 xl:gap-4 2xl:gap-6">
-            {properties.length > 0 ? (
-              properties.map((property) => (
+            {currentProperties.length > 0 ? (
+              currentProperties.map((property, index) => (
                 <div
-                  key={property.id}
+                  key={index}
                   className="bg-white rounded-[16px] overflow-hidden"
                 >
                   <div className="relative">
@@ -251,21 +319,34 @@ const Profile = () => {
                       className="w-full h-48 2xl:h-[330px] object-cover"
                     />
                     <div className="absolute top-2.5 left-2.5 flex gap-2">
-                      {property.tags.map((tag, index) => (
+                      {/* {property.tags?.map((tag, index) => (
                         <span
                           key={index}
                           className="bg-[#FFFFFFF2] text-primary-50 text-xs px-2 2xl:px-3 py-2 rounded-full"
                         >
                           {tag}
                         </span>
-                      ))}
+                      ))} */}
                     </div>
-                    <button className="absolute top-2 right-2 text-white bg-black/20 hover:bg-black/50 p-2 rounded-full">
-                      <IoMdHeartEmpty size={20} />
-                    </button>
+                    {activeTab === "favorites" && (
+                      <button
+                        onClick={() => toggleFavorite(property._id)}
+                        className={`absolute top-2 right-2 p-2 rounded-full ${
+                          favorites.some((fav) => fav._id === property._id)
+                            ? "text-red-500 bg-white/90 hover:bg-white"
+                            : "text-white bg-black/20 hover:bg-black/50"
+                        }`}
+                      >
+                        {favorites.some((fav) => fav._id === property._id) ? (
+                          <FaHeart size={20} />
+                        ) : (
+                          <IoMdHeartEmpty size={20} />
+                        )}
+                      </button>
+                    )}
                   </div>
                   <div className="p-4 border border-[#28303F1A] rounded-[16px] -mt-4 bg-white relative">
-                    <div className="flex items-center pt-2 justify-between">
+                    <div className="flex items-start pt-2 justify-between">
                       <div>
                         <h3 className="text-lg mb-1 font-semibold">
                           {property.title}
@@ -279,24 +360,75 @@ const Profile = () => {
                         Share
                       </p>
                     </div>
-                    <p className="res_text font-medium inline-flex text-[#28303FCC] items-center gap-2 mt-4">
-                      <MdOutlineRemoveRedEye className="text-lg" />
-                      2,345 Views
-                    </p>
+                    {activeTab === "listings" && (
+                      <p className="res_text font-medium inline-flex text-[#28303FCC] items-center gap-2 mt-4">
+                        <MdOutlineRemoveRedEye className="text-lg" />
+                        2,345 Views
+                      </p>
+                    )}
+                    {activeTab === "favorites" && (
+                      <div className="flex items-center p-1 bg-[#F7F7F7] rounded-full gap-1 text-gray-700 text-[12px]  3xl:text-sm mt-2">
+                        <p className="bg-white flex-1 border border-[#28303F1A] rounded-full justify-center flex items-center gap-1.5 pl-0.5 py-1.5 pr-3">
+                          <Image
+                            src="/images/bed.svg"
+                            alt="Bed"
+                            width={20}
+                            height={20}
+                            className="w-7 h-7 2xl:w-6 2xl:h-6 3xl:w-8 3xl:h-8"
+                          />
+                          {property.beds} Beds
+                        </p>
+                        <p className="bg-white flex-1 border border-[#28303F1A] rounded-full justify-center flex items-center gap-1.5 pl-0.5 py-1.5 pr-3">
+                          <Image
+                            src="/images/bath.svg"
+                            alt="Bath"
+                            width={20}
+                            height={20}
+                            className="w-7 h-7 2xl:w-6 2xl:h-6 3xl:w-8 3xl:h-8"
+                          />
+                          {property.bathrooms} Baths
+                        </p>
+                        <p className="bg-white flex-1 border border-[#28303F1A] rounded-full justify-center flex items-center gap-1.5 pl-0.5 py-1.5 pr-3">
+                          <Image
+                            src="/images/area.svg"
+                            alt="Area"
+                            width={20}
+                            height={20}
+                            className="w-7 h-7 2xl:w-6 2xl:h-6 3xl:w-8 3xl:h-8"
+                          />
+                          {property.squareFeet || "N/A"} SqFt
+                        </p>
+                      </div>
+                    )}
                     <div className="mt-3 flex gap-3">
-                      <button className="bg-[#3A99D3] flex-1 flex-grow res_text text-white px-4 xl:px-6 py-[14px] rounded-full font-semibold">
-                        Boost
-                      </button>
-                      <button className="text-[#3A99D3] flex-1 flex-grow res_text bg-primary/15 px-4 xl:px-6 py-[14px] rounded-full">
-                        View Details
-                      </button>
+                      {activeTab === "listings" && (
+                        <button className="bg-[#3A99D3] flex-1 flex-grow res_text text-white px-4 xl:px-6 py-[14px] rounded-full font-semibold">
+                          Boost
+                        </button>
+                      )}
+                      {activeTab === "favorites" ? (
+                        <Link
+                          href={`/property/${property._id}`}
+                          className="text-[#3A99D3] flex-1 text-center  flex-grow res_text bg-primary/15 px-4 xl:px-6 py-[14px] rounded-full"
+                        >
+                          View Details
+                        </Link>
+                      ) : (
+                        <Link
+                          //@ts-ignore
+                          href={`/property/${property.id}`}
+                          className="text-[#3A99D3] flex-1 text-center  flex-grow res_text bg-primary/15 px-4 xl:px-6 py-[14px] rounded-full"
+                        >
+                          View Details
+                        </Link>
+                      )}
                     </div>
                   </div>
                 </div>
               ))
             ) : (
               <div className="col-span-full text-center py-8">
-                <p className="text-primary-200">No properties listed yet</p>
+                <p className="text-primary-200">{noItemsMessage}</p>
               </div>
             )}
           </div>
