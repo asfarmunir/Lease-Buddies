@@ -169,73 +169,97 @@ const PropertyDetails: React.FC = () => {
                   Interior Details
                 </h3>
 
-                {property.amenities.interior.map((item, index) => (
-                  <p
-                    key={index}
-                    className="res_text flex items-center gap-2.5 text-[#28303FCC]"
-                  >
-                    {item.included && (
-                      <span className="text-green-500 ml-2">
-                        <FaCheck />
-                      </span>
-                    )}
-                    {item.name}
+                {property.amenities.interior.length === 0 ? (
+                  <p className="res_text text-[#28303FCC]">
+                    No indoor amenities available.
                   </p>
-                ))}
+                ) : (
+                  property.amenities.interior.map((item, index) => (
+                    <p
+                      key={index}
+                      className="res_text flex items-center gap-2.5 text-[#28303FCC]"
+                    >
+                      {item.included && (
+                        <span className="text-green-500 ml-2">
+                          <FaCheck />
+                        </span>
+                      )}
+                      {item.name}
+                    </p>
+                  ))
+                )}
               </div>
               <div className=" bg-white space-y-3 border flex-grow border-[#28303F1A] rounded-2xl p-4 xl:p-6">
                 <h3 className="text-sm 2xl:text-base font-semibold">
                   Outdoor Details
                 </h3>
-                {property.amenities.outdoor.map((item, index) => (
-                  <p
-                    key={index}
-                    className="res_text flex items-center gap-2.5 text-[#28303FCC]"
-                  >
-                    {item.included && (
-                      <span className="text-green-500 ml-2">
-                        <FaCheck />
-                      </span>
-                    )}
-                    {item.name}
+                {property.amenities.outdoor.length === 0 ? (
+                  <p className="res_text text-[#28303FCC]">
+                    No outdoor amenities available.
                   </p>
-                ))}
+                ) : (
+                  property.amenities.outdoor.map((item, index) => (
+                    <p
+                      key={index}
+                      className="res_text flex items-center gap-2.5 text-[#28303FCC]"
+                    >
+                      {item.included && (
+                        <span className="text-green-500 ml-2">
+                          <FaCheck />
+                        </span>
+                      )}
+                      {item.name}
+                    </p>
+                  ))
+                )}
               </div>
               <div className=" bg-white space-y-3 border flex-grow border-[#28303F1A] rounded-2xl p-4 xl:p-6">
                 <h3 className="text-sm 2xl:text-base font-semibold">
                   Utilities
                 </h3>
-                {property.amenities.utilities.map((item, index) => (
-                  <p
-                    key={index}
-                    className="res_text flex items-center gap-2.5 text-[#28303FCC]"
-                  >
-                    {item.included && (
-                      <span className="text-green-500 ml-2">
-                        <FaCheck />
-                      </span>
-                    )}
-                    {item.name}
+                {property.amenities.utilities.length === 0 ? (
+                  <p className="res_text text-[#28303FCC]">
+                    No utilities available.
                   </p>
-                ))}
+                ) : (
+                  property.amenities.utilities.map((item, index) => (
+                    <p
+                      key={index}
+                      className="res_text flex items-center gap-2.5 text-[#28303FCC]"
+                    >
+                      {item.included && (
+                        <span className="text-green-500 ml-2">
+                          <FaCheck />
+                        </span>
+                      )}
+                      {item.name}
+                    </p>
+                  ))
+                )}
               </div>
               <div className=" bg-white space-y-3 border flex-grow border-[#28303F1A] rounded-2xl p-4 xl:p-6">
                 <h3 className="text-sm 2xl:text-base font-semibold">
                   Other Features
                 </h3>
-                {property.amenities.otherFeatures.map((item, index) => (
-                  <p
-                    key={index}
-                    className="res_text flex items-center gap-2.5 text-[#28303FCC]"
-                  >
-                    {item.included && (
-                      <span className="text-green-500 ml-2">
-                        <FaCheck />
-                      </span>
-                    )}
-                    {item.name}
+                {property.amenities.otherFeatures.length === 0 ? (
+                  <p className="res_text text-[#28303FCC]">
+                    No other features available.
                   </p>
-                ))}
+                ) : (
+                  property.amenities.otherFeatures.map((item, index) => (
+                    <p
+                      key={index}
+                      className="res_text flex items-center gap-2.5 text-[#28303FCC]"
+                    >
+                      {item.included && (
+                        <span className="text-green-500 ml-2">
+                          <FaCheck />
+                        </span>
+                      )}
+                      {item.name}
+                    </p>
+                  ))
+                )}
               </div>
             </div>
           </div>
@@ -349,9 +373,16 @@ const PropertyDetails: React.FC = () => {
           </div>
           <div className="mt-8">
             <h2 className="text-lg mb-4 font-semibold">Where You Will Be</h2>
-            <div className="w-full h-[400px] bg-gray-200 rounded-lg flex items-center justify-center">
-              <p className="text-gray-500">Map will be embedded here</p>
+            <div className="w-full h-[400px] rounded-lg overflow-hidden">
+              <StaticPropertyMap
+                lat={property.address.lat}
+                lng={property.address.lng}
+                formattedAddress={property.address.formattedAddress}
+              />
             </div>
+            <p className="mt-2 text-gray-600">
+              {property.address.formattedAddress}
+            </p>
           </div>
         </div>
 
@@ -413,3 +444,50 @@ const PropertyDetails: React.FC = () => {
 };
 
 export default PropertyDetails;
+
+interface PropertyMapProps {
+  lat: number;
+  lng: number;
+  formattedAddress: string;
+}
+
+const StaticPropertyMap = ({
+  lat,
+  lng,
+  formattedAddress,
+}: PropertyMapProps) => {
+  const markerIcon = encodeURIComponent(
+    "https://maps.google.com/mapfiles/ms/icons/red-dot.png"
+  );
+  const staticMapUrl = `https://maps.googleapis.com/maps/api/staticmap?
+    center=${lat},${lng}&
+    zoom=14&
+    size=800x400&
+    scale=2&
+    format=png&
+    maptype=roadmap&
+    style=feature:all|element:labels|visibility:on&
+    markers=color:red%7C${lat},${lng}&
+    key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY}`.replace(/\s/g, "");
+
+  return (
+    <div className="w-full h-[400px] relative rounded-lg overflow-hidden">
+      <Image
+        src={staticMapUrl}
+        alt={`Map of ${formattedAddress}`}
+        fill
+        className="object-cover"
+        quality={100}
+        priority
+      />
+      <a
+        href={`https://www.google.com/maps/?q=${lat},${lng}`}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="absolute bottom-2 right-2 bg-white px-3 py-1.5 rounded-lg text-sm font-medium shadow-md hover:bg-gray-100"
+      >
+        View on Google Maps
+      </a>
+    </div>
+  );
+};

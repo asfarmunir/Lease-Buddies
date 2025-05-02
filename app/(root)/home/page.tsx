@@ -654,6 +654,7 @@ function PropertyCard({ property }: { property: Property }) {
           }
           alt={property.title}
           width={400}
+          priority
           height={250}
           className="w-full h-48 2xl:h-56 object-cover"
         />
@@ -704,9 +705,11 @@ function PropertyCard({ property }: { property: Property }) {
               {property.address.city}, {property.address.state}
             </p>
           </div>
-          {/* <p className="bg-[#3A99D31A] text-nowrap text-[#0479B7] px-2 2xl:px-2.5 py-2 border border-[#0077B61A] text-[11px] 3xl:text-xs rounded-full">
-            Quick Look
-          </p> */}
+          <Link href={`/property/${property._id}`}>
+            <p className="bg-[#3A99D31A] text-nowrap text-[#0479B7] px-2 2xl:px-2.5 py-2 border border-[#0077B61A] text-[11px] 3xl:text-xs rounded-full">
+              Quick Look
+            </p>
+          </Link>
         </div>
         <div className="flex items-center p-1 bg-[#F7F7F7] rounded-full gap-1 text-gray-700 text-[12px] 2xl:text-[10px] 3xl:text-sm mt-2">
           <p className="bg-white flex-1 border border-[#28303F1A] rounded-full flex items-center gap-1.5 pl-0.5 py-0.5 pr-3">

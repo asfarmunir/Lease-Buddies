@@ -105,9 +105,12 @@ const Page = () => {
                 locations.
               </p>
             </div>
-            <button className=" hidden sm:block res_text bg-primary rounded-full px-4 xl:px-6 py-4 text-white   ">
+            <Link
+              href={"/home"}
+              className=" hidden sm:block res_text bg-primary rounded-full px-4 xl:px-6 py-4 text-white   "
+            >
               Explore more
-            </button>
+            </Link>
           </div>
           <div className="w-full grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 pt-[40px]    gap-4 ">
             {Array.from({ length: 3 }).map((_, index) => (
@@ -171,9 +174,12 @@ const Page = () => {
             customized solutions to help you reach millions of quality renters
             during every step of the renter journey.
           </p>
-          <button className=" res_text bg-primary rounded-full px-4  xl:px-8 py-4 text-white mt-4 xl:mt-6 2xl:mt-8  ">
+          <Link
+            href={"/home"}
+            className=" res_text bg-primary rounded-full px-4  xl:px-8 py-4 text-white mt-4 xl:mt-6 2xl:mt-8  "
+          >
             List your property
-          </button>
+          </Link>
         </div>
 
         {/* Image Container */}
