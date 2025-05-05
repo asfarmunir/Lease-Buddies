@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import crypto from "crypto";
 import User from "@/lib/database/models/user.model";
-import { sendResetEmail } from "@/lib/sendgrid";
+import { sendPasswordResetEmail } from "@/lib/mailgun";
 
 export async function POST(req: NextRequest) {
   try {
@@ -25,7 +25,7 @@ export async function POST(req: NextRequest) {
 
 
     const resetLink = `${process.env.APP_URL}/forget-password/${user.id}?token=${resetToken}`;
-    await sendResetEmail(email, resetLink);
+    await sendPasswordResetEmail(email, resetLink);
 
     return NextResponse.json(
       { message: "Reset email sent successfully" },

@@ -55,7 +55,6 @@ const filters = [
 const Navbar = () => {
   const session = useSession();
   const router = useRouter();
-  const pathname = usePathname();
 
   const signOutUser = async () => {
     await signOut({
@@ -91,7 +90,7 @@ const Navbar = () => {
 
   return (
     <nav className="w-[95%] mx-auto my-3 flex items-center justify-between bg-[#FAFAFA] rounded-full px-4 py-4">
-      <Link href={"/"}>
+      <Link href={session.status === "authenticated" ? "/home" : "/"}>
         <Image
           src="/logo.svg"
           width={100}

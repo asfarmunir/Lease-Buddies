@@ -5,9 +5,13 @@ import { FaPhone, FaCheck, FaStar } from "react-icons/fa";
 import { IoMdHeartEmpty } from "react-icons/io";
 import { useParams } from "next/navigation";
 import { Property } from "@/lib/types/property";
-
+import CheckAvailability from "@/components/shared/modals/CheckAvailability";
+import BookVisit from "@/components/shared/modals/BookVisit";
+import PropertyImageCarousel from "@/components/shared/PropertyImageCarousel";
 const PropertyDetails: React.FC = () => {
   const { id } = useParams();
+  const [showAvailability, setShowAvailability] = useState(false);
+  const [showBookVisit, setShowBookVisit] = useState(false);
   const [property, setProperty] = useState<Property | null>(null);
   console.log("🚀 ~ property:", property);
   const [loading, setLoading] = useState(true);
@@ -57,7 +61,7 @@ const PropertyDetails: React.FC = () => {
   return (
     <div className=" wrapper mx-auto p-4 md:p-8">
       {/* Image Gallery */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+      {/* <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
         <div className=" bg-slate-50">
           <Image
             src={selectedImage}
@@ -79,8 +83,13 @@ const PropertyDetails: React.FC = () => {
             />
           ))}
         </div>
-      </div>
+      </div> */}
 
+      <PropertyImageCarousel
+        images={property.photos}
+        selectedImage={selectedImage}
+        onSelect={setSelectedImage}
+      />
       {/* Property Details */}
       <div className="flex flex-col md:flex-row mt-6 gap-6">
         {/* Left Section */}
@@ -393,12 +402,29 @@ const PropertyDetails: React.FC = () => {
               {property.currency === "USD" ? "$" : "CA$"}
               {property.price}/month
             </h2>
-            <button className="bg-primary text-white font-semibold w-full py-3 rounded-full mt-4">
+            <button
+              onClick={() => setShowAvailability(true)}
+              className="bg-primary text-white font-semibold w-full py-3 rounded-full mt-4"
+            >
               Check Availability
             </button>
-            <button className="bg-[#3A99D31A] text-primary font-semibold w-full py-3 rounded-full mt-4">
+            <CheckAvailability
+              propertyId={property._id}
+              open={showAvailability}
+              onOpenChange={setShowAvailability}
+            />
+            <button
+              onClick={() => setShowBookVisit(true)}
+              className="bg-[#3A99D31A] text-primary font-semibold w-full py-3 rounded-full mt-4"
+            >
               Request Visit
             </button>
+            <BookVisit
+              propertyId={property._id}
+              open={showBookVisit}
+              onOpenChange={setShowBookVisit}
+            />
+
             <p className="text-[#28303F] text-center res_text mt-4">
               By sending this inquiry, I accept LeaseBuddi’s Terms and
               Conditions, Privacy Policy, and Community Values.

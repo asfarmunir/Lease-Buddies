@@ -19,6 +19,8 @@ import Link from "next/link";
 import PropertiesMap from "@/components/shared/PropertiesMap";
 import { useSession } from "next-auth/react";
 import toast from "react-hot-toast";
+import CheckAvailability from "@/components/shared/modals/CheckAvailability";
+import BookVisit from "@/components/shared/modals/BookVisit";
 export default function ApartmentListings() {
   const [properties, setProperties] = useState<Property[]>([]);
   const [loading, setLoading] = useState(true);
@@ -589,6 +591,8 @@ function PropertyCard({ property }: { property: Property }) {
   const [isFavorited, setIsFavorited] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const { data: session } = useSession();
+  const [showAvailability, setShowAvailability] = useState(false);
+  const [showBookVisit, setShowBookVisit] = useState(false);
 
   const router = useRouter();
 
@@ -744,21 +748,36 @@ function PropertyCard({ property }: { property: Property }) {
           </p>
         </div>
         <div className="mt-3 flex items-center gap-3 border-t border-[#28303F1A] pt-3">
-          <Link href={`/property/${property._id}`} className="">
-            <button className="px-1 py-2 flex items-center res_text gap-1.5 rounded-lg">
-              <Image
-                src="/images/calendar.svg"
-                alt="Phone"
-                width={20}
-                height={20}
-                className="-mt-0.5"
-              />
-              Tour
-            </button>
-          </Link>
-          <button className="bg-[#3A99D3] flex-grow res_text text-white px-4 xl:px-6 py-[14px] rounded-full font-semibold">
+          <button
+            onClick={() => setShowBookVisit(true)}
+            className="px-1 py-2 flex items-center res_text gap-1.5 rounded-lg"
+          >
+            <Image
+              src="/images/calendar.svg"
+              alt="Phone"
+              width={20}
+              height={20}
+              className="-mt-0.5"
+            />
+            Tour
+          </button>
+
+          <button
+            onClick={() => setShowAvailability(true)}
+            className="bg-[#3A99D3] flex-grow res_text text-white px-4 xl:px-6 py-[14px] rounded-full font-semibold"
+          >
             Check Availability
           </button>
+          <CheckAvailability
+            open={showAvailability}
+            onOpenChange={() => setShowAvailability(false)}
+            propertyId={property._id}
+          />
+          <BookVisit
+            open={showBookVisit}
+            onOpenChange={() => setShowBookVisit(false)}
+            propertyId={property._id}
+          />
         </div>
       </div>
     </div>

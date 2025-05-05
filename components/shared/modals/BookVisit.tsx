@@ -6,29 +6,31 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import Image from "next/image";
-import React, { useState } from "react";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import React, { useState } from "react";
 import toast from "react-hot-toast";
 
-interface AvailabilityFormData {
+interface BookingFormData {
   fullName: string;
   email: string;
   phone: string;
+  visitDate: string;
   moveInDate: string;
   floorPlan: string;
   message: string;
 }
 
-const CheckAvailability: React.FC<{
+const BookVisit: React.FC<{
   propertyId: string;
   open?: boolean;
   onOpenChange?: (open: boolean) => void;
 }> = ({ propertyId, open, onOpenChange }) => {
-  const [formData, setFormData] = useState<AvailabilityFormData>({
+  const [formData, setFormData] = useState<BookingFormData>({
     fullName: "",
     email: "",
     phone: "",
+    visitDate: "",
     moveInDate: "",
     floorPlan: "",
     message: "",
@@ -50,7 +52,7 @@ const CheckAvailability: React.FC<{
     setIsSubmitting(true);
 
     try {
-      const response = await fetch("/api/properties/availability", {
+      const response = await fetch("/api/properties/book-visit", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -62,51 +64,40 @@ const CheckAvailability: React.FC<{
       });
 
       if (!response.ok) {
-        throw new Error("Failed to submit inquiry");
+        throw new Error("Failed to book visit");
       }
 
-      toast.success("Inquiry submitted successfully!");
-
+      toast.success("request submitted!");
       setFormData({
         fullName: "",
         email: "",
         phone: "",
+        visitDate: "",
         moveInDate: "",
         floorPlan: "",
         message: "",
       });
     } catch (error) {
       console.error("Error submitting form:", error);
-      toast.error("Failed to submit inquiry. Please try again later.");
+      toast.error("Failed to submit visit request. Please try again later.");
     } finally {
       setIsSubmitting(false);
     }
   };
 
-  const clearForm = () => {
-    setFormData({
-      fullName: "",
-      email: "",
-      phone: "",
-      moveInDate: "",
-      floorPlan: "",
-      message: "",
-    });
-  };
-
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       {/* <DialogTrigger asChild>
-        <button className="bg-primary text-white font-semibold w-full py-3 rounded-full mt-4">
-          Check Availability
+        <button className="bg-[#3A99D31A] text-primary font-semibold w-full py-3 rounded-full mt-4">
+          Request Visit
         </button>
       </DialogTrigger> */}
 
       <DialogContent className="rounded-3xl max-w-xl max-h-[95svh] overflow-y-auto no-scrollbar">
         <DialogHeader>
-          <DialogTitle className="mb-2">Check Availability</DialogTitle>
+          <DialogTitle className="mb-2">Request Property Visit</DialogTitle>
           <DialogDescription>
-            Fill out the form to check availability for this property.
+            Schedule your preferred visit type and provide your details.
           </DialogDescription>
         </DialogHeader>
 
@@ -173,6 +164,25 @@ const CheckAvailability: React.FC<{
             />
           </div>
 
+          {/* Visit Date */}
+          <div className="w-full space-y-2">
+            <label
+              htmlFor="visitDate"
+              className="pl-4 res_text font-[500] text-start"
+            >
+              Preferred Visit Date and Time
+            </label>
+            <Input
+              id="visitDate"
+              name="visitDate"
+              type={"datetime-local"}
+              value={formData.visitDate}
+              onChange={handleChange}
+              className="bg-[#F7F7F7] text-xs md:text-sm 3xl:text-base rounded-full border border-[#28303F1A] py-7 2xl:py-8 sm:px-5 w-full text-[#28303FCC]"
+              required
+            />
+          </div>
+
           {/* Move In Date and Floor Plan (same row) */}
           <div className="flex items-center justify-between gap-4 w-full">
             <div className="w-full space-y-2">
@@ -180,7 +190,7 @@ const CheckAvailability: React.FC<{
                 htmlFor="moveInDate"
                 className="pl-4 res_text font-[500] text-start"
               >
-                Move In Date
+                Desired Move-In Date
               </label>
               <Input
                 id="moveInDate"
@@ -189,7 +199,6 @@ const CheckAvailability: React.FC<{
                 value={formData.moveInDate}
                 onChange={handleChange}
                 className="bg-[#F7F7F7] text-xs md:text-sm 3xl:text-base rounded-full border border-[#28303F1A] py-7 2xl:py-8 sm:px-5 w-full text-[#28303FCC]"
-                required
               />
             </div>
             <div className="w-full space-y-2">
@@ -197,16 +206,15 @@ const CheckAvailability: React.FC<{
                 htmlFor="floorPlan"
                 className="pl-4 res_text font-[500] text-start"
               >
-                Floor Plan
+                Interested Floor Plan
               </label>
               <Input
                 id="floorPlan"
                 name="floorPlan"
                 value={formData.floorPlan}
                 onChange={handleChange}
-                placeholder="Preferred floor plan"
+                placeholder="Specify if applicable"
                 className="bg-[#F7F7F7] text-xs md:text-sm 3xl:text-base rounded-full border border-[#28303F1A] py-7 2xl:py-8 sm:px-5 w-full text-[#28303FCC]"
-                required
               />
             </div>
           </div>
@@ -217,14 +225,14 @@ const CheckAvailability: React.FC<{
               htmlFor="message"
               className="pl-4 res_text font-[500] text-start"
             >
-              Custom Message
+              Additional Notes
             </label>
             <textarea
               id="message"
               name="message"
               value={formData.message}
               onChange={handleChange}
-              placeholder="Any additional information or questions"
+              placeholder="Any special requests or questions"
               className="bg-[#F7F7F7] text-xs h-24 md:text-sm 3xl:text-base rounded-3xl border border-[#28303F1A] py-4 px-5 w-full text-[#28303FCC]"
             />
           </div>
@@ -236,11 +244,11 @@ const CheckAvailability: React.FC<{
               type="submit"
               className="bg-primary disabled:opacity-50 font-semibold text-white py-4 res_text rounded-full hover:bg-primary-dark transition-colors"
             >
-              Check Availability
+              {isSubmitting ? "Submitting..." : "Request Visit"}
             </button>
             <p className="text-center text-xs mt-2 md:text-sm 3xl:text-base text-[#28303F]">
-              By sending this inquiry, I accept LeaseBuddi’s Terms and
-              Conditions, Privacy Policy, and Community Values.
+              By submitting this request, I agree to LeaseBuddi's Terms and
+              Conditions, Privacy Policy, and Community Values.
             </p>
           </div>
         </form>
@@ -249,4 +257,4 @@ const CheckAvailability: React.FC<{
   );
 };
 
-export default CheckAvailability;
+export default BookVisit;
