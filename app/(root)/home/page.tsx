@@ -1,8 +1,8 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import Image from "next/image";
-import { FaHeart, FaStar } from "react-icons/fa";
+import { FaHeart, FaStar, FaSearch, FaTimes } from "react-icons/fa";
 import { IoMdHeartEmpty } from "react-icons/io";
 import { HiOutlineShieldCheck } from "react-icons/hi2";
 import {
@@ -13,6 +13,7 @@ import {
 import { GoChevronDown } from "react-icons/go";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Slider } from "@/components/ui/slider";
+import { Input } from "@/components/ui/input";
 import FIlters from "@/components/shared/modals/FIlters";
 import { useSearchParams, useRouter, usePathname } from "next/navigation";
 import { FilterOptions, Property } from "@/lib/types/property";
@@ -22,6 +23,24 @@ import { useSession } from "next-auth/react";
 import toast from "react-hot-toast";
 import CheckAvailability from "@/components/shared/modals/CheckAvailability";
 import BookVisit from "@/components/shared/modals/BookVisit";
+import { LuSearch } from "react-icons/lu";
+
+// Custom debounce hook
+function useDebounce<T>(value: T, delay: number): T {
+  const [debouncedValue, setDebouncedValue] = useState<T>(value);
+
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedValue(value);
+    }, delay);
+
+    return () => {
+      clearTimeout(handler);
+    };
+  }, [value, delay]);
+
+  return debouncedValue;
+}
 
 export default function ApartmentListings() {
   const [properties, setProperties] = useState<Property[]>([]);
@@ -33,18 +52,22 @@ export default function ApartmentListings() {
     types: string[];
     pets: string[];
     priceRange: [number, number];
+    search: string | null;
   }>({
     bedrooms: null,
     bathrooms: null,
     types: [],
     pets: [],
     priceRange: [1000, 3000],
+    search: null,
   });
 
   const [appliedFilters, setAppliedFilters] = useState<FilterOptions>({});
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
+  const [searchInput, setSearchInput] = useState<string>("");
+  const debouncedSearch = useDebounce(searchInput, 500);
 
   const fetchProperties = async () => {
     try {
@@ -70,6 +93,7 @@ export default function ApartmentListings() {
     const bathrooms = searchParams.get("bathrooms");
     const minPrice = searchParams.get("minPrice");
     const maxPrice = searchParams.get("maxPrice");
+    const search = searchParams.get("search");
 
     setTempFilters({
       bedrooms,
@@ -80,6 +104,7 @@ export default function ApartmentListings() {
         minPrice ? parseInt(minPrice) : 1000,
         maxPrice ? parseInt(maxPrice) : 3000,
       ],
+      search,
     });
 
     setAppliedFilters({
@@ -89,10 +114,18 @@ export default function ApartmentListings() {
       bathrooms: bathrooms || undefined,
       minPrice: minPrice ? parseInt(minPrice) : undefined,
       maxPrice: maxPrice ? parseInt(maxPrice) : undefined,
+      search: search || undefined,
     });
 
+    setSearchInput(search || "");
     fetchProperties();
   }, [searchParams]);
+
+  useEffect(() => {
+    if (debouncedSearch !== tempFilters.search) {
+      updateFilters({ search: debouncedSearch || undefined });
+    }
+  }, [debouncedSearch]);
 
   const updateFilters = (newFilters: Partial<FilterOptions>) => {
     const params = new URLSearchParams();
@@ -104,7 +137,8 @@ export default function ApartmentListings() {
         key !== "type" &&
         key !== "petsAllowed" &&
         key !== "minPrice" &&
-        key !== "maxPrice"
+        key !== "maxPrice" &&
+        key !== "search"
       ) {
         params.set(key, value);
       }
@@ -148,6 +182,11 @@ export default function ApartmentListings() {
       else params.delete("maxPrice");
     }
 
+    if (newFilters.search !== undefined) {
+      if (newFilters.search) params.set("search", newFilters.search);
+      else params.delete("search");
+    }
+
     router.push(`${pathname}?${params.toString()}`);
   };
 
@@ -158,7 +197,9 @@ export default function ApartmentListings() {
       types: [],
       pets: [],
       priceRange: [1000, 3000],
+      search: null,
     });
+    setSearchInput("");
     router.push(pathname);
     setAppliedFilters({});
   };
@@ -199,345 +240,382 @@ export default function ApartmentListings() {
 
   return (
     <div className="p-4 md:px-6 2xl:px-10">
-      {/* Filters */}
-      <div className="hidden sm:flex items-center gap-2 my-3">
-        <div className="flex items-center w-fit p-1 bg-[#F7F7F7] rounded-full gap-2 text-gray-700 text-[12px] 2xl:text-[10px] 3xl:text-sm">
-          {/* Beds/Baths Filter */}
-          <DropdownMenu>
-            <DropdownMenuTrigger className="flex font-semibold items-center bg-white px-4 py-3 rounded-full gap-2 2xl:gap-8 focus:outline-none res_text">
-              Beds/Baths
-              <GoChevronDown />
-              {appliedFilters.bedrooms || appliedFilters.bathrooms ? (
-                <span className="w-2 h-2 bg-blue-500 rounded-full"></span>
-              ) : null}
-            </DropdownMenuTrigger>
-            <DropdownMenuContent className="w-[300px] sm:w-[400px] rounded-3xl shadow-lg bg-white p-4 md:px-6 ml-6 mt-2">
-              <h2 className="res_text">Bedrooms</h2>
-              <div className="flex items-center w-full mb-4 p-1 my-2 bg-[#F7F7F7] rounded-full gap-1.5 text-gray-700 text-[12px] 2xl:text-[10px] 3xl:text-sm mt-2">
-                {["Studio", "1", "2", "3", "4+"].map((option) => (
+      {/* Filters and Search */}
+      <div className=" w-full flex items-center justify-between gap-2 sm:gap-4 ">
+        <div className="hidden sm:flex items-center gap-2 my-3">
+          <div className="flex items-center w-fit p-1 bg-[#F7F7F7] rounded-full gap-2 text-gray-700 text-[12px] 2xl:text-[10px] 3xl:text-sm">
+            {/* Beds/Baths Filter */}
+            <DropdownMenu>
+              <DropdownMenuTrigger className="flex font-semibold items-center bg-white px-4 py-3 rounded-full gap-2 2xl:gap-8 focus:outline-none res_text">
+                Beds/Baths
+                <GoChevronDown />
+                {appliedFilters.bedrooms || appliedFilters.bathrooms ? (
+                  <span className="w-2 h-2 bg-blue-500 rounded-full"></span>
+                ) : null}
+              </DropdownMenuTrigger>
+              <DropdownMenuContent className="w-[300px] sm:w-[400px] rounded-3xl shadow-lg bg-white p-4 md:px-6 ml-6 mt-2">
+                <h2 className="res_text">Bedrooms</h2>
+                <div className="flex items-center w-full mb-4 p-1 my-2 bg-[#F7F7F7] rounded-full gap-1.5 text-gray-700 text-[12px] 2xl:text-[10px] 3xl:text-sm mt-2">
+                  {["Studio", "1", "2", "3", "4+"].map((option) => (
+                    <button
+                      key={option}
+                      className={`flex-grow font-semibold text-center px-4 py-2.5 rounded-full gap-2 2xl:gap-8 focus:outline-none res_text ${
+                        tempFilters.bedrooms === option
+                          ? "bg-blue-500 text-white"
+                          : "bg-white"
+                      }`}
+                      onClick={() =>
+                        setTempFilters((prev) => ({
+                          ...prev,
+                          bedrooms: prev.bedrooms === option ? null : option,
+                        }))
+                      }
+                    >
+                      {option}
+                    </button>
+                  ))}
+                </div>
+                <h2 className="res_text">Bathrooms</h2>
+                <div className="flex items-center w-full mb-4 p-1 my-2 bg-[#F7F7F7] rounded-full gap-1.5 text-gray-700 text-[12px] 2xl:text-[10px] 3xl:text-sm mt-2">
+                  {["1", "2", "3", "4+"].map((option) => (
+                    <button
+                      key={option}
+                      className={`flex-grow font-semibold text-center px-4 py-2.5 rounded-full gap-2 2xl:gap-8 focus:outline-none res_text ${
+                        tempFilters.bathrooms === option
+                          ? "bg-blue-500 text-white"
+                          : "bg-white"
+                      }`}
+                      onClick={() =>
+                        setTempFilters((prev) => ({
+                          ...prev,
+                          bathrooms: prev.bathrooms === option ? null : option,
+                        }))
+                      }
+                    >
+                      {option}
+                    </button>
+                  ))}
+                </div>
+                <div className="pt-4 mt-4 border-t-2 border-[#28303F1A]">
                   <button
-                    key={option}
-                    className={`flex-grow font-semibold text-center px-4 py-2.5 rounded-full gap-2 2xl:gap-8 focus:outline-none res_text ${
-                      tempFilters.bedrooms === option
-                        ? "bg-blue-500 text-white"
-                        : "bg-white"
-                    }`}
-                    onClick={() =>
+                    className="rounded-full font-semibold res_text w-full py-3.5 bg-[#28303F] text-white"
+                    onClick={() => {
+                      updateFilters({
+                        bedrooms: tempFilters.bedrooms || undefined,
+                        bathrooms: tempFilters.bathrooms || undefined,
+                      });
+                    }}
+                  >
+                    View Rentals
+                  </button>
+                  <button
+                    className="rounded-full w-full res_text py-3.5 text-[#28303F]"
+                    onClick={() => {
+                      const params = new URLSearchParams(
+                        searchParams.toString()
+                      );
+                      params.delete("bedrooms");
+                      params.delete("bathrooms");
+                      router.push(`${pathname}?${params.toString()}`);
                       setTempFilters((prev) => ({
                         ...prev,
-                        bedrooms: prev.bedrooms === option ? null : option,
-                      }))
-                    }
+                        bedrooms: null,
+                        bathrooms: null,
+                      }));
+                    }}
                   >
-                    {option}
+                    Clear
                   </button>
-                ))}
-              </div>
-              <h2 className="res_text">Bathrooms</h2>
-              <div className="flex items-center w-full mb-4 p-1 my-2 bg-[#F7F7F7] rounded-full gap-1.5 text-gray-700 text-[12px] 2xl:text-[10px] 3xl:text-sm mt-2">
-                {["1", "2", "3", "4+"].map((option) => (
-                  <button
-                    key={option}
-                    className={`flex-grow font-semibold text-center px-4 py-2.5 rounded-full gap-2 2xl:gap-8 focus:outline-none res_text ${
-                      tempFilters.bathrooms === option
-                        ? "bg-blue-500 text-white"
-                        : "bg-white"
-                    }`}
-                    onClick={() =>
+                </div>
+              </DropdownMenuContent>
+            </DropdownMenu>
+
+            {/* Price Filter */}
+            <DropdownMenu>
+              <DropdownMenuTrigger className="flex font-semibold items-center bg-white px-4 py-3 rounded-full gap-2 2xl:gap-8 focus:outline-none res_text">
+                Price
+                <GoChevronDown />
+                {(appliedFilters.minPrice || appliedFilters.maxPrice) && (
+                  <span className="w-2 h-2 bg-blue-500 rounded-full"></span>
+                )}
+              </DropdownMenuTrigger>
+              <DropdownMenuContent className="w-[300px] sm:w-[400px] rounded-3xl shadow-lg bg-white p-4 md:px-6 ml-6 mt-2">
+                <div className="w-full py-4 justify-center items-center flex flex-col">
+                  <Image
+                    src="/images/range.svg"
+                    width={270}
+                    height={270}
+                    alt="Price range"
+                  />
+                  <Slider
+                    value={tempFilters.priceRange}
+                    onValueChange={(value) =>
                       setTempFilters((prev) => ({
                         ...prev,
-                        bathrooms: prev.bathrooms === option ? null : option,
+                        priceRange: value as [number, number],
                       }))
                     }
+                    max={5000}
+                    min={0}
+                    className="max-w-xs 2xl:max-w-sm mx-auto"
+                    step={100}
+                  />
+                </div>
+                <div className="py-3 flex gap-3 items-center justify-between">
+                  <div className="flex-grow">
+                    <h4 className="res_text mb-1">Minimum</h4>
+                    <p className="border border-[#28303F1A] p-4 text-center rounded-full">
+                      <span className="font-semibold">
+                        ${tempFilters.priceRange[0].toLocaleString()}
+                      </span>{" "}
+                      /mo
+                    </p>
+                  </div>
+                  <div className="flex-grow">
+                    <h4 className="res_text mb-1">Maximum</h4>
+                    <p className="border border-[#28303F1A] p-4 text-center rounded-full">
+                      <span className="font-semibold">
+                        ${tempFilters.priceRange[1].toLocaleString()}
+                      </span>{" "}
+                      /mo
+                    </p>
+                  </div>
+                </div>
+                <div className="pt-4 mt-2 border-t-2 border-[#28303F1A]">
+                  <button
+                    className="rounded-full font-semibold res_text w-full py-3.5 bg-[#28303F] text-white"
+                    onClick={() => {
+                      updateFilters({
+                        minPrice: tempFilters.priceRange[0],
+                        maxPrice: tempFilters.priceRange[1],
+                      });
+                    }}
                   >
-                    {option}
+                    View Rentals
                   </button>
-                ))}
-              </div>
-              <div className="pt-4 mt-4 border-t-2 border-[#28303F1A]">
-                <button
-                  className="rounded-full font-semibold res_text w-full py-3.5 bg-[#28303F] text-white"
-                  onClick={() => {
-                    updateFilters({
-                      bedrooms: tempFilters.bedrooms || undefined,
-                      bathrooms: tempFilters.bathrooms || undefined,
-                    });
-                  }}
-                >
-                  View Rentals
-                </button>
-                <button
-                  className="rounded-full w-full res_text py-3.5 text-[#28303F]"
-                  onClick={() => {
-                    const params = new URLSearchParams(searchParams.toString());
-                    params.delete("bedrooms");
-                    params.delete("bathrooms");
-                    router.push(`${pathname}?${params.toString()}`);
-                    setTempFilters((prev) => ({
-                      ...prev,
-                      bedrooms: null,
-                      bathrooms: null,
-                    }));
-                  }}
-                >
-                  Clear
-                </button>
-              </div>
-            </DropdownMenuContent>
-          </DropdownMenu>
-
-          {/* Price Filter */}
-          <DropdownMenu>
-            <DropdownMenuTrigger className="flex font-semibold items-center bg-white px-4 py-3 rounded-full gap-2 2xl:gap-8 focus:outline-none res_text">
-              Price
-              <GoChevronDown />
-              {(appliedFilters.minPrice || appliedFilters.maxPrice) && (
-                <span className="w-2 h-2 bg-blue-500 rounded-full"></span>
-              )}
-            </DropdownMenuTrigger>
-            <DropdownMenuContent className="w-[300px] sm:w-[400px] rounded-3xl shadow-lg bg-white p-4 md:px-6 ml-6 mt-2">
-              <div className="w-full py-4 justify-center items-center flex flex-col">
-                <Image
-                  src="/images/range.svg"
-                  width={270}
-                  height={270}
-                  alt="Price range"
-                />
-                <Slider
-                  value={tempFilters.priceRange}
-                  onValueChange={(value) =>
-                    setTempFilters((prev) => ({
-                      ...prev,
-                      priceRange: value as [number, number],
-                    }))
-                  }
-                  max={5000}
-                  min={0}
-                  className="max-w-xs 2xl:max-w-sm mx-auto"
-                  step={100}
-                />
-              </div>
-              <div className="py-3 flex gap-3 items-center justify-between">
-                <div className="flex-grow">
-                  <h4 className="res_text mb-1">Minimum</h4>
-                  <p className="border border-[#28303F1A] p-4 text-center rounded-full">
-                    <span className="font-semibold">
-                      ${tempFilters.priceRange[0].toLocaleString()}
-                    </span>{" "}
-                    /mo
-                  </p>
+                  <button
+                    className="rounded-full w-full res_text py-3.5 text-[#28303F]"
+                    onClick={() => {
+                      const params = new URLSearchParams(
+                        searchParams.toString()
+                      );
+                      params.delete("minPrice");
+                      params.delete("maxPrice");
+                      router.push(`${pathname}?${params.toString()}`);
+                      setTempFilters((prev) => ({
+                        ...prev,
+                        priceRange: [1000, 3000],
+                      }));
+                    }}
+                  >
+                    Clear
+                  </button>
                 </div>
-                <div className="flex-grow">
-                  <h4 className="res_text mb-1">Maximum</h4>
-                  <p className="border border-[#28303F1A] p-4 text-center rounded-full">
-                    <span className="font-semibold">
-                      ${tempFilters.priceRange[1].toLocaleString()}
-                    </span>{" "}
-                    /mo
-                  </p>
-                </div>
-              </div>
-              <div className="pt-4 mt-2 border-t-2 border-[#28303F1A]">
-                <button
-                  className="rounded-full font-semibold res_text w-full py-3.5 bg-[#28303F] text-white"
-                  onClick={() => {
-                    updateFilters({
-                      minPrice: tempFilters.priceRange[0],
-                      maxPrice: tempFilters.priceRange[1],
-                    });
-                  }}
-                >
-                  View Rentals
-                </button>
-                <button
-                  className="rounded-full w-full res_text py-3.5 text-[#28303F]"
-                  onClick={() => {
-                    const params = new URLSearchParams(searchParams.toString());
-                    params.delete("minPrice");
-                    params.delete("maxPrice");
-                    router.push(`${pathname}?${params.toString()}`);
-                    setTempFilters((prev) => ({
-                      ...prev,
-                      priceRange: [1000, 3000],
-                    }));
-                  }}
-                >
-                  Clear
-                </button>
-              </div>
-            </DropdownMenuContent>
-          </DropdownMenu>
+              </DropdownMenuContent>
+            </DropdownMenu>
 
-          {/* Type Filter */}
-          <DropdownMenu>
-            <DropdownMenuTrigger className="flex font-semibold items-center bg-white px-4 py-3 rounded-full gap-2 2xl:gap-8 focus:outline-none res_text">
-              Type
-              <GoChevronDown />
-              {appliedFilters.type?.length ? (
-                <span className="w-2 h-2 bg-blue-500 rounded-full"></span>
-              ) : null}
-            </DropdownMenuTrigger>
-            <DropdownMenuContent className="w-[300px] sm:w-[400px] rounded-3xl shadow-lg bg-white p-4 md:px-6 ml-6 mt-2">
-              {["Apartment", "Condo", "House", "Townhouse", "Other"].map(
-                (type) => (
+            {/* Type Filter */}
+            <DropdownMenu>
+              <DropdownMenuTrigger className="flex font-semibold items-center bg-white px-4 py-3 rounded-full gap-2 2xl:gap-8 focus:outline-none res_text">
+                Type
+                <GoChevronDown />
+                {appliedFilters.type?.length ? (
+                  <span className="w-2 h-2 bg-blue-500 rounded-full"></span>
+                ) : null}
+              </DropdownMenuTrigger>
+              <DropdownMenuContent className="w-[300px] sm:w-[400px] rounded-3xl shadow-lg bg-white p-4 md:px-6 ml-6 mt-2">
+                {["Apartment", "Condo", "House", "Townhouse", "Other"].map(
+                  (type) => (
+                    <div
+                      key={type}
+                      className={`flex items-center gap-2 p-4 rounded-full ${
+                        tempFilters.types.includes(type)
+                          ? "bg-[#28303F]/15"
+                          : ""
+                      }`}
+                    >
+                      <Checkbox
+                        checked={tempFilters.types.includes(type)}
+                        onCheckedChange={(checked) => {
+                          setTempFilters((prev) => ({
+                            ...prev,
+                            types: checked
+                              ? [...prev.types, type]
+                              : prev.types.filter((t) => t !== type),
+                          }));
+                        }}
+                        className="data-[state=checked]:bg-[#28303F] border border-[#28303F]"
+                      />
+                      <p className="text-sm">{type}</p>
+                    </div>
+                  )
+                )}
+                <div className="pt-4 mt-2 border-t-2 border-[#28303F1A]">
+                  <button
+                    className="rounded-full font-semibold res_text w-full py-3.5 bg-[#28303F] text-white"
+                    onClick={() => {
+                      updateFilters({
+                        type: tempFilters.types.length
+                          ? tempFilters.types
+                          : undefined,
+                      });
+                    }}
+                  >
+                    View Rentals
+                  </button>
+                  <button
+                    className="rounded-full w-full res_text py-3.5 text-[#28303F]"
+                    onClick={() => {
+                      const params = new URLSearchParams(
+                        searchParams.toString()
+                      );
+                      params.delete("type");
+                      router.push(`${pathname}?${params.toString()}`);
+                      setTempFilters((prev) => ({
+                        ...prev,
+                        types: [],
+                      }));
+                    }}
+                  >
+                    Clear
+                  </button>
+                </div>
+              </DropdownMenuContent>
+            </DropdownMenu>
+
+            {/* Pets Allowed Filter */}
+            <DropdownMenu>
+              <DropdownMenuTrigger className="flex font-semibold items-center bg-white px-4 py-3 rounded-full gap-2 2xl:gap-8 focus:outline-none res_text">
+                Pets Allowed
+                <GoChevronDown />
+                {appliedFilters.petsAllowed?.length ? (
+                  <span className="w-2 h-2 bg-blue-500 rounded-full"></span>
+                ) : null}
+              </DropdownMenuTrigger>
+              <DropdownMenuContent className="w-[300px] sm:w-[400px] rounded-3xl shadow-lg bg-white p-4 md:px-6 ml-6 mt-2">
+                {["Dogs Allowed", "Cats Allowed", "No Pets"].map((pet) => (
                   <div
-                    key={type}
+                    key={pet}
                     className={`flex items-center gap-2 p-4 rounded-full ${
-                      tempFilters.types.includes(type) ? "bg-[#28303F]/15" : ""
+                      tempFilters.pets.includes(pet) ? "bg-[#28303F]/15" : ""
                     }`}
                   >
                     <Checkbox
-                      checked={tempFilters.types.includes(type)}
+                      checked={tempFilters.pets.includes(pet)}
                       onCheckedChange={(checked) => {
                         setTempFilters((prev) => ({
                           ...prev,
-                          types: checked
-                            ? [...prev.types, type]
-                            : prev.types.filter((t) => t !== type),
+                          pets: checked
+                            ? [...prev.pets, pet]
+                            : prev.pets.filter((p) => p !== pet),
                         }));
                       }}
                       className="data-[state=checked]:bg-[#28303F] border border-[#28303F]"
                     />
-                    <p className="text-sm">{type}</p>
+                    <p className="text-sm">{pet}</p>
                   </div>
-                )
-              )}
-              <div className="pt-4 mt-2 border-t-2 border-[#28303F1A]">
-                <button
-                  className="rounded-full font-semibold res_text w-full py-3.5 bg-[#28303F] text-white"
-                  onClick={() => {
-                    updateFilters({
-                      type: tempFilters.types.length
-                        ? tempFilters.types
-                        : undefined,
-                    });
-                  }}
-                >
-                  View Rentals
-                </button>
-                <button
-                  className="rounded-full w-full res_text py-3.5 text-[#28303F]"
-                  onClick={() => {
-                    const params = new URLSearchParams(searchParams.toString());
-                    params.delete("type");
-                    router.push(`${pathname}?${params.toString()}`);
-                    setTempFilters((prev) => ({
-                      ...prev,
-                      types: [],
-                    }));
-                  }}
-                >
-                  Clear
-                </button>
-              </div>
-            </DropdownMenuContent>
-          </DropdownMenu>
-
-          {/* Pets Allowed Filter */}
-          <DropdownMenu>
-            <DropdownMenuTrigger className="flex font-semibold items-center bg-white px-4 py-3 rounded-full gap-2 2xl:gap-8 focus:outline-none res_text">
-              Pets Allowed
-              <GoChevronDown />
-              {appliedFilters.petsAllowed?.length ? (
-                <span className="w-2 h-2 bg-blue-500 rounded-full"></span>
-              ) : null}
-            </DropdownMenuTrigger>
-            <DropdownMenuContent className="w-[300px] sm:w-[400px] rounded-3xl shadow-lg bg-white p-4 md:px-6 ml-6 mt-2">
-              {["Dogs Allowed", "Cats Allowed", "No Pets"].map((pet) => (
-                <div
-                  key={pet}
-                  className={`flex items-center gap-2 p-4 rounded-full ${
-                    tempFilters.pets.includes(pet) ? "bg-[#28303F]/15" : ""
-                  }`}
-                >
-                  <Checkbox
-                    checked={tempFilters.pets.includes(pet)}
-                    onCheckedChange={(checked) => {
+                ))}
+                <div className="pt-4 mt-2 border-t-2 border-[#28303F1A]">
+                  <button
+                    className="rounded-full font-semibold res_text w-full py-3.5 bg-[#28303F] text-white"
+                    onClick={() => {
+                      updateFilters({
+                        petsAllowed: tempFilters.pets.length
+                          ? tempFilters.pets
+                          : undefined,
+                      });
+                    }}
+                  >
+                    View Rentals
+                  </button>
+                  <button
+                    className="rounded-full w-full res_text py-3.5 text-[#28303F]"
+                    onClick={() => {
+                      const params = new URLSearchParams(
+                        searchParams.toString()
+                      );
+                      params.delete("petsAllowed");
+                      router.push(`${pathname}?${params.toString()}`);
                       setTempFilters((prev) => ({
                         ...prev,
-                        pets: checked
-                          ? [...prev.pets, pet]
-                          : prev.pets.filter((p) => p !== pet),
+                        pets: [],
                       }));
                     }}
-                    className="data-[state=checked]:bg-[#28303F] border border-[#28303F]"
-                  />
-                  <p className="text-sm">{pet}</p>
+                  >
+                    Clear
+                  </button>
                 </div>
-              ))}
-              <div className="pt-4 mt-2 border-t-2 border-[#28303F1A]">
-                <button
-                  className="rounded-full font-semibold res_text w-full py-3.5 bg-[#28303F] text-white"
-                  onClick={() => {
-                    updateFilters({
-                      petsAllowed: tempFilters.pets.length
-                        ? tempFilters.pets
-                        : undefined,
-                    });
-                  }}
-                >
-                  View Rentals
-                </button>
-                <button
-                  className="rounded-full w-full res_text py-3.5 text-[#28303F]"
-                  onClick={() => {
-                    const params = new URLSearchParams(searchParams.toString());
-                    params.delete("petsAllowed");
-                    router.push(`${pathname}?${params.toString()}`);
-                    setTempFilters((prev) => ({
-                      ...prev,
-                      pets: [],
-                    }));
-                  }}
-                >
-                  Clear
-                </button>
-              </div>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        </div>
-        <FIlters
-          onApplyFilters={(filters) => {
-            const params = new URLSearchParams(searchParams.toString());
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
 
-            if (filters.audience && filters.audience !== "Any") {
-              params.set("audience", filters.audience);
-            } else {
+          {/* Search Bar */}
+
+          <FIlters
+            onApplyFilters={(filters) => {
+              const params = new URLSearchParams(searchParams.toString());
+
+              if (filters.audience && filters.audience !== "Any") {
+                params.set("audience", filters.audience);
+              } else {
+                params.delete("audience");
+              }
+
+              params.delete("amenities");
+              if (filters.amenities && filters.amenities.length > 0) {
+                filters.amenities.forEach((amenity) =>
+                  params.append("amenities", amenity)
+                );
+              }
+
+              if (filters.squareFeet) {
+                params.set("squareFeet", filters.squareFeet);
+              } else {
+                params.delete("squareFeet");
+              }
+
+              router.push(`${pathname}?${params.toString()}`);
+            }}
+            onClearFilters={() => {
+              const params = new URLSearchParams(searchParams.toString());
               params.delete("audience");
-            }
-
-            params.delete("amenities");
-            if (filters.amenities && filters.amenities.length > 0) {
-              filters.amenities.forEach((amenity) =>
-                params.append("amenities", amenity)
-              );
-            }
-
-            if (filters.squareFeet) {
-              params.set("squareFeet", filters.squareFeet);
-            } else {
+              params.delete("amenities");
               params.delete("squareFeet");
-            }
-
-            router.push(`${pathname}?${params.toString()}`);
-          }}
-          onClearFilters={() => {
-            const params = new URLSearchParams(searchParams.toString());
-            params.delete("audience");
-            params.delete("amenities");
-            params.delete("squareFeet");
-            router.push(`${pathname}?${params.toString()}`);
-          }}
-          appliedFilters={{
-            audience: searchParams.get("audience") as
-              | "Affordable"
-              | "Luxury"
-              | undefined,
-            amenities: searchParams.getAll("amenities"),
-            squareFeet: searchParams.get("squareFeet") || undefined,
-          }}
-        />
+              router.push(`${pathname}?${params.toString()}`);
+            }}
+            appliedFilters={{
+              audience: searchParams.get("audience") as
+                | "Affordable"
+                | "Luxury"
+                | undefined,
+              amenities: searchParams.getAll("amenities"),
+              squareFeet: searchParams.get("squareFeet") || undefined,
+            }}
+          />
+        </div>
+        <div className="relative flex items-center bg-white px-4 py-1 rounded-full border border-[#28303F1A] text-[12px] 2xl:text-[10px] 3xl:text-sm">
+          <LuSearch className="text-gray-500 text-lg mr-1" />
+          <Input
+            type="text"
+            placeholder="Search by name, city, or state..."
+            value={searchInput}
+            onChange={(e) => setSearchInput(e.target.value)}
+            className="bg-transparent border-none shadow-none xl:w-64 focus:ring-0 text-gray-700 placeholder-gray-400 res_text"
+          />
+          {searchInput && (
+            <button
+              onClick={() => {
+                setSearchInput("");
+                updateFilters({ search: undefined });
+              }}
+              className="absolute right-3 z-50 text-gray-500 hover:text-gray-700"
+            >
+              <FaTimes />
+            </button>
+          )}
+        </div>
       </div>
+
       <div className="border border-[#28303F1A] p-4 xl:p-6 rounded-[20px]">
         <h2 className="text-xl 2xl:text-2xl text-primary-50 font-semibold">
           Apartments For Rents

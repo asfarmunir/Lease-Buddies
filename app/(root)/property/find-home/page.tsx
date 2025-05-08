@@ -11,7 +11,7 @@ import { useRouter } from "next/navigation";
 const steps = [
   "type",
   "audience",
-  "Location",
+  // "Location",
   "Address",
   "Basics",
   "Amenities",
@@ -358,7 +358,7 @@ export default function PropertyListingForm() {
             )}
 
             {/* Step 2 - Location */}
-            {step === 2 && (
+            {/* {step === 2 && (
               <div className="flex flex-col items-center gap-3">
                 <h2 className="text-xl text-center 2xl:text-2xl font-semibold text-primary-50 3xl:text-3xl">
                   Where are you looking to rent?
@@ -372,10 +372,10 @@ export default function PropertyListingForm() {
                   onChange={(e) => handleChange("location", e.target.value)}
                 />
               </div>
-            )}
+            )} */}
 
             {/* Step 3 - Basics */}
-            {step === 3 && (
+            {step === 2 && (
               <div className="flex flex-col items-center gap-3">
                 <h2 className="text-xl text-center 2xl:text-2xl font-semibold text-primary-50 3xl:text-3xl">
                   Let's make it more your style
@@ -527,7 +527,7 @@ export default function PropertyListingForm() {
             )}
 
             {/* Step 4 - Amenities */}
-            {step === 4 && (
+            {step === 3 && (
               <div className="flex flex-col items-center gap-3">
                 <h2 className="text-xl text-center 2xl:text-2xl font-semibold text-primary-50 3xl:text-3xl">
                   What features are essential for your housing?
@@ -578,7 +578,7 @@ export default function PropertyListingForm() {
             )}
 
             {/* Step 5 - Pet Policy */}
-            {step === 5 && (
+            {step === 4 && (
               <div className="flex flex-col items-center gap-3">
                 <h2 className="text-xl text-center 2xl:text-2xl font-semibold text-primary-50 3xl:text-3xl">
                   What is your pet policy?
@@ -626,7 +626,7 @@ export default function PropertyListingForm() {
             )}
 
             {/* Step 6 - Price (Final Step) */}
-            {step === 6 && (
+            {step === 5 && (
               <div className="flex flex-col items-center gap-3">
                 <h2 className="text-xl text-center 2xl:text-2xl font-semibold text-primary-50 3xl:text-3xl">
                   What's your budget?

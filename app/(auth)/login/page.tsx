@@ -104,9 +104,9 @@ const LoginFormSchema = () => {
       setLoading(false);
       return;
     }
-    toast.success("Logged in successfully!");
-    setLoading(false);
     router.push("/home");
+    setLoading(false);
+    toast.success("Logged in successfully!");
   }
 
   async function onSignupSubmit(values: z.infer<typeof signupFormSchema>) {
