@@ -1,4 +1,5 @@
 "use client";
+
 import { useEffect, useRef, useState } from "react";
 import { Property } from "@/lib/types/property";
 import { FaMapMarkerAlt, FaStar, FaHeart } from "react-icons/fa";
@@ -32,6 +33,7 @@ export default function PropertiesMap({
   const mapRef = useRef<HTMLDivElement>(null);
   const mapInstance = useRef<any>(null);
   const markersRef = useRef<any[]>([]);
+  const searchInputRef = useRef<HTMLInputElement>(null);
   const [currentLocation, setCurrentLocation] = useState<{
     lat: number;
     lng: number;
@@ -47,11 +49,13 @@ export default function PropertiesMap({
 
     const loadGoogleMaps = () => {
       if (window.google && window.google.maps) {
+        console.log("Google Maps script already loaded");
         initializeMap();
         return;
       }
 
       if (document.querySelector(`#${scriptId}`)) {
+        console.log("Script tag exists, waiting for load");
         return;
       }
 
@@ -65,12 +69,14 @@ export default function PropertiesMap({
       script.defer = true;
 
       script.onload = () => {
+        console.log("Google Maps script loaded successfully");
         initializeMap();
       };
 
       script.onerror = () => {
-        setError("Failed to load Google Maps");
+        setError("Failed to load Google Maps script");
         setLoading(false);
+        console.error("Failed to load Google Maps script");
       };
 
       document.head.appendChild(script);
@@ -78,6 +84,9 @@ export default function PropertiesMap({
 
     const initializeMap = () => {
       if (!mapRef.current || !window.google?.maps) {
+        setError("Google Maps API not available");
+        setLoading(false);
+        console.error("Google Maps API not available");
         return;
       }
 
@@ -132,6 +141,7 @@ export default function PropertiesMap({
               setCurrentLocation(pos);
               mapInstance.current?.setCenter(pos);
               onLocationChange?.(pos);
+              console.log("Geolocation set:", pos);
             },
             () => {
               console.warn("Geolocation permission denied");
@@ -140,6 +150,7 @@ export default function PropertiesMap({
         }
 
         setLoading(false);
+        console.log("Map initialized successfully");
       } catch (err) {
         console.error("Map initialization error:", err);
         setError("Failed to initialize map");
@@ -163,31 +174,80 @@ export default function PropertiesMap({
         infoWindowRef.current.close();
       }
     };
-  }, [userLocation]);
+  }, [userLocation, onLocationChange, onBoundsChange]);
+
+  // Initialize Autocomplete
+  useEffect(() => {
+    if (
+      !window.google?.maps?.places ||
+      !searchInputRef.current ||
+      loading ||
+      error
+    ) {
+      return;
+    }
+
+    try {
+      console.log("Initializing Autocomplete");
+      const autocomplete = new window.google.maps.places.Autocomplete(
+        searchInputRef.current,
+        {
+          types: ["geocode"],
+          fields: ["geometry", "formatted_address"],
+        }
+      );
+
+      autocomplete.addListener("place_changed", () => {
+        const place = autocomplete.getPlace();
+        console.log("Place selected:", place);
+
+        if (!place.geometry || !place.geometry.location) {
+          console.warn("No valid location selected");
+          setError("Please select a valid location");
+          return;
+        }
+
+        const location = {
+          lat: place.geometry.location.lat(),
+          lng: place.geometry.location.lng(),
+        };
+
+        console.log("Centering map to:", location);
+        mapInstance.current.setCenter(location);
+        setCurrentLocation(location);
+        onLocationChange?.(location);
+        setError(null); // Clear any previous errors
+      });
+
+      return () => {
+        window.google?.maps?.event?.clearListeners?.(
+          autocomplete,
+          "place_changed"
+        );
+      };
+    } catch (err) {
+      console.error("Autocomplete initialization error:", err);
+      setError("Failed to initialize search");
+    }
+  }, [loading, error, onLocationChange]);
 
   function createCustomMarkerIcon(isFeatured: boolean, price: string): string {
     const color = isFeatured ? "#FF5252" : "#000";
     const textColor = "#FFFFFF";
     const tagColor = isFeatured ? "#D32F2F" : "#333";
-    const pointerColor = tagColor; // Same as tag color
+    const pointerColor = tagColor;
 
     return `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(`
     <svg xmlns="http://www.w3.org/2000/svg" width="60" height="80" viewBox="0 0 60 80">
-      <!-- Price tag background with padding -->
       <rect x="10" y="5" width="40" height="30" rx="4" fill="${tagColor}"/>
-      
-      <!-- Pointer triangle connecting to marker -->
       <path d="M25,35 L35,35 L30,45 Z" fill="${pointerColor}"/>
-      
-      <!-- Price text with increased font size and padding -->
       <text x="30" y="25" font-family="Arial" font-size="14" font-weight="bold" 
             text-anchor="middle" fill="${textColor}">${price}</text>
-      
-      <!-- Marker circle -->
       <circle cx="30" cy="65" r="12" fill="${color}" stroke="#FFFFFF" stroke-width="5"/>
     </svg>
   `)}`;
   }
+
   // Create markers for properties
   useEffect(() => {
     if (!mapInstance.current || !window.google?.maps || loading || error) {
@@ -210,7 +270,6 @@ export default function PropertiesMap({
             return null;
           }
 
-          // Format price for display
           const formattedPrice = new Intl.NumberFormat("en-US", {
             style: "currency",
             currency: "USD",
@@ -223,7 +282,7 @@ export default function PropertiesMap({
             icon: {
               url: createCustomMarkerIcon(property.isFeatured, formattedPrice),
               scaledSize: new window.google.maps.Size(60, 80),
-              anchor: new window.google.maps.Point(30, 80), // Anchor at bottom center
+              anchor: new window.google.maps.Point(30, 80),
             },
           });
 
@@ -231,109 +290,9 @@ export default function PropertiesMap({
             if (infoWindowRef.current) {
               infoWindowRef.current.close();
 
-              // Create container for React content
               const container = document.createElement("div");
               container.className = "property-info-window";
 
-              // Render property info
-              const content = (
-                <div className="bg-white rounded-[16px] overflow-hidden w-full">
-                  <div className="relative">
-                    <img
-                      src={
-                        property.featuredImage ||
-                        property.photos[0] ||
-                        "/images/prop.png"
-                      }
-                      alt={property.title}
-                      className="w-full h-48 object-cover"
-                    />
-                    <div className="absolute top-2.5 left-2.5 flex gap-2">
-                      {property.isFeatured && (
-                        <span className="bg-[#FFFFFFF2] text-primary-50 text-xs px-2 py-2 rounded-full">
-                          Featured
-                        </span>
-                      )}
-                      {property.audience === "Affordable" && (
-                        <span className="bg-[#FFFFFFF2] text-primary-50 text-xs px-2 py-2 rounded-full">
-                          Affordable
-                        </span>
-                      )}
-                    </div>
-                    <button className="absolute top-2 right-2 text-white bg-black/20 hover:bg-black/50 p-2 rounded-full">
-                      <FaHeart size={16} />
-                    </button>
-                  </div>
-                  <div className="p-4 border border-[#28303F1A] rounded-[16px] -mt-4 bg-white relative">
-                    <div className="flex items-center justify-between">
-                      <p className="bg-green-100 text-green-600 px-3 inline-flex items-center gap-1.5 py-1.5 text-xs rounded-full">
-                        <HiOutlineShieldCheck className="text-base -mt-0.5" />
-                        Verified
-                      </p>
-                      <p className="bg-[#28303F1A] px-3 inline-flex items-center gap-1.5 py-1.5 text-xs rounded-full">
-                        <FaStar className="text-base -mt-0.5" />
-                        4.3
-                      </p>
-                    </div>
-                    <div className="flex items-start py-4 justify-between">
-                      <div>
-                        <h3 className="text-lg font-semibold">
-                          {property.title}
-                        </h3>
-                        <p className="text-xs text-ellipsis text-gray-500">
-                          {property.address.city}, {property.address.state}
-                        </p>
-                      </div>
-                    </div>
-                    <div className="flex items-center p-1 bg-[#F7F7F7] rounded-full gap-1 text-gray-700 text-xs mt-2">
-                      <p className="bg-white flex-1 border border-[#28303F1A] rounded-full flex items-center gap-1.5 pl-0.5 py-0.5 pr-3">
-                        <img
-                          src="/images/bed.svg"
-                          alt="Bed"
-                          className="w-5 h-5"
-                        />
-                        {property.beds} Beds
-                      </p>
-                      <p className="bg-white flex-1 border border-[#28303F1A] rounded-full flex items-center gap-1.5 pl-0.5 py-0.5 pr-3">
-                        <img
-                          src="/images/bath.svg"
-                          alt="Bath"
-                          className="w-5 h-5"
-                        />
-                        {property.bathrooms} Baths
-                      </p>
-                      <p className="bg-white flex-1 border border-[#28303F1A] rounded-full flex items-center gap-1.5 pl-0.5 py-0.5 pr-3">
-                        <img
-                          src="/images/area.svg"
-                          alt="Area"
-                          className="w-5 h-5"
-                        />
-                        {property.squareFeet || "N/A"} SqFt
-                      </p>
-                    </div>
-                    <div className="mt-3 flex items-center gap-3 border-t border-[#28303F1A] pt-3">
-                      <Link
-                        href={`/property/${property._id}`}
-                        className="flex-1"
-                      >
-                        <button className="px-1 py-2 flex items-center gap-1.5 rounded-lg">
-                          <img
-                            src="/images/calendar.svg"
-                            alt="Tour"
-                            className="w-5 h-5"
-                          />
-                          Tour
-                        </button>
-                      </Link>
-                      <button className="bg-[#3A99D3] flex-grow text-white px-4 py-3 rounded-full font-semibold">
-                        Check Availability
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              );
-
-              // For demo, we'll use innerHTML since we can't directly render React here
               container.innerHTML = `
                 <div class="bg-white rounded-[16px] overflow-hidden w-full">
                   <div class="relative">
@@ -356,7 +315,9 @@ export default function PropertiesMap({
                           : ""
                       }
                     </div>
-                    
+                    <button class="absolute top-2 right-2 text-white bg-black/20 hover:bg-black/50 p-2 rounded-full">
+                      <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z"></path></svg>
+                    </button>
                   </div>
                   <div class="p-4 border border-[#28303F1A] rounded-[16px] -mt-4 bg-white relative">
                     <div class="flex items-center justify-between">
@@ -391,12 +352,16 @@ export default function PropertiesMap({
                         ${property.squareFeet || "N/A"} SqFt
                       </p>
                     </div>
-                    <div class="mt-3 w-full justify-center flex items-center gap-3 border-t border-[#28303F1A] pt-3">
-                      <a  href="/property/${property._id}" className=" w-full"> 
-                      <button class="bg-[#3A99D3] flex-grow text-white px-4 py-3 rounded-full font-semibold">
-                      Visit Property 
-                      </button>
+                    <div class="mt-3 flex items-center gap-3 border-t border-[#28303F1A] pt-3">
+                      <a href="/property/${property._id}" class="flex-1">
+                        <button class="px-1 py-2 flex items-center gap-1.5 rounded-lg">
+                          <img src="/images/calendar.svg" alt="Tour" class="w-5 h-5" />
+                          Tour
+                        </button>
                       </a>
+                      <button class="bg-[#3A99D3] flex-grow text-white px-4 py-3 rounded-full font-semibold">
+                        Check Availability
+                      </button>
                     </div>
                   </div>
                 </div>
@@ -429,6 +394,7 @@ export default function PropertiesMap({
           setCurrentLocation(pos);
           mapInstance.current?.setCenter(pos);
           onLocationChange?.(pos);
+          console.log("Refreshed to geolocation:", pos);
         },
         () => {
           console.warn("Geolocation permission denied");
@@ -440,6 +406,19 @@ export default function PropertiesMap({
   return (
     <div className="relative w-full h-[700px] rounded-lg overflow-hidden border border-gray-200">
       <div ref={mapRef} className="w-full h-full" />
+
+      {/* Search Bar */}
+      {!loading && !error && (
+        <div className="absolute top-2 left-2 w-64 sm:w-80 bg-white rounded-md shadow-md z-20">
+          <input
+            ref={searchInputRef}
+            type="text"
+            placeholder="Search for a location..."
+            className="w-full px-4 py-3 text-xs rounded-lg border border-[#28303F1A] focus:outline-none focus:ring-2 focus:ring-[#3A99D3] placeholder-gray-400"
+            aria-label="Search for a location"
+          />
+        </div>
+      )}
 
       {loading && (
         <div className="absolute inset-0 bg-gray-100 flex items-center justify-center">
@@ -465,21 +444,13 @@ export default function PropertiesMap({
       )}
 
       {!loading && !error && (
-        <>
-          <button
-            onClick={handleRefresh}
-            className="absolute bottom-4 left-4 bg-white px-4 py-2 rounded-lg shadow-md z-10 flex items-center gap-2 hover:bg-gray-50 transition-colors"
-          >
-            <FaMapMarkerAlt className="text-blue-500" />
-            My Location
-          </button>
-          {/* <div className="absolute top-4 left-4 bg-white px-3 py-1.5 rounded-lg shadow-md z-10 text-sm flex items-center gap-2">
-            <span className="font-semibold">{properties.length}</span>
-            <span>
-              {properties.length === 1 ? "Property" : "Properties"} Found
-            </span>
-          </div> */}
-        </>
+        <button
+          onClick={handleRefresh}
+          className="absolute bottom-4 left-4 bg-white px-4 py-2 rounded-lg shadow-md z-20 flex items-center gap-2 hover:bg-gray-50 transition-colors"
+        >
+          <FaMapMarkerAlt className="text-blue-500" />
+          My Location
+        </button>
       )}
     </div>
   );
