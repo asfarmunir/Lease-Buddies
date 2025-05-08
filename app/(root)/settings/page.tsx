@@ -24,11 +24,11 @@ const tabs = [
     icon: <FaLock />,
     image: "/images/password.svg",
   },
-  {
-    title: "Payment Details",
-    icon: <FaCreditCard />,
-    image: "/images/payment.svg",
-  },
+  // {
+  //   title: "Payment Details",
+  //   icon: <FaCreditCard />,
+  //   image: "/images/payment.svg",
+  // },
 ];
 
 type FormData = {
@@ -351,7 +351,7 @@ const UserSettings: React.FC = () => {
                       className="bg-[#F7F7F7] disabled:opacity-50 rounded-full px-5 py-3 2xl:py-4 res_text border border-[#28303F1A] focus:outline-none"
                     />
                   </div>
-                  <div className="flex flex-col gap-2 w-full">
+                  {/* <div className="flex flex-col gap-2 w-full">
                     <label
                       htmlFor=""
                       className="pl-2 font-[500] text-primary-50 text-xs 2xl:text-sm 3xl:text-base"
@@ -372,7 +372,7 @@ const UserSettings: React.FC = () => {
                         ? "Disconnect Facebook"
                         : "Connect Facebook"}
                     </button>
-                  </div>
+                  </div> */}
                 </div>
               </div>
 
