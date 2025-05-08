@@ -16,16 +16,22 @@ import { ProfileImageUpload } from "@/components/shared/ProfileImageUpload";
 import toast from "react-hot-toast";
 import { Property } from "@/lib/types/property";
 import { User } from "@/lib/database/models/user.model";
+import { useSearchParams } from "next/navigation";
+import BoostStatus from "@/components/shared/modals/BoostStatus";
 
 const Profile = () => {
   const session = useSession();
   const [activeTab, setActiveTab] = useState<"listings" | "favorites">(
     "listings"
   );
+
+  const searchParams = useSearchParams();
+  const initialTab = searchParams.get("boost") as "success" | "canceled" | null;
   const [user, setUser] = useState<User | null>(null);
   const [properties, setProperties] = useState<Property[]>([]);
-  console.log("🚀 ~ Profile ~ properties:", properties);
   const [favorites, setFavorites] = useState<Property[]>([]);
+  const [showModal, setShowModal] = useState(false);
+
   const [loading, setLoading] = useState({
     user: true,
     properties: true,
@@ -235,7 +241,7 @@ const Profile = () => {
             </div>
           </div>
           <div className="flex items-center flex-wrap gap-3 2xl:gap-4">
-            <Link href={"#"} className="w-full md:w-fit">
+            {/* <Link href={"#"} className="w-full md:w-fit">
               <div className="bg-[#F7F7F7] border res_text text-primary-200 font-medium border-[#28303F1A] px-3 2xl:px-4 py-1.5 2xl:py-1.5 flex items-center gap-2 rounded-full">
                 <BiSolidWalletAlt className="text-xl" />
                 <div>
@@ -248,7 +254,7 @@ const Profile = () => {
                   Earn Cash
                 </p>
               </div>
-            </Link>
+            </Link> */}
             <button
               onClick={() => setActiveTab("favorites")}
               className={`bg-[#F7F7F7] border res_text font-medium border-[#28303F1A] px-3 2xl:px-4 py-2 xl:py-3.5 2xl:py-4 flex items-center gap-2 rounded-full ${
@@ -274,6 +280,16 @@ const Profile = () => {
             </Link>
           </div>
         </div>
+        {initialTab === "success" && (
+          <BoostStatus
+            open={initialTab === "success"}
+            onOpenChange={() => {
+              if (initialTab) {
+                setActiveTab("listings");
+              }
+            }}
+          />
+        )}
         <div className="w-full p-4 xl:p-6 2xl:px-8 mt-12 border border-[#28303F1A] rounded-2xl">
           <div className="w-full flex items-center justify-between gap-3 flex-col md:flex-row">
             <div className="flex items-start  gap-3">
@@ -301,119 +317,71 @@ const Profile = () => {
               </div>
             </div>
 
-            {activeTab === "listings" && <BoostListing />}
+            {activeTab === "listings" && (
+              <>
+                <button
+                  onClick={() => setShowModal(true)}
+                  className="bg-[#28303F] text-white px-4 xl:px-8 py-2.5 2xl:py-3 text-sm 2xl:text-base rounded-full font-medium"
+                >
+                  Boost New Listing
+                </button>
+                <BoostListing
+                  properties={properties}
+                  open={showModal}
+                  onOpenChange={() => setShowModal(false)}
+                />
+              </>
+            )}
           </div>
           <div className="grid grid-cols-1 mt-6 md:grid-cols-2 2xl:grid-cols-3 gap-2 xl:gap-4 2xl:gap-6">
-            {currentProperties.length > 0 ? (
-              currentProperties.map((property, index) => (
-                <div
-                  key={index}
-                  className="bg-white rounded-[16px] overflow-hidden"
-                >
-                  <div className="relative">
-                    <Image
-                      src={property.featuredImage || "/images/prop.png"}
-                      alt={property.title}
-                      width={400}
-                      height={250}
-                      className="w-full h-48 2xl:h-[330px] object-cover"
-                    />
-                    <div className="absolute top-2.5 left-2.5 flex gap-2">
-                      {/* {property.tags?.map((tag, index) => (
-                        <span
-                          key={index}
-                          className="bg-[#FFFFFFF2] text-primary-50 text-xs px-2 2xl:px-3 py-2 rounded-full"
-                        >
-                          {tag}
-                        </span>
-                      ))} */}
-                    </div>
-                    {activeTab === "favorites" && (
-                      <button
-                        onClick={() => toggleFavorite(property._id)}
-                        className={`absolute top-2 right-2 p-2 rounded-full ${
-                          favorites.some((fav) => fav._id === property._id)
-                            ? "text-red-500 bg-white/90 hover:bg-white"
-                            : "text-white bg-black/20 hover:bg-black/50"
-                        }`}
-                      >
-                        {favorites.some((fav) => fav._id === property._id) ? (
-                          <FaHeart size={20} />
-                        ) : (
-                          <IoMdHeartEmpty size={20} />
-                        )}
-                      </button>
-                    )}
-                  </div>
-                  <div className="p-4 border border-[#28303F1A] rounded-[16px] -mt-4 bg-white relative">
-                    <div className="flex items-start pt-2 justify-between">
-                      <div>
-                        <h3 className="text-lg mb-1 font-semibold">
-                          {property.title}
-                        </h3>
-                        <p className="text-xs 3xl:text-sm text-gray-500">
-                          {property.location}
-                        </p>
-                      </div>
-                      <p className="flex items-center text-[#28303FCC] px-2 2xl:px-2.5 font-medium gap-2 res_text rounded-full">
-                        <FiShare2 className="text-lg" />
-                        Share
-                      </p>
-                    </div>
-                    {activeTab === "listings" && (
-                      <p className="res_text font-medium inline-flex text-[#28303FCC] items-center gap-2 mt-4">
-                        <MdOutlineRemoveRedEye className="text-lg" />
-                        2,345 Views
-                      </p>
-                    )}
-                    {activeTab === "favorites" && (
-                      <div className="flex items-center p-1 bg-[#F7F7F7] rounded-full gap-1 text-gray-700 text-[12px]  3xl:text-sm mt-2">
-                        <p className="bg-white flex-1 border border-[#28303F1A] rounded-full justify-center flex items-center gap-1.5 pl-0.5 py-1.5 pr-3">
-                          <Image
-                            src="/images/bed.svg"
-                            alt="Bed"
-                            width={20}
-                            height={20}
-                            className="w-7 h-7 2xl:w-6 2xl:h-6 3xl:w-8 3xl:h-8"
-                          />
-                          {property.beds} Beds
-                        </p>
-                        <p className="bg-white flex-1 border border-[#28303F1A] rounded-full justify-center flex items-center gap-1.5 pl-0.5 py-1.5 pr-3">
-                          <Image
-                            src="/images/bath.svg"
-                            alt="Bath"
-                            width={20}
-                            height={20}
-                            className="w-7 h-7 2xl:w-6 2xl:h-6 3xl:w-8 3xl:h-8"
-                          />
-                          {property.bathrooms} Baths
-                        </p>
-                        <p className="bg-white flex-1 border border-[#28303F1A] rounded-full justify-center flex items-center gap-1.5 pl-0.5 py-1.5 pr-3">
-                          <Image
-                            src="/images/area.svg"
-                            alt="Area"
-                            width={20}
-                            height={20}
-                            className="w-7 h-7 2xl:w-6 2xl:h-6 3xl:w-8 3xl:h-8"
-                          />
-                          {property.squareFeet || "N/A"} SqFt
-                        </p>
-                      </div>
-                    )}
-                    <div className="mt-3 flex gap-3">
-                      {activeTab === "listings" && (
-                        <button className="bg-[#3A99D3] flex-1 flex-grow res_text text-white px-4 xl:px-6 py-[14px] rounded-full font-semibold">
-                          Boost
-                        </button>
+            {activeTab === "listings"
+              ? properties.map((property, index) => (
+                  <div
+                    key={index}
+                    className="bg-white rounded-[16px] overflow-hidden"
+                  >
+                    <div className="relative">
+                      <Image
+                        src={property.featuredImage || "/images/prop.png"}
+                        alt={property.title}
+                        width={400}
+                        height={250}
+                        className="w-full h-48 2xl:h-[330px] object-cover"
+                      />
+                      {property.isFeatured && (
+                        <div className="absolute top-2.5 left-2.5 flex gap-2">
+                          <span className="bg-[#FFFFFFF2] text-primary-50 font-semibold text-xs px-2 2xl:px-3 py-2 rounded-full">
+                            Featured
+                          </span>
+                        </div>
                       )}
-                      {activeTab === "favorites" ? (
-                        <Link
-                          href={`/property/${property._id}`}
-                          className="text-[#3A99D3] flex-1 text-center  flex-grow res_text bg-primary/15 px-4 xl:px-6 py-[14px] rounded-full"
-                        >
-                          View Details
-                        </Link>
-                      ) : (
+                    </div>
+                    <div className="p-4 border border-[#28303F1A] rounded-[16px] -mt-4 bg-white relative">
+                      <div className="flex items-start pt-2 justify-between">
+                        <div>
+                          <h3 className="text-lg mb-1 font-semibold">
+                            {property.title}
+                          </h3>
+                          <p className="text-xs 3xl:text-sm text-gray-500">
+                            {property.location}
+                          </p>
+                        </div>
+                        <p className="flex items-center text-[#28303FCC] px-2 2xl:px-2.5 font-medium gap-2 res_text rounded-full">
+                          <FiShare2 className="text-lg" />
+                          Share
+                        </p>
+                      </div>
+
+                      <div className="mt-4 flex gap-3">
+                        {activeTab === "listings" && !property.isFeatured && (
+                          <button
+                            onClick={() => setShowModal(true)}
+                            className="bg-[#3A99D3] flex-1 flex-grow res_text text-white px-4 xl:px-6 py-[14px] rounded-full font-semibold"
+                          >
+                            Boost
+                          </button>
+                        )}
+
                         <Link
                           //@ts-ignore
                           href={`/property/${property.id}`}
@@ -421,14 +389,117 @@ const Profile = () => {
                         >
                           View Details
                         </Link>
-                      )}
+                      </div>
                     </div>
                   </div>
-                </div>
-              ))
-            ) : (
-              <div className="col-span-full text-center py-8">
-                <p className="text-primary-200">{noItemsMessage}</p>
+                ))
+              : activeTab === "favorites"
+              ? favorites.map((property, index) => (
+                  <div
+                    key={index}
+                    className="bg-white rounded-[16px] overflow-hidden"
+                  >
+                    <div className="relative">
+                      <Image
+                        src={property.featuredImage || "/images/prop.png"}
+                        alt={property.title}
+                        width={400}
+                        height={250}
+                        className="w-full h-48 2xl:h-[330px] object-cover"
+                      />
+                      <div className="absolute top-2.5 left-2.5 flex gap-2"></div>
+                      {activeTab === "favorites" && (
+                        <button
+                          onClick={() => toggleFavorite(property._id)}
+                          className={`absolute top-2 right-2 p-2 rounded-full ${
+                            favorites.some((fav) => fav._id === property._id)
+                              ? "text-red-500 bg-white/90 hover:bg-white"
+                              : "text-white bg-black/20 hover:bg-black/50"
+                          }`}
+                        >
+                          {favorites.some((fav) => fav._id === property._id) ? (
+                            <FaHeart size={20} />
+                          ) : (
+                            <IoMdHeartEmpty size={20} />
+                          )}
+                        </button>
+                      )}
+                    </div>
+                    <div className="p-4 border border-[#28303F1A] rounded-[16px] -mt-4 bg-white relative">
+                      <div className="flex items-start pt-2 justify-between">
+                        <div>
+                          <h3 className="text-lg mb-1 font-semibold">
+                            {property.title}
+                          </h3>
+                          <p className="text-xs 3xl:text-sm text-gray-500">
+                            {property.location}
+                          </p>
+                        </div>
+                        <p className="flex items-center text-[#28303FCC] px-2 2xl:px-2.5 font-medium gap-2 res_text rounded-full">
+                          <FiShare2 className="text-lg" />
+                          Share
+                        </p>
+                      </div>
+
+                      {activeTab === "favorites" && (
+                        <div className="flex items-center p-1 bg-[#F7F7F7] rounded-full gap-1 text-gray-700 text-[12px]  3xl:text-sm mt-2">
+                          <p className="bg-white flex-1 border border-[#28303F1A] rounded-full justify-center flex items-center gap-1.5 pl-0.5 py-1.5 pr-3">
+                            <Image
+                              src="/images/bed.svg"
+                              alt="Bed"
+                              width={20}
+                              height={20}
+                              className="w-7 h-7 2xl:w-6 2xl:h-6 3xl:w-8 3xl:h-8"
+                            />
+                            {property.beds} Beds
+                          </p>
+                          <p className="bg-white flex-1 border border-[#28303F1A] rounded-full justify-center flex items-center gap-1.5 pl-0.5 py-1.5 pr-3">
+                            <Image
+                              src="/images/bath.svg"
+                              alt="Bath"
+                              width={20}
+                              height={20}
+                              className="w-7 h-7 2xl:w-6 2xl:h-6 3xl:w-8 3xl:h-8"
+                            />
+                            {property.bathrooms} Baths
+                          </p>
+                          <p className="bg-white flex-1 border border-[#28303F1A] rounded-full justify-center flex items-center gap-1.5 pl-0.5 py-1.5 pr-3">
+                            <Image
+                              src="/images/area.svg"
+                              alt="Area"
+                              width={20}
+                              height={20}
+                              className="w-7 h-7 2xl:w-6 2xl:h-6 3xl:w-8 3xl:h-8"
+                            />
+                            {property.squareFeet || "N/A"} SqFt
+                          </p>
+                        </div>
+                      )}
+                      <div className="mt-3 flex gap-3">
+                        {activeTab === "favorites" ? (
+                          <Link
+                            href={`/property/${property._id}`}
+                            className="text-[#3A99D3] flex-1 text-center  flex-grow res_text bg-primary/15 px-4 xl:px-6 py-[14px] rounded-full"
+                          >
+                            View Details
+                          </Link>
+                        ) : (
+                          <Link
+                            //@ts-ignore
+                            href={`/property/${property.id}`}
+                            className="text-[#3A99D3] flex-1 text-center  flex-grow res_text bg-primary/15 px-4 xl:px-6 py-[14px] rounded-full"
+                          >
+                            View Details
+                          </Link>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                ))
+              : null}
+            {currentProperties.length === 0 && (
+              <div className="col-span-1 md:col-span-2 2xl:col-span-3 flex items-center justify-center h-64 text-primary-200 font-semibold">
+                {noItemsMessage}
               </div>
             )}
           </div>

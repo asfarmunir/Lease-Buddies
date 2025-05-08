@@ -28,12 +28,12 @@ export interface Property {
     lat: number;
     lng: number;
     formattedAddress: string;
-    placeId?: string; // Optional: store Google Places ID for reference
+    placeId?: string;
   };
   locationGeo: {
-    type: "Point"; // Fixed to 'Point' for GeoJSON
-    coordinates: [number, number]; // [lng, lat] format for GeoJSON
-  },
+    type: "Point";
+    coordinates: [number, number];
+  };
   bedrooms: number;
   beds: number;
   bathrooms: number;
@@ -58,14 +58,16 @@ export interface Property {
   };
   isActive: boolean;
   isFeatured: boolean;
+  boostSubscription?: string; // Reference to Subscription _id
+  boostExpiration?: Date; // Expiration date of the boost
   createdAt: Date;
   updatedAt: Date;
   availabilityDate?: Date;
   leaseTerms?: string;
   neighborhoodInfo?: string;
   nearbyAttractions?: string[];
-  formattedAddress?: string;
-  displayPrice?: string;
+  formattedAddress?: string; // Virtual field
+  displayPrice?: string; // Virtual field
 }
 
 export interface FilterOptions {

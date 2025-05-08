@@ -1,5 +1,7 @@
 import { Schema, model, models } from "mongoose";
 
+
+
 const PropertySchema = new Schema(
   {
     title: { type: String, required: true },
@@ -24,24 +26,20 @@ const PropertySchema = new Schema(
       state: { type: String, required: true },
       zip: { type: String, required: true },
       country: { type: String, required: true, default: "US" },
-      // New fields for geolocation
       lat: { type: Number, required: true },
       lng: { type: Number, required: true },
       formattedAddress: { type: String, required: true },
-      placeId: { type: String } // Optional: store Google Places ID for reference
+      placeId: { type: String }
     },
     
-    // GeoJSON for advanced geospatial queries
     locationGeo: {
       type: {
         type: String,
         enum: ['Point'],
-        // required: true,
         default: 'Point'
       },
       coordinates: {
-        type: [Number],
-        // required: true
+        type: [Number]
       }
     },
     
@@ -76,16 +74,10 @@ const PropertySchema = new Schema(
     }],
     
     photos: [{ 
-      type: String, // URLs to images
-      required: true,
-      // validate: {
-      //   validator: function(v: string[]) {
-      //     return v.length >= 5 && v.length <= 10;
-      //   },
-      //   message: 'You must provide between 5 and 10 photos'
-      // }
+      type: String,
+      required: true
     }],
-    featuredImage: { type: String }, // Main/featured image URL
+    featuredImage: { type: String },
     price: { type: Number, required: true, min: 0 },
     currency: { 
       type: String, 
@@ -108,6 +100,11 @@ const PropertySchema = new Schema(
     },
     isActive: { type: Boolean, default: true },
     isFeatured: { type: Boolean, default: false },
+    boostSubscription: { 
+      type: Schema.Types.ObjectId, 
+      ref: "Subscription" 
+    },
+    boostExpiration: { type: Date },
     
     createdAt: { type: Date, default: Date.now },
     updatedAt: { type: Date, default: Date.now },
@@ -124,10 +121,8 @@ const PropertySchema = new Schema(
   }
 );
 
-// Create 2dsphere index for geospatial queries
 PropertySchema.index({ locationGeo: '2dsphere' });
 
-// Add text index for search functionality
 PropertySchema.index({
   title: "text",
   description: "text",
@@ -136,23 +131,20 @@ PropertySchema.index({
   type: "text"
 });
 
-// Virtual for formatted address (alternative to stored formattedAddress)
 PropertySchema.virtual("formattedAddress").get(function() {
-  //@ts-ignore
+    //@ts-ignore
   return `${this.address.address1}, ${this.address.city}, ${this.address.state} ${this.address.zip}`;
 });
 
-// Virtual for price display
 PropertySchema.virtual("displayPrice").get(function() {
   return `${this.currency === "USD" ? "$" : "C"}${this.price.toLocaleString()}`;
 });
 
-// Pre-save hook to update locationGeo coordinates
 PropertySchema.pre('save', function(next) {
   if (this.isModified('address.lat') || this.isModified('address.lng')) {
     this.locationGeo = {
       type: 'Point',
-      //@ts-ignore
+        //@ts-ignore
       coordinates: [this.address.lng, this.address.lat]
     };
   }

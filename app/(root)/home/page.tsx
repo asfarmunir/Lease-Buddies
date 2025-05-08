@@ -1,4 +1,5 @@
 "use client";
+
 import { useState, useEffect } from "react";
 import Image from "next/image";
 import { FaHeart, FaStar } from "react-icons/fa";
@@ -21,6 +22,7 @@ import { useSession } from "next-auth/react";
 import toast from "react-hot-toast";
 import CheckAvailability from "@/components/shared/modals/CheckAvailability";
 import BookVisit from "@/components/shared/modals/BookVisit";
+
 export default function ApartmentListings() {
   const [properties, setProperties] = useState<Property[]>([]);
   const [loading, setLoading] = useState(true);
@@ -95,7 +97,6 @@ export default function ApartmentListings() {
   const updateFilters = (newFilters: Partial<FilterOptions>) => {
     const params = new URLSearchParams();
 
-    // Set all filters from searchParams first
     searchParams.forEach((value, key) => {
       if (
         key !== "bedrooms" &&
@@ -109,7 +110,6 @@ export default function ApartmentListings() {
       }
     });
 
-    // Apply new filters
     if (newFilters.type !== undefined) {
       params.delete("type");
       if (newFilters.type && newFilters.type.length > 0) {
@@ -151,7 +151,6 @@ export default function ApartmentListings() {
     router.push(`${pathname}?${params.toString()}`);
   };
 
-  // Clear all filters
   const clearAllFilters = () => {
     setTempFilters({
       bedrooms: null,
@@ -164,9 +163,25 @@ export default function ApartmentListings() {
     setAppliedFilters({});
   };
 
+  // Sort properties: Featured first, then by boostExpiration (newest first), then by createdAt (newest first)
+  const sortedProperties = [...properties].sort((a, b) => {
+    if (a.isFeatured && !b.isFeatured) return -1;
+    if (!a.isFeatured && b.isFeatured) return 1;
+    if (a.isFeatured && b.isFeatured) {
+      const aExpiration = a.boostExpiration
+        ? new Date(a.boostExpiration).getTime()
+        : 0;
+      const bExpiration = b.boostExpiration
+        ? new Date(b.boostExpiration).getTime()
+        : 0;
+      return bExpiration - aExpiration; // Newer expiration first
+    }
+    return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(); // Newer created first
+  });
+
   if (loading)
     return (
-      <div className="p-4 text-center h-[80svh] animate-pulse  flex-col flex items-center justify-center">
+      <div className="p-4 text-center h-[80svh] animate-pulse flex-col flex items-center justify-center">
         <Image
           src="/logo.svg"
           alt="No properties found"
@@ -485,14 +500,12 @@ export default function ApartmentListings() {
           onApplyFilters={(filters) => {
             const params = new URLSearchParams(searchParams.toString());
 
-            // Update audience filter
             if (filters.audience && filters.audience !== "Any") {
               params.set("audience", filters.audience);
             } else {
               params.delete("audience");
             }
 
-            // Update amenities filters
             params.delete("amenities");
             if (filters.amenities && filters.amenities.length > 0) {
               filters.amenities.forEach((amenity) =>
@@ -500,7 +513,6 @@ export default function ApartmentListings() {
               );
             }
 
-            // Update square feet filter
             if (filters.squareFeet) {
               params.set("squareFeet", filters.squareFeet);
             } else {
@@ -528,7 +540,7 @@ export default function ApartmentListings() {
       </div>
       <div className="border border-[#28303F1A] p-4 xl:p-6 rounded-[20px]">
         <h2 className="text-xl 2xl:text-2xl text-primary-50 font-semibold">
-          Apartments For Rent In New York, USA
+          Apartments For Rents
         </h2>
         <p className="text-primary-50 mt-2 text-xs 2xl:text-sm">
           {properties.length}{" "}
@@ -539,46 +551,15 @@ export default function ApartmentListings() {
         <div className="grid grid-cols-1 lg:grid-cols-[2fr_1fr] gap-6 mt-6">
           {/* Apartment Listings */}
           <div className="grid grid-cols-1 md:grid-cols-2 2xl:grid-cols-3 gap-2">
-            {properties.map((property) => (
+            {sortedProperties.map((property) => (
               <PropertyCard key={property._id} property={property} />
             ))}
           </div>
 
-          {/* Map Section */}
-          {/* <div
-            className="relative w-full bg-gray-200 h-[700px] rounded-lg overflow-hidden"
-            style={{
-              backgroundImage: "url('/images/map.png')",
-              backgroundSize: "cover",
-              backgroundPosition: "bottom",
-            }}
-          >
-            <h3 className="absolute top-2 left-2 bg-white px-4 py-2 rounded-md text-sm font-semibold shadow">
-              Points of Interest
-            </h3>
-            {mapMarkers.map((marker) => (
-              <div
-                key={marker.id}
-                className={`absolute ${marker.x} ${marker.y} bg-black text-white px-3 py-1 rounded-full shadow-md`}
-              >
-                {marker.price}
-              </div>
-            ))}
-            <button className="absolute bottom-2 left-2 bg-white px-4 py-2 rounded-lg shadow">
-              Refresh Map
-            </button>
-          </div> */}
           <PropertiesMap
             properties={properties}
-            // userLocation={userLocation} // Optional: pass user location if you have it
-            onLocationChange={(location) => {
-              // Handle location changes if needed
-            }}
-            onBoundsChange={async (bounds) => {
-              // Optional: implement bounds-based filtering
-              // This will be called when the map is moved/zoomed
-              // You can use the bounds to fetch properties in the visible area
-            }}
+            onLocationChange={(location) => {}}
+            onBoundsChange={async (bounds) => {}}
           />
         </div>
       </div>
@@ -586,7 +567,6 @@ export default function ApartmentListings() {
   );
 }
 
-// Property Card Component
 function PropertyCard({ property }: { property: Property }) {
   const [isFavorited, setIsFavorited] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -597,9 +577,8 @@ function PropertyCard({ property }: { property: Property }) {
   const router = useRouter();
 
   useEffect(() => {
-    // Check if property is in user's favorites when component mounts
     const checkFavoriteStatus = async () => {
-      //@ts-ignore
+      // @ts-ignore
       if (session?.user?.id) {
         try {
           const response = await fetch("/api/user/favorites");
@@ -619,7 +598,6 @@ function PropertyCard({ property }: { property: Property }) {
 
   const toggleFavorite = async () => {
     if (!session) {
-      // Redirect to login if not authenticated
       router.push("/login");
       return;
     }
@@ -650,7 +628,7 @@ function PropertyCard({ property }: { property: Property }) {
   };
 
   return (
-    <div className="bg-white rounded-[16px]   overflow-hidden">
+    <div className="bg-white rounded-[16px] overflow-hidden">
       <div className="relative">
         <Image
           src={
@@ -705,7 +683,7 @@ function PropertyCard({ property }: { property: Property }) {
         <div className="flex items-start py-4 justify-between">
           <div>
             <h3 className="text-lg font-semibold">{property.title}</h3>
-            <p className="text-xs 3xl:text-sm text-ellipsis  text-gray-500">
+            <p className="text-xs 3xl:text-sm text-ellipsis text-gray-500">
               {property.address.city}, {property.address.state}
             </p>
           </div>

@@ -391,16 +391,12 @@ export default function PropertiesMap({
                         ${property.squareFeet || "N/A"} SqFt
                       </p>
                     </div>
-                    <div class="mt-3 flex items-center gap-3 border-t border-[#28303F1A] pt-3">
-                      <a href="/property/${property._id}" class="flex-1">
-                        <button class="px-1 py-2 flex items-center gap-1.5 rounded-lg">
-                          <img src="/images/calendar.svg" alt="Tour" class="w-5 h-5" />
-                          Tour
-                        </button>
-                      </a>
+                    <div class="mt-3 w-full justify-center flex items-center gap-3 border-t border-[#28303F1A] pt-3">
+                      <a  href="/property/${property._id}" className=" w-full"> 
                       <button class="bg-[#3A99D3] flex-grow text-white px-4 py-3 rounded-full font-semibold">
-                        Check Availability
+                      Visit Property 
                       </button>
+                      </a>
                     </div>
                   </div>
                 </div>
@@ -477,12 +473,12 @@ export default function PropertiesMap({
             <FaMapMarkerAlt className="text-blue-500" />
             My Location
           </button>
-          <div className="absolute top-4 left-4 bg-white px-3 py-1.5 rounded-lg shadow-md z-10 text-sm flex items-center gap-2">
+          {/* <div className="absolute top-4 left-4 bg-white px-3 py-1.5 rounded-lg shadow-md z-10 text-sm flex items-center gap-2">
             <span className="font-semibold">{properties.length}</span>
             <span>
               {properties.length === 1 ? "Property" : "Properties"} Found
             </span>
-          </div>
+          </div> */}
         </>
       )}
     </div>

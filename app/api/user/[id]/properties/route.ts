@@ -26,7 +26,10 @@ export const GET = async (request: Request, { params }: { params: { id: string }
       price: `$${property.price}`,
       tags: property.isFeatured ? ["Featured"] : [],
       verified: true,
-      featuredImage: property.featuredImage || property.photos[0]
+      featuredImage: property.featuredImage || property.photos[0],
+      city : property.address.city,
+      state : property.address.state,
+      isFeatured: property.isFeatured,
     }));
 
     return NextResponse.json(formattedProperties);

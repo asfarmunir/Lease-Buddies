@@ -6,14 +6,13 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import Agreements from "@/components/shared/modals/Agreements";
-import { DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import toast from "react-hot-toast";
 import { useSession } from "next-auth/react";
 import { RiLoader3Line } from "react-icons/ri";
-import GooglePlacesAutocomplete from "react-google-autocomplete";
 import LocationInput from "@/components/shared/AutoCompleteField";
-import { GoogleMap, LoadScript, Marker } from "@react-google-maps/api";
+import { GoogleMap, Marker } from "@react-google-maps/api";
 import { useLoadScript } from "@react-google-maps/api";
+import { useRouter } from "next/navigation";
 const steps = [
   "type",
   "audience",
@@ -123,7 +122,7 @@ export default function PropertyListingForm() {
     googleMapsApiKey: process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || "",
     libraries: ["places"],
   });
-
+  const router = useRouter();
   const { data: session } = useSession();
   const [step, setStep] = useState(0);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -267,21 +266,6 @@ export default function PropertyListingForm() {
     setFormData((prev) => ({ ...prev, [field]: value }));
   };
 
-  const handleNestedChange = (
-    parentField: string,
-    field: string,
-    value: any
-  ) => {
-    setFormData((prev) => ({
-      ...prev,
-      [parentField]: {
-        //@ts-ignore
-        ...prev[parentField as keyof typeof prev],
-        [field]: value,
-      },
-    }));
-  };
-
   const toggleAmenity = (
     category: keyof typeof formData.amenities,
     amenityName: string
@@ -309,14 +293,6 @@ export default function PropertyListingForm() {
         },
       };
     });
-  };
-  const togglePetPolicy = (policy: string) => {
-    setFormData((prev) => ({
-      ...prev,
-      petsAllowed: prev.petsAllowed.includes(policy)
-        ? prev.petsAllowed.filter((item) => item !== policy)
-        : [...prev.petsAllowed, policy],
-    }));
   };
 
   const [uploading, setUploading] = useState(false);
@@ -421,9 +397,9 @@ export default function PropertyListingForm() {
         throw new Error(errorData.error || "Failed to create listing");
       }
 
-      const result = await response.json();
+      await response.json();
       toast.success("Property listed successfully!");
-      // Reset form or redirect as needed
+      router.push("/profile");
     } catch (error: any) {
       toast.error(error.message || "An error occurred");
     } finally {

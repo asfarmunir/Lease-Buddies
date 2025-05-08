@@ -121,7 +121,6 @@ const LoginFormSchema = () => {
         toast.error(response.data.message);
         return;
       }
-      const { email, password } = values;
       toast.success("Account created successfully");
       router.push("/welcome");
     } catch (error) {
@@ -204,7 +203,7 @@ const LoginFormSchema = () => {
                     </FormLabel>
                     <FormControl>
                       <Input
-                        placeholder="shadcn"
+                        placeholder="enter email"
                         {...field}
                         className="bg-[#F7F7F7] text-xs md:text-sm 2xl:text-base rounded-full border border-[#28303F1A] py-5 2xl:py-7 px-4 w-full text-[#28303FCC]"
                       />

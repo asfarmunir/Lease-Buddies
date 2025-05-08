@@ -164,10 +164,11 @@ const Navbar = () => {
               </DropdownMenuContent>
             </DropdownMenu>
           ))}
-
-          <button className="res_text text-primary font-semibold">
-            Advertise
-          </button>
+          <Link href={"/profile"}>
+            <button className="res_text text-primary font-semibold">
+              Advertise
+            </button>
+          </Link>
 
           <Link href={"/property/list"}>
             <button className="res_text bg-primary rounded-full p-4 py-2.5 text-white">

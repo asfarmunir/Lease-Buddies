@@ -94,10 +94,14 @@ const PropertyDetails: React.FC = () => {
       <div className="flex flex-col md:flex-row mt-6 gap-6">
         {/* Left Section */}
         <div className="flex-1">
-          <div className="flex justify-between items-center gap-2">
-            <span className="bg-[#E2E2E21A] text-primary-50 text-xs px-2 2xl:px-3 py-2 rounded-full">
-              Featured
-            </span>
+          <div className="flex justify-between mb-2 items-center gap-2">
+            {property.isFeatured ? (
+              <span className="bg-primary text-white text-xs  px-2 2xl:px-4 py-2 rounded-full">
+                Featured
+              </span>
+            ) : (
+              <p className="opacity-0">p</p>
+            )}
             <p className="bg-[#28303F1A]  px-3 inline-flex items-center gap-1.5  py-1.5 text-xs rounded-full">
               <FaStar className="text-base -mt-0.5" />
               4.3
