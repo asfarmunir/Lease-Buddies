@@ -82,11 +82,11 @@ const LoginFormSchema = () => {
   const signupForm = useForm<z.infer<typeof signupFormSchema>>({
     resolver: zodResolver(signupFormSchema),
     defaultValues: {
-      email: "asfarma2815@gmail.com",
-      password: "asfarasfar",
-      confirmPassword: "asfarasfar",
-      firstname: "asfar",
-      lastname: "munir",
+      email: "",
+      password: "",
+      confirmPassword: "",
+      firstname: "",
+      lastname: "",
     },
   });
 
@@ -110,6 +110,8 @@ const LoginFormSchema = () => {
   }
 
   async function onSignupSubmit(values: z.infer<typeof signupFormSchema>) {
+    const { email, password } = values;
+
     setLoading(true);
 
     try {
@@ -121,8 +123,18 @@ const LoginFormSchema = () => {
         toast.error(response.data.message);
         return;
       }
-      toast.success("Account created successfully");
+      const logRes = await signIn("credentials", {
+        email,
+        password,
+        redirect: false,
+      });
+      if (!logRes!.ok) {
+        toast.error(logRes!.error);
+        setLoading(false);
+        return;
+      }
       router.push("/welcome");
+      toast.success("Account created successfully");
     } catch (error) {
       console.log(error);
       toast.error("Something went wrong");
@@ -304,7 +316,7 @@ const LoginFormSchema = () => {
                         </FormLabel>
                         <FormControl>
                           <Input
-                            placeholder="shadcn"
+                            placeholder="enter email"
                             {...field}
                             className="bg-[#F7F7F7] text-xs md:text-sm 2xl:text-base rounded-full border border-[#28303F1A] py-5 2xl:py-7 px-4 w-full text-[#28303FCC]"
                           />

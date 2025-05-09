@@ -24,14 +24,12 @@ const Profile = () => {
   const [activeTab, setActiveTab] = useState<"listings" | "favorites">(
     "listings"
   );
-
   const searchParams = useSearchParams();
   const initialTab = searchParams.get("boost") as "success" | "canceled" | null;
   const [user, setUser] = useState<User | null>(null);
   const [properties, setProperties] = useState<Property[]>([]);
   const [favorites, setFavorites] = useState<Property[]>([]);
   const [showModal, setShowModal] = useState(false);
-
   const [loading, setLoading] = useState({
     user: true,
     properties: true,
@@ -48,9 +46,7 @@ const Profile = () => {
       try {
         //@ts-ignore
         const response = await fetch(`/api/user/${session.data?.user.id}`);
-        if (!response.ok) {
-          throw new Error("Failed to fetch user data");
-        }
+        if (!response.ok) throw new Error("Failed to fetch user data");
         const data = await response.json();
         setUser(data);
       } catch (err: any) {
@@ -66,9 +62,7 @@ const Profile = () => {
           //@ts-ignore
           `/api/user/${session.data?.user.id}/properties`
         );
-        if (!response.ok) {
-          throw new Error("Failed to fetch properties data");
-        }
+        if (!response.ok) throw new Error("Failed to fetch properties data");
         const data = await response.json();
         setProperties(data);
       } catch (err: any) {
@@ -81,9 +75,7 @@ const Profile = () => {
     const fetchFavoritesData = async () => {
       try {
         const response = await fetch("/api/user/favorites");
-        if (!response.ok) {
-          throw new Error("Failed to fetch favorites data");
-        }
+        if (!response.ok) throw new Error("Failed to fetch favorites data");
         const data = await response.json();
         setFavorites(data.favorites);
       } catch (err: any) {
@@ -104,20 +96,11 @@ const Profile = () => {
     try {
       const response = await fetch("/api/user/update-profile-image", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          //@ts-ignore
-          userId: session.data?.user.id,
-          imageUrl,
-        }),
+        headers: { "Content-Type": "application/json" },
+        //@ts-ignore
+        body: JSON.stringify({ userId: session.data?.user.id, imageUrl }),
       });
-
-      if (!response.ok) {
-        throw new Error("Failed to update profile image");
-      }
-
+      if (!response.ok) throw new Error("Failed to update profile image");
       const data = await response.json();
       setUser((prev) =>
         prev ? { ...prev, profileImage: data.profileImage } : null
@@ -132,20 +115,15 @@ const Profile = () => {
     try {
       const response = await fetch("/api/user/favorites", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ propertyId }),
       });
-
       if (response.ok) {
         const data = await response.json();
-        // Update favorites list
         const updatedFavorites = data.isFavorited
           ? [...favorites, properties.find((p) => p._id === propertyId)!]
           : favorites.filter((p) => p._id !== propertyId);
         setFavorites(updatedFavorites);
-
         toast.success(
           data.isFavorited ? "Added to favorites!" : "Removed from favorites"
         );
@@ -215,7 +193,6 @@ const Profile = () => {
         <div className="w-full flex flex-col gap-5 md:flex-row items-center md:items-start mt-5 justify-between">
           <div className="flex flex-col md:flex-row items-center gap-4">
             <ProfileImageUpload user={user} onImageUpload={handleImageUpload} />
-
             <div className="flex flex-col gap-3">
               <h1 className="text-[20px] flex flex-col md:flex-row gap-2 items-center font-semibold">
                 <p className="capitalize">{fullName}</p>
@@ -264,15 +241,15 @@ const Profile = () => {
               <FaRegHeart className="text-lg" />
               Favorites
             </button>
-            <button
-              className={`bg-[#F7F7F7] border res_text font-medium border-[#28303F1A] px-3 2xl:px-4 py-2 xl:py-3.5 2xl:py-4 flex items-center gap-2 rounded-full ${
-                false ? "bg-blue-100 border-blue-300" : ""
-              }`}
-            >
-              <AiOutlineMessage className="text-xl" />
-              Inbox
-            </button>
-            <Link href={"/settings"}>
+            <Link href="/inbox">
+              <p
+                className={`bg-[#F7F7F7] border res_text font-medium border-[#28303F1A] px-3 2xl:px-4 py-2 xl:py-3.5 2xl:py-4 flex items-center gap-2 rounded-full`}
+              >
+                <AiOutlineMessage className="text-xl" />
+                Inbox
+              </p>
+            </Link>
+            <Link href="/settings">
               <p className="bg-[#F7F7F7] border res_text text-primary-200 font-medium border-[#28303F1A] px-3 2xl:px-4 py-2 xl:py-3.5 2xl:py-4 flex items-center gap-2 rounded-full">
                 <BsThreeDots className="text-xl" />
                 Edit Profile
@@ -284,15 +261,13 @@ const Profile = () => {
           <BoostStatus
             open={initialTab === "success"}
             onOpenChange={() => {
-              if (initialTab) {
-                setActiveTab("listings");
-              }
+              if (initialTab) setActiveTab("listings");
             }}
           />
         )}
         <div className="w-full p-4 xl:p-6 2xl:px-8 mt-12 border border-[#28303F1A] rounded-2xl">
           <div className="w-full flex items-center justify-between gap-3 flex-col md:flex-row">
-            <div className="flex items-start  gap-3">
+            <div className="flex items-start gap-3">
               {activeTab === "favorites" && (
                 <button
                   onClick={() => setActiveTab("listings")}
@@ -316,7 +291,6 @@ const Profile = () => {
                 </p>
               </div>
             </div>
-
             {activeTab === "listings" && (
               <>
                 <button
@@ -371,7 +345,6 @@ const Profile = () => {
                           Share
                         </p>
                       </div>
-
                       <div className="mt-4 flex gap-3">
                         {activeTab === "listings" && !property.isFeatured && (
                           <button
@@ -381,11 +354,10 @@ const Profile = () => {
                             Boost
                           </button>
                         )}
-
                         <Link
                           //@ts-ignore
                           href={`/property/${property.id}`}
-                          className="text-[#3A99D3] flex-1 text-center  flex-grow res_text bg-primary/15 px-4 xl:px-6 py-[14px] rounded-full"
+                          className="text-[#3A99D3] flex-1 text-center flex-grow res_text bg-primary/15 px-4 xl:px-6 py-[14px] rounded-full"
                         >
                           View Details
                         </Link>
@@ -440,9 +412,8 @@ const Profile = () => {
                           Share
                         </p>
                       </div>
-
                       {activeTab === "favorites" && (
-                        <div className="flex items-center p-1 bg-[#F7F7F7] rounded-full gap-1 text-gray-700 text-[12px]  3xl:text-sm mt-2">
+                        <div className="flex items-center p-1 bg-[#F7F7F7] rounded-full gap-1 text-gray-700 text-[12px] 3xl:text-sm mt-2">
                           <p className="bg-white flex-1 border border-[#28303F1A] rounded-full justify-center flex items-center gap-1.5 pl-0.5 py-1.5 pr-3">
                             <Image
                               src="/images/bed.svg"
@@ -476,22 +447,12 @@ const Profile = () => {
                         </div>
                       )}
                       <div className="mt-3 flex gap-3">
-                        {activeTab === "favorites" ? (
-                          <Link
-                            href={`/property/${property._id}`}
-                            className="text-[#3A99D3] flex-1 text-center  flex-grow res_text bg-primary/15 px-4 xl:px-6 py-[14px] rounded-full"
-                          >
-                            View Details
-                          </Link>
-                        ) : (
-                          <Link
-                            //@ts-ignore
-                            href={`/property/${property.id}`}
-                            className="text-[#3A99D3] flex-1 text-center  flex-grow res_text bg-primary/15 px-4 xl:px-6 py-[14px] rounded-full"
-                          >
-                            View Details
-                          </Link>
-                        )}
+                        <Link
+                          href={`/property/${property._id}`}
+                          className="text-[#3A99D3] flex-1 text-center flex-grow res_text bg-primary/15 px-4 xl:px-6 py-[14px] rounded-full"
+                        >
+                          View Details
+                        </Link>
                       </div>
                     </div>
                   </div>

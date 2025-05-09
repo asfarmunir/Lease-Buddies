@@ -2,16 +2,13 @@ import { connectToDatabase } from "@/lib/database";
 import Property from "@/lib/database/models/property.model";
 import { NextResponse } from "next/server";
 
+export async function GET(request: Request, context: { params: Promise<{ id: string }> }) {
 
-export async function GET(
-  request: Request,
-  { params }: { params: { id: string } }
-)  {
-  console.log("🚀 ~ id:", params.id)
+  const { id } = await context.params;
   try {
     await connectToDatabase();
 
-    const property = await Property.findById(params.id)
+    const property = await Property.findById(id)
       .populate('owner', 'firstname lastname email phone')
       .lean();
 

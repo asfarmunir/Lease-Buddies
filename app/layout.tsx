@@ -4,6 +4,7 @@ import "./globals.css";
 import { Toaster } from "react-hot-toast";
 import NextTopLoader from "nextjs-toploader";
 import AuthSessionProvider from "@/lib/AuthProvider";
+import "stream-chat-react/dist/css/v2/index.css";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
