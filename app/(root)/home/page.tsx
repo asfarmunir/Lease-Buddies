@@ -24,6 +24,7 @@ import toast from "react-hot-toast";
 import CheckAvailability from "@/components/shared/modals/CheckAvailability";
 import BookVisit from "@/components/shared/modals/BookVisit";
 import { LuSearch } from "react-icons/lu";
+import { RiFindReplaceLine } from "react-icons/ri";
 
 // Custom debounce hook
 function useDebounce<T>(value: T, delay: number): T {
@@ -66,13 +67,32 @@ export default function ApartmentListings() {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
-  const [searchInput, setSearchInput] = useState<string>("");
+  const [searchInput, setSearchInput] = useState<string>(
+    searchParams.get("search") || ""
+  );
   const debouncedSearch = useDebounce(searchInput, 500);
+
+  // Helper function to check if any filters are applied
+  const hasActiveFilters = () => {
+    return (
+      !!appliedFilters.bedrooms ||
+      !!appliedFilters.bathrooms ||
+      (appliedFilters.type && appliedFilters.type.length > 0) ||
+      (appliedFilters.petsAllowed && appliedFilters.petsAllowed.length > 0) ||
+      !!appliedFilters.minPrice ||
+      !!appliedFilters.maxPrice ||
+      !!appliedFilters.search ||
+      searchParams.getAll("amenities").length > 0 ||
+      !!searchParams.get("audience") ||
+      !!searchParams.get("squareFeet")
+    );
+  };
 
   const fetchProperties = async () => {
     try {
       setLoading(true);
       const params = new URLSearchParams(searchParams.toString());
+      console.log("Fetching properties with params:", params.toString());
       const response = await fetch(`/api/properties?${params.toString()}`);
       if (!response.ok) throw new Error("Failed to fetch properties");
       const data = await response.json();
@@ -94,6 +114,8 @@ export default function ApartmentListings() {
     const minPrice = searchParams.get("minPrice");
     const maxPrice = searchParams.get("maxPrice");
     const search = searchParams.get("search");
+
+    console.log("Initial searchParams:", Object.fromEntries(searchParams));
 
     setTempFilters({
       bedrooms,
@@ -117,33 +139,22 @@ export default function ApartmentListings() {
       search: search || undefined,
     });
 
-    setSearchInput(search || "");
     fetchProperties();
   }, [searchParams]);
 
   useEffect(() => {
-    if (debouncedSearch !== tempFilters.search) {
-      updateFilters({ search: debouncedSearch || undefined });
+    // Only update filters if searchInput was changed by user, not on initial load
+    if (searchInput !== searchParams.get("search")) {
+      console.log("Updating search filter:", searchInput);
+      updateFilters({ search: searchInput || undefined });
     }
-  }, [debouncedSearch]);
+  }, [debouncedSearch, searchInput, searchParams]);
 
   const updateFilters = (newFilters: Partial<FilterOptions>) => {
-    const params = new URLSearchParams();
+    const params = new URLSearchParams(searchParams.toString());
+    console.log("Updating filters with:", newFilters);
 
-    searchParams.forEach((value, key) => {
-      if (
-        key !== "bedrooms" &&
-        key !== "bathrooms" &&
-        key !== "type" &&
-        key !== "petsAllowed" &&
-        key !== "minPrice" &&
-        key !== "maxPrice" &&
-        key !== "search"
-      ) {
-        params.set(key, value);
-      }
-    });
-
+    // Preserve all existing filter-related parameters
     if (newFilters.type !== undefined) {
       params.delete("type");
       if (newFilters.type && newFilters.type.length > 0) {
@@ -187,6 +198,7 @@ export default function ApartmentListings() {
       else params.delete("search");
     }
 
+    console.log("New URL params:", params.toString());
     router.push(`${pathname}?${params.toString()}`);
   };
 
@@ -241,7 +253,7 @@ export default function ApartmentListings() {
   return (
     <div className="p-4 md:px-6 2xl:px-10">
       {/* Filters and Search */}
-      <div className=" w-full flex items-center justify-between gap-2 sm:gap-4 ">
+      <div className="w-full flex items-center justify-between gap-2 sm:gap-4">
         <div className="hidden sm:flex items-center gap-2 my-3">
           <div className="flex items-center w-fit p-1 bg-[#F7F7F7] rounded-full gap-2 text-gray-700 text-[12px] 2xl:text-[10px] 3xl:text-sm">
             {/* Beds/Baths Filter */}
@@ -550,7 +562,6 @@ export default function ApartmentListings() {
           </div>
 
           {/* Search Bar */}
-
           <FIlters
             onApplyFilters={(filters) => {
               const params = new URLSearchParams(searchParams.toString());
@@ -620,10 +631,20 @@ export default function ApartmentListings() {
         <h2 className="text-xl 2xl:text-2xl text-primary-50 font-semibold">
           Apartments For Rents
         </h2>
-        <p className="text-primary-50 mt-2 text-xs 2xl:text-sm">
-          {properties.length}{" "}
-          {properties.length === 1 ? "Property" : "Properties"}
-        </p>
+        <div className="flex items-center gap-4 mt-3">
+          <p className="text-primary-50 text-xs 2xl:text-sm">
+            {properties.length}{" "}
+            {properties.length === 1 ? "Property" : "Properties"}
+          </p>
+          {hasActiveFilters() && (
+            <button
+              onClick={clearAllFilters}
+              className="text-[#28303F] text-xs 2xl:text-sm underline hover:text-primary-50 transition-colors"
+            >
+              Clear All Filters
+            </button>
+          )}
+        </div>
 
         {/* Listings and Map */}
         <div className="grid grid-cols-1 lg:grid-cols-[2fr_1fr] gap-6 mt-6">
@@ -632,6 +653,15 @@ export default function ApartmentListings() {
             {sortedProperties.map((property) => (
               <PropertyCard key={property._id} property={property} />
             ))}
+            {sortedProperties.length === 0 && (
+              <div className="col-span-1 md:col-span-2 2xl:col-span-3  flex-col  flex items-center justify-center h-[40svh]">
+                <RiFindReplaceLine size={80} className="text-primary" />
+
+                <p className="text-gray-500 text-lg font-semibold mt-4">
+                  No properties found
+                </p>
+              </div>
+            )}
           </div>
 
           <PropertiesMap

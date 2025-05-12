@@ -706,8 +706,8 @@ export default function PropertyListingForm() {
                 onClick={handleNext}
                 disabled={
                   (step === 0 && !formData.type) ||
-                  (step === 1 && !formData.audience) ||
-                  (step === 2 && !formData.location)
+                  (step === 1 && !formData.audience)
+                  // (step === 2 && !formData.location)
                 }
               >
                 Next
