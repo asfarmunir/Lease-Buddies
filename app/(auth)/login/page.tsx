@@ -1,11 +1,11 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Eye, EyeOff } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { signIn } from "next-auth/react";
+import { signIn, useSession } from "next-auth/react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import {
@@ -57,7 +57,7 @@ const signupFormSchema = z
   })
   .refine((data) => data.password === data.confirmPassword, {
     message: "Passwords don't match",
-    path: ["confirmPassword"], // This shows the error on confirmPassword field
+    path: ["confirmPassword"],
   });
 
 const LoginFormSchema = () => {
@@ -72,6 +72,7 @@ const LoginFormSchema = () => {
   });
 
   const router = useRouter();
+  const { data: session, status } = useSession();
   const loginForm = useForm<z.infer<typeof loginFormSchema>>({
     resolver: zodResolver(loginFormSchema),
     defaultValues: {
@@ -90,61 +91,76 @@ const LoginFormSchema = () => {
     },
   });
 
-  // 2. Define a submit handler.
+  // Monitor session status for navigation after login/signup
+  useEffect(() => {
+    if (status === "authenticated" && session) {
+      console.log("Session authenticated, navigating...");
+      if (type === "login") {
+        console.log("Navigating to /home");
+        router.push("/home");
+        toast.success("Logged in successfully!");
+      } else if (type === "signup") {
+        console.log("Navigating to /welcome");
+        router.push("/welcome");
+        toast.success("Account created successfully!");
+      }
+    }
+  }, [status, session, router, type]);
+
   async function onSubmit(values: z.infer<typeof loginFormSchema>) {
     setLoading(true);
-    const { email, password } = values;
-    const res = await signIn("credentials", {
-      email,
-      password,
-      redirect: false,
-    });
-    if (!res!.ok) {
-      toast.error(res!.error);
+    try {
+      const { email, password } = values;
+      console.log("Attempting login with:", { email });
+      const res = await signIn("credentials", {
+        email,
+        password,
+        redirect: false,
+      });
+      console.log("signIn response:", res);
+      if (!res?.ok || res?.error) {
+        throw new Error(res?.error || "Login failed");
+      }
+      // Navigation handled by useEffect
+    } catch (error: any) {
+      console.error("Login error:", error);
+      toast.error(error.message || "Something went wrong");
+    } finally {
       setLoading(false);
-      return;
     }
-    router.push("/home");
-    setLoading(false);
-    toast.success("Logged in successfully!");
   }
 
   async function onSignupSubmit(values: z.infer<typeof signupFormSchema>) {
-    const { email, password } = values;
-
     setLoading(true);
-
     try {
+      const { email, password, firstname, lastname } = values;
+      console.log("Attempting signup with:", { email, firstname, lastname });
       const response = await axios.post("/api/auth/signup", values);
-      if (response.status !== 200) {
-        throw new Error("Something went wrong");
+      console.log("Signup API response:", response.data);
+      if (response.status !== 200 || response.data.status !== 200) {
+        throw new Error(response.data.message || "Signup failed");
       }
-      if (response.data.status !== 200) {
-        toast.error(response.data.message);
-        return;
-      }
+      // Auto-login after signup
       const logRes = await signIn("credentials", {
         email,
         password,
         redirect: false,
       });
-      if (!logRes!.ok) {
-        toast.error(logRes!.error);
-        setLoading(false);
-        return;
+      console.log("Auto-login response:", logRes);
+      if (!logRes?.ok || logRes?.error) {
+        throw new Error(logRes?.error || "Auto-login failed");
       }
-      router.push("/welcome");
-      toast.success("Account created successfully");
-    } catch (error) {
-      console.log(error);
-      toast.error("Something went wrong");
+      // Navigation handled by useEffect
+    } catch (error: any) {
+      console.error("Signup error:", error);
+      toast.error(error.message || "Something went wrong");
     } finally {
       setLoading(false);
     }
   }
 
   return (
-    <div className="flex items-center justify-center min-h-screen py-8 px-4  ">
+    <div className="flex items-center justify-center min-h-screen py-8 px-4">
       <div className="bg-white py-8 px-6 md:px-10 rounded-[32px] shadow-lg max-w-xl w-full">
         {type === "login" ? (
           <h2 className="text-2xl font-semibold text-center mb-2">
@@ -162,38 +178,35 @@ const LoginFormSchema = () => {
 
         {type === "login" ? (
           <p className="text-center text-xs 2xl:text-sm text-[#28303FCC] mb-6">
-            {" "}
             Enter your email and password to sign in to your account.
           </p>
         ) : step === 1 ? (
           <p className="text-center text-xs 2xl:text-sm text-[#28303FCC] mb-6">
-            {" "}
             Enter your email and password to sign in to your account.
           </p>
         ) : (
           <p className="text-center text-xs 2xl:text-sm text-[#28303FCC] mb-6">
-            {" "}
             Confirm your consent and finalize your account.
           </p>
         )}
         <div
-          className={`
-          ${type === "signup" && step === 2 ? "hidden" : "flex"}
-           space-x-2 mb-6 bg-[#F7F7F7] rounded-full`}
+          className={`${
+            type === "signup" && step === 2 ? "hidden" : "flex"
+          } space-x-2 mb-6 bg-[#F7F7F7] rounded-full`}
         >
           <button
             onClick={() => setType("login")}
-            className={`"flex-1 py-3 transition-all 2xl:py-4 w-full font-medium ${
+            className={`flex-1 py-3 transition-all 2xl:py-4 w-full font-medium ${
               type === "login" ? "bg-[#28303F] text-white" : "text-[#28303FCC]"
-            }   rounded-full text-xs md:text-sm 2xl:text-base"`}
+            } rounded-full text-xs md:text-sm 2xl:text-base`}
           >
             Sign in
           </button>
           <button
             onClick={() => setType("signup")}
-            className={`"flex-1 py-3 transition-all 2xl:py-4 w-full font-medium ${
+            className={`flex-1 py-3 transition-all 2xl:py-4 w-full font-medium ${
               type === "signup" ? "bg-[#28303F] text-white" : "text-[#28303FCC]"
-            }   rounded-full text-xs md:text-sm 2xl:text-base"`}
+            } rounded-full text-xs md:text-sm 2xl:text-base`}
           >
             Sign up
           </button>
@@ -241,7 +254,6 @@ const LoginFormSchema = () => {
                           className="border-none text-xs md:text-sm 2xl:text-base shadow-none focus:outline-none focus:ring-0 focus:ring-transparent focus:border-transparent"
                         />
                       </FormControl>
-
                       <button
                         type="button"
                         className="absolute inset-y-0 right-3 flex items-center text-gray-500"
@@ -278,10 +290,10 @@ const LoginFormSchema = () => {
               <Button
                 type="submit"
                 disabled={loading}
-                className=" w-full disabled:opacity-50  rounded-full bg-gradient-to-b from-[#3A99D3] to-[#3A89D3] py-3 "
+                className="w-full disabled:opacity-50 rounded-full bg-gradient-to-b from-[#3A99D3] to-[#3A89D3] py-3"
               >
                 {loading ? (
-                  <RiLoader3Line className="animate-spin " />
+                  <RiLoader3Line className="animate-spin" />
                 ) : (
                   "Sign in"
                 )}
@@ -291,7 +303,7 @@ const LoginFormSchema = () => {
                 <a href="#" className="text-[#28303F]">
                   privacy policy
                 </a>{" "}
-                <br className=" hidden sm:block" />
+                <br className="hidden sm:block" />
                 and{" "}
                 <a href="#" className="text-[#28303F]">
                   terms of service
@@ -380,7 +392,6 @@ const LoginFormSchema = () => {
                               className="border-none text-xs md:text-sm 2xl:text-base shadow-none focus:outline-none focus:ring-0 focus:ring-transparent focus:border-transparent"
                             />
                           </FormControl>
-
                           <button
                             type="button"
                             className="absolute inset-y-0 right-3 flex items-center text-gray-500"
@@ -405,7 +416,7 @@ const LoginFormSchema = () => {
                         <FormLabel className="pl-4 text-xs md:text-sm 2xl:text-base">
                           Confirm Password
                         </FormLabel>
-                        <div className="bg-[#F7F7F7]  relative rounded-full border border-[#28303F1A] py-1 2xl:py-3 px-4 w-full text-[#28303FCC]">
+                        <div className="bg-[#F7F7F7] relative rounded-full border border-[#28303F1A] py-1 2xl:py-3 px-4 w-full text-[#28303FCC]">
                           <FormControl className="">
                             <Input
                               {...field}
@@ -414,7 +425,6 @@ const LoginFormSchema = () => {
                               className="border-none text-xs md:text-sm 2xl:text-base shadow-none focus:outline-none focus:ring-0 focus:ring-transparent focus:border-transparent"
                             />
                           </FormControl>
-
                           <button
                             type="button"
                             className="absolute inset-y-0 right-3 flex items-center text-gray-500"
@@ -445,15 +455,15 @@ const LoginFormSchema = () => {
                         setStep(2);
                       }
                     }}
-                    className=" w-full  rounded-full bg-gradient-to-b from-[#3A99D3] to-[#3A89D3] py-3 2xl:py-3.5 "
+                    className="w-full rounded-full bg-gradient-to-b from-[#3A99D3] to-[#3A89D3] py-3 2xl:py-3.5"
                   >
                     Next
                   </Button>
                 </div>
               ) : (
                 <div className="space-y-2 md:space-y-4">
-                  <div className=" w-full p-3 2xl:p-5 3xl:p-6 bg-[#F7F7F7] rounded-[10px] border-[#FFFFFF1A] flex items-center justify-between gap-5">
-                    <p className="text-xs 2xl:text-sm 3xl:text-base ">
+                  <div className="w-full p-3 2xl:p-5 3xl:p-6 bg-[#F7F7F7] rounded-[10px] border-[#FFFFFF1A] flex items-center justify-between gap-5">
+                    <p className="text-xs 2xl:text-sm 3xl:text-base">
                       I agree to the processing of personal data according to
                       Privacy Policy
                     </p>
@@ -464,10 +474,10 @@ const LoginFormSchema = () => {
                       }}
                     />
                   </div>
-                  <div className=" w-full p-3 2xl:p-5 3xl:p-6 bg-[#F7F7F7] rounded-[10px] border-[#FFFFFF1A] flex items-center justify-between gap-5">
-                    <p className="text-xs 2xl:text-sm 3xl:text-base ">
-                      Do you want to receive news about our project Sign up to
-                      our Newsletter?
+                  <div className="w-full p-3 2xl:p-5 3xl:p-6 bg-[#F7F7F7] rounded-[10px] border-[#FFFFFF1A] flex items-center justify-between gap-5">
+                    <p className="text-xs 2xl:text-sm 3xl:text-base">
+                      Do you want to receive news about our project? Sign up to
+                      our Newsletter
                     </p>
                     <Checkbox
                       onCheckedChange={(checked) => {
@@ -476,10 +486,10 @@ const LoginFormSchema = () => {
                       }}
                     />
                   </div>
-                  <div className=" w-full p-3 2xl:p-5 3xl:p-6 bg-[#F7F7F7] rounded-[10px] border-[#FFFFFF1A] flex items-center justify-between gap-5">
-                    <p className="text-xs 2xl:text-sm 3xl:text-base ">
-                      According my name is correct and correspond to the
-                      government issued identification
+                  <div className="w-full p-3 2xl:p-5 3xl:p-6 bg-[#F7F7F7] rounded-[10px] border-[#FFFFFF1A] flex items-center justify-between gap-5">
+                    <p className="text-xs 2xl:text-sm 3xl:text-base">
+                      Confirm my name is correct and corresponds to
+                      government-issued identification
                     </p>
                     <Checkbox
                       onCheckedChange={(checked) => {
@@ -490,29 +500,23 @@ const LoginFormSchema = () => {
                   </div>
                   <Button
                     type="submit"
-                    disabled={
-                      !terms.privacy ||
-                      // !terms.terms ||
-                      !terms.cookies ||
-                      loading
-                    }
-                    className=" w-full disabled:opacity-70  rounded-full bg-gradient-to-b from-[#3A99D3] to-[#3A89D3] py-3 2xl:py-3.5 "
+                    disabled={!terms.privacy || !terms.cookies || loading}
+                    className="w-full disabled:opacity-70 rounded-full bg-gradient-to-b from-[#3A99D3] to-[#3A89D3] py-3 2xl:py-3.5"
                   >
                     {loading ? (
-                      <RiLoader3Line className="animate-spin " />
+                      <RiLoader3Line className="animate-spin" />
                     ) : (
                       "Create Account"
                     )}
                   </Button>
                 </div>
               )}
-
               <p className="mt-4 text-xs text-center text-gray-500">
                 This site is protected by reCAPTCHA and the Google{" "}
                 <a href="#" className="text-[#28303F]">
                   privacy policy
                 </a>{" "}
-                <br className=" hidden sm:block" />
+                <br className="hidden sm:block" />
                 and{" "}
                 <a href="#" className="text-[#28303F]">
                   terms of service
