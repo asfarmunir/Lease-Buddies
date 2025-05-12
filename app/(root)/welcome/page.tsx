@@ -16,7 +16,7 @@ const types = [
     title: "Broker or Agent",
     description:
       "Condos, apartments, townhomes, scattered site portfolio, etc.",
-    image: "/images/broker.svg",
+    image: "/images/svg",
     url: "/property/list",
   },
   {

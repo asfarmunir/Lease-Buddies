@@ -262,7 +262,7 @@ export default function PropertyListingForm() {
         <div className="flex my-12 xl:my-20 items-center gap-4 xl:gap-6 2xl:gap-12 justify-center w-full">
           <div>
             <Image
-              src={"/images/list2.png"}
+              src={"/images/list2.webp"}
               alt="Find your home"
               width={500}
               height={500}

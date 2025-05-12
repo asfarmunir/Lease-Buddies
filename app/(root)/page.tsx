@@ -52,7 +52,7 @@ const Page = () => {
         {/* Image Container */}
         <div className="w-full rounded-[40px] relative flex-1">
           <Image
-            src="/home/hero1.svg"
+            src="/home/hero1.webp"
             width={600}
             height={600}
             className="w-full h-full object-cover"
@@ -310,7 +310,7 @@ const Page = () => {
               </div>
               <div className="2xl:h-[330px] 3xl:h-[400px] xl:w-[500px] rounded-[20px] overflow-hidden 2xl:w-[600px]">
                 <Image
-                  src="/home/testimonial1.png"
+                  src="/home/testimonial1.webp"
                   alt="hehe"
                   width={400}
                   height={400}
@@ -332,7 +332,7 @@ const Page = () => {
               </div>
               <div className="2xl:h-[330px] 3xl:h-[400px] xl:w-[500px] rounded-[20px] overflow-hidden 2xl:w-[600px]">
                 <Image
-                  src="/home/testimonial1.png"
+                  src="/home/testimonial1.webp"
                   alt="hehe"
                   width={400}
                   height={400}
@@ -354,7 +354,7 @@ const Page = () => {
               </div>
               <div className="2xl:h-[330px] 3xl:h-[400px] xl:w-[500px] rounded-[20px] overflow-hidden 2xl:w-[600px]">
                 <Image
-                  src="/home/testimonial1.png"
+                  src="/home/testimonial1.webp"
                   alt="hehe"
                   width={400}
                   height={400}

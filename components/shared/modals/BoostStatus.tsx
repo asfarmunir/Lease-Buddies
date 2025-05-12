@@ -35,7 +35,7 @@ const BoostStatus = ({
 
         <div className="flex flex-col items-center gap-2">
           <Image
-            src="/images/boosted.svg"
+            src="/images/boosted.webp"
             alt="Boost Status"
             width={300}
             height={300}
