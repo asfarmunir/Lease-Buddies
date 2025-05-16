@@ -123,7 +123,7 @@ const LoginFormSchema = () => {
       }
       // Navigation handled by useEffect
     } catch (error: any) {
-      console.error("Login error:", error);
+      console.log("Login error:", error);
       toast.error(error.message || "Something went wrong");
     } finally {
       setLoading(false);

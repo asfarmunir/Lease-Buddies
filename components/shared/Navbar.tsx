@@ -96,7 +96,7 @@ const Navbar = () => {
           width={100}
           height={100}
           alt="Lease Buddies Logo"
-          className="w-[100px] 2xl:w-[120px]"
+          className="w-[100px] 2xl:w-[125px] 3xl:w-[150px] cursor-pointer"
         />
       </Link>
 

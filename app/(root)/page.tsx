@@ -177,7 +177,7 @@ const Page = () => {
                 />
                 <div className="absolute w-[95%] p-4 mx-auto bottom-3 bg-white rounded-[20px] flex items-center justify-between">
                   <div className="">
-                    <p className="res_text mb-1.5">starting from $1000</p>
+                    <p className="res_text mb-1.5">checkout the listings in</p>
                     <p className="3xl:text-lg font-semibold">{p.name}</p>
                   </div>
                   <Link href={`/home?search=${p.link}`}>
@@ -223,7 +223,7 @@ const Page = () => {
         <div className="bg-[#F7F8FA] rounded-[40px] flex-1 flex flex-col justify-center items-start p-6 xl:p-6 2xl:p-9 3xl:p-10">
           <h1 className="text-4xl xl:text-4xl 2xl:text-5xl max-w-2xl 3xl:max-w-2xl 3xl:text-6xl 2xl:leading-[60px] 3xl:leading-[70px] font-bold tracking-wide">
             <span className="text-primary">Marketing solutions</span> for our
-            partners big and small
+            partners, big and small!
           </h1>
           <p className="res_text leading-[28px] max-w-xl 3xl:max-w-2xl mt-4 xl:mt-6 2xl:mt-8">
             Whether you're a property owner, manager or broker, we offer
@@ -299,13 +299,13 @@ const Page = () => {
             <div className="w-full flex flex-col-reverse md:flex-row gap-4 items-center bg-white rounded-[20px] justify-between">
               <div className="p-4 xl:p-8 res_text font-semibold">
                 <p>
-                  The team at Luxey went above and beyond to help me find the
-                  perfect property. Their knowledge of the market is impressive,
-                  and their dedication is unmatched."
+                  The team at LeaseBuddi went above and beyond to help me find
+                  the perfect property. Their knowledge of the market is
+                  impressive, and their dedication is unmatched."
                 </p>
                 <p className="flex items-center gap-2 mt-6 mb-2 sm:mb-0">
                   <Image src="/user.svg" width={25} height={25} alt="Quote" />
-                  John Doe
+                  Michael Chen
                 </p>
               </div>
               <div className="2xl:h-[330px] 3xl:h-[400px] xl:w-[500px] rounded-[20px] overflow-hidden 2xl:w-[600px]">
@@ -320,15 +320,23 @@ const Page = () => {
             </div>
             <div className="w-full flex flex-col-reverse md:flex-row-reverse gap-4 items-center bg-white rounded-[20px] justify-between">
               <div className="p-4 xl:p-8 res_text font-semibold">
+                {" "}
                 <p>
-                  The team at Luxey went above and beyond to help me find the
-                  perfect property. Their knowledge of the market is impressive,
-                  and their dedication is unmatched."
-                </p>
+                  {" "}
+                  LeaseBuddi made my property search effortless! Their attention
+                  to detail and personalized service ensured I found a home that
+                  exceeded my expectations. Highly recommend their expertise!{" "}
+                </p>{" "}
                 <p className="flex items-center gap-2 mt-6 mb-2 sm:mb-0">
-                  <Image src="/user.svg" width={25} height={25} alt="Quote" />
-                  John Doe
-                </p>
+                  {" "}
+                  <Image
+                    src="/user.svg"
+                    width={25}
+                    height={25}
+                    alt="Quote"
+                  />{" "}
+                  Sarah Johnson{" "}
+                </p>{" "}
               </div>
               <div className="2xl:h-[330px] 3xl:h-[400px] xl:w-[500px] rounded-[20px] overflow-hidden 2xl:w-[600px]">
                 <Image
@@ -342,15 +350,23 @@ const Page = () => {
             </div>
             <div className="w-full flex flex-col-reverse md:flex-row gap-4 items-center bg-white rounded-[20px] justify-between">
               <div className="p-4 xl:p-8 res_text font-semibold">
+                {" "}
                 <p>
-                  The team at Luxey went above and beyond to help me find the
-                  perfect property. Their knowledge of the market is impressive,
-                  and their dedication is unmatched."
-                </p>
+                  {" "}
+                  LeaseBuddi’s team is exceptional! They guided me through every
+                  step of the buying process with patience and expertise. I
+                  couldn’t have asked for a better experience—thank you!{" "}
+                </p>{" "}
                 <p className="flex items-center gap-2 mt-6 mb-2 sm:mb-0">
-                  <Image src="/user.svg" width={25} height={25} alt="Quote" />
-                  John Doe
-                </p>
+                  {" "}
+                  <Image
+                    src="/user.svg"
+                    width={25}
+                    height={25}
+                    alt="Quote"
+                  />{" "}
+                  Emily Rodriguez{" "}
+                </p>{" "}
               </div>
               <div className="2xl:h-[330px] 3xl:h-[400px] xl:w-[500px] rounded-[20px] overflow-hidden 2xl:w-[600px]">
                 <Image

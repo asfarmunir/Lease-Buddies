@@ -78,13 +78,6 @@ const petTypes = [
     description: "Filters locations with a strict no-pets policy.",
   },
 ];
-const amenitiesTypes = [
-  "Air Conditioning",
-  "Carpet",
-  "Business Center",
-  "Balcony",
-  "Assigned Parking",
-];
 
 const amenitiesCategories = {
   interior: [
@@ -93,6 +86,10 @@ const amenitiesCategories = {
     { name: "Walk-in Closet", included: true },
     { name: "Carpet", included: true },
     { name: "Fireplace", included: true },
+    {
+      name: "interior Parking Space",
+      included: true,
+    },
   ],
   outdoor: [
     { name: "Balcony", included: true },
@@ -100,6 +97,10 @@ const amenitiesCategories = {
     { name: "Garden", included: true },
     { name: "Swimming Pool", included: true },
     { name: "Garage", included: true },
+    {
+      name: "Exterior Parking Space",
+      included: true,
+    },
   ],
   utilities: [
     { name: "Water Included", included: true },
@@ -140,6 +141,7 @@ export default function PropertyListingForm() {
       lat: 0, // Add latitude
       lng: 0, // Add longitude
       formattedAddress: "", // Add formatted address
+      apartmentNumber: "",
     },
     bedrooms: 1,
     beds: 1,
@@ -710,6 +712,25 @@ export default function PropertyListingForm() {
                     htmlFor=""
                     className=" pl-4   res_text font-[500] text-start"
                   >
+                    Apartment Number
+                  </label>
+                  <Input
+                    placeholder="Enter your apartment number (optional)"
+                    value={formData.address.apartmentNumber}
+                    className="bg-[#F7F7F7] text-xs md:text-sm 3xl:text-base rounded-full border border-[#28303F1A] py-7 2xl:py-8 sm:px-5 w-full text-[#28303FCC]"
+                    onChange={(e) =>
+                      handleChange("address", {
+                        ...formData.address,
+                        apartmentNumber: e.target.value,
+                      })
+                    }
+                  />
+                </div>
+                <div className=" w-full space-y-2">
+                  <label
+                    htmlFor=""
+                    className=" pl-4   res_text font-[500] text-start"
+                  >
                     City
                   </label>
                   <Input
@@ -751,7 +772,7 @@ export default function PropertyListingForm() {
                     Postal Code
                   </label>
                   <Input
-                    placeholder="Enter postal code (otpional)"
+                    placeholder="Enter postal code"
                     value={formData.address.zip}
                     className="bg-[#F7F7F7] text-xs md:text-sm 3xl:text-base rounded-full border border-[#28303F1A] py-7 2xl:py-8 sm:px-5 w-full text-[#28303FCC]"
                     onChange={(e) =>
@@ -807,7 +828,7 @@ export default function PropertyListingForm() {
                     </button>
                   </div>
                 </div>
-                <div className="bg-[#F7F7F7] flex items-center justify-between text-xs md:text-sm 3xl:text-base rounded-full  py-5 2xl:py-6 3xl:py-7 px-5 xl:px-10 w-full text-[#28303FCC]">
+                {/* <div className="bg-[#F7F7F7] flex items-center justify-between text-xs md:text-sm 3xl:text-base rounded-full  py-5 2xl:py-6 3xl:py-7 px-5 xl:px-10 w-full text-[#28303FCC]">
                   <p className="res-text font-[500]">Beds</p>
                   <div className="flex items-center gap-2 xl:gap-6">
                     <button
@@ -837,7 +858,7 @@ export default function PropertyListingForm() {
                       />
                     </button>
                   </div>
-                </div>
+                </div> */}
                 <div className="bg-[#F7F7F7] flex items-center justify-between text-xs md:text-sm 3xl:text-base rounded-full  py-5 2xl:py-6 3xl:py-7 px-5 xl:px-10 w-full text-[#28303FCC]">
                   <p className="res-text font-[500]">Bathrooms</p>
                   <div className="flex items-center gap-2 xl:gap-6">

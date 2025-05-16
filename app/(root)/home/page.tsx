@@ -810,7 +810,7 @@ function PropertyCard({ property }: { property: Property }) {
               height={20}
               className="w-7 h-7 2xl:w-6 2xl:h-6 3xl:w-8 3xl:h-8"
             />
-            {property.beds} Beds
+            {property.bedrooms} Beds
           </p>
           <p className="bg-white flex-1 border border-[#28303F1A] rounded-full flex items-center gap-1.5 pl-0.5 py-0.5 pr-3">
             <Image

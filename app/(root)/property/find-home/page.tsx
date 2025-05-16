@@ -130,7 +130,7 @@ export default function PropertyListingForm() {
     petsAllowed: [],
     photos: [],
     title: "",
-    type: "",
+    type: [] as string[], // Change from "" to []
     audience: "",
     description: "",
     price: 0,
@@ -180,7 +180,10 @@ export default function PropertyListingForm() {
     const params = new URLSearchParams();
 
     // Property type
-    if (formData.type) params.set("type", formData.type);
+    // if (formData.type) params.set("type", formData.type);
+    formData.type.forEach((type) => {
+      params.append("type", type);
+    });
 
     // Audience (price category)
     if (formData.audience && formData.audience !== "Any") {
@@ -291,8 +294,7 @@ export default function PropertyListingForm() {
               />
             </div>
 
-            {/* Step 0 - Property Type */}
-            {step === 0 && (
+            {/* {step === 0 && (
               <div className="flex flex-col items-center gap-3">
                 <h2 className="text-xl text-center 2xl:text-2xl font-semibold text-primary-50 3xl:text-3xl">
                   What type of property are you looking for
@@ -311,6 +313,48 @@ export default function PropertyListingForm() {
                             ? "bg-primary/15"
                             : "bg-[#F7F7F7]"
                         }`}
+                    >
+                      <h2 className="2xl:text-lg mb-1 font-semibold 3xl:text-xl text-primary-50">
+                        {type.title}
+                      </h2>
+                      <p className="res_text text-primary-200">
+                        {type.description}
+                      </p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )} */}
+
+            {step === 0 && (
+              <div className="flex flex-col items-center gap-3">
+                {/* ... existing title/prompt */}
+                <div className="w-full my-4 space-y-2">
+                  {propertyTypes.map((type, index) => (
+                    <div
+                      key={index}
+                      onClick={() => {
+                        setFormData((prev) => {
+                          const newTypes = [...prev.type];
+                          const typeIndex = newTypes.indexOf(type.title);
+
+                          if (typeIndex >= 0) {
+                            // Remove if already selected
+                            newTypes.splice(typeIndex, 1);
+                          } else {
+                            // Add if not selected
+                            newTypes.push(type.title);
+                          }
+
+                          return { ...prev, type: newTypes };
+                        });
+                      }}
+                      className={`w-full border cursor-pointer border-primary-100 rounded-[20px] p-4 2xl:py-5 2xl:px-6
+            ${
+              formData.type.includes(type.title)
+                ? "bg-primary/15"
+                : "bg-[#F7F7F7]"
+            }`}
                     >
                       <h2 className="2xl:text-lg mb-1 font-semibold 3xl:text-xl text-primary-50">
                         {type.title}
@@ -705,7 +749,8 @@ export default function PropertyListingForm() {
                 className="bg-primary text-white px-8 py-3.5 rounded-full font-semibold"
                 onClick={handleNext}
                 disabled={
-                  (step === 0 && !formData.type) ||
+                  // (step === 0 && !formData.type) ||
+                  (step === 0 && formData.type.length === 0) || // Changed from !formData.type
                   (step === 1 && !formData.audience)
                   // (step === 2 && !formData.location)
                 }

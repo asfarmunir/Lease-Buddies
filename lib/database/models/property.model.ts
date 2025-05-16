@@ -29,7 +29,8 @@ const PropertySchema = new Schema(
       lat: { type: Number, required: true },
       lng: { type: Number, required: true },
       formattedAddress: { type: String, required: true },
-      placeId: { type: String }
+      placeId: { type: String },
+      apartmentNumber: { type: String },
     },
     
     locationGeo: {
