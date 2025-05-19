@@ -78,6 +78,10 @@ const amenitiesCategories = {
     { name: "Walk-in Closet", included: true },
     { name: "Carpet", included: true },
     { name: "Fireplace", included: true },
+    {
+      name: "Interior Parking Space",
+      included: true,
+    },
   ],
   outdoor: [
     { name: "Balcony", included: true },
@@ -85,6 +89,10 @@ const amenitiesCategories = {
     { name: "Garden", included: true },
     { name: "Swimming Pool", included: true },
     { name: "Garage", included: true },
+    {
+      name: "Exterior Parking Space",
+      included: true,
+    },
   ],
   utilities: [
     { name: "Water Included", included: true },

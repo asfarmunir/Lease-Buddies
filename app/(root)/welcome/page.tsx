@@ -4,21 +4,21 @@ import React from "react";
 
 const types = [
   {
-    subTitle: "1 - 10 UNITS",
-    title: "Individual",
+    subTitle: "Want to list your property?",
+    title: "Landlord",
     description:
       "Condos, apartments, townhomes, scattered site portfolio, etc.",
-    image: "/images/individual.svg",
+    image: "/images/business-man.webp",
     url: "/property/list",
   },
-  {
-    subTitle: "10 - 50+ UNITS",
-    title: "Broker or Agent",
-    description:
-      "Condos, apartments, townhomes, scattered site portfolio, etc.",
-    image: "/images/svg",
-    url: "/property/list",
-  },
+  // {
+  //   subTitle: "10 - 50+ UNITS",
+  //   title: "Broker or Agent",
+  //   description:
+  //     "Condos, apartments, townhomes, scattered site portfolio, etc.",
+  //   image: "/images/svg",
+  //   url: "/property/list",
+  // },
   {
     subTitle: "Looking for a home?",
     title: "Renter",
@@ -41,7 +41,7 @@ const Page = () => {
       <p className="text-sm 2xl:text-lg text-center 3xl:text-xl text-[#535965]">
         Get results faster with LeaseBoost, simply signup and well show you how!
       </p>
-      <div className=" w-full max-w-5xl 2xl:max-w-6xl 3xl:max-w-7xl pt-8 mx-auto grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+      <div className=" w-full max-w-2xl 2xl:max-w-3xl 3xl:max-w-4xl pt-8 mx-auto grid grid-cols-1 sm:grid-cols-2   gap-4">
         {types.map((type, index) => (
           <div
             key={index}

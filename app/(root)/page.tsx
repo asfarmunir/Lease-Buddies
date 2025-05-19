@@ -383,15 +383,15 @@ const Page = () => {
       </div>
       <div className="wrapper">
         <div
-          className="relative py-12 2xl:h-[515px] px-6 2xl:px-10 flex flex-col md:flex-row items-center gap-6 2xl:gap-12 justify-between rounded-[40px]"
+          className="relative py-12 2xl:h-[515px] px-6 2xl:px-10 flex flex-col md:flex-row items-center gap-6 2xl:gap-12 justify-center rounded-[40px]"
           style={{
             backgroundImage: "url(/home/bg2.webp)",
             backgroundSize: "cover",
             backgroundPosition: "center",
           }}
         >
-          <div className="text-white flex flex-col justify-center items-center sm:items-start gap-1">
-            <h1 className="text-3xl xl:text-4xl text-center sm:text-start 2xl:text-5xl max-w-2xl 3xl:max-w-2xl 3xl:text-5xl 2xl:leading-[60px] 3xl:leading-[70px] font-bold tracking-wide">
+          <div className="text-white flex flex-col justify-center items-center  gap-1">
+            <h1 className="text-3xl xl:text-4xl text-center  2xl:text-5xl max-w-2xl 3xl:max-w-2xl 3xl:text-5xl 2xl:leading-[60px] 3xl:leading-[70px] font-bold tracking-wide">
               Questions? <br />
               We've got answers.
             </h1>
@@ -405,7 +405,7 @@ const Page = () => {
               </button>
             </Link>
           </div>
-          <div className="bg-white rounded-[40px] max-w-3xl 3xl:max-w-4xl w-full flex-1 flex flex-col justify-start items-start p-4 xl:p-6">
+          {/* <div className="bg-white rounded-[40px] max-w-3xl 3xl:max-w-4xl w-full flex-1 flex flex-col justify-start items-start p-4 xl:p-6">
             <Accordion
               type="single"
               collapsible
@@ -429,7 +429,7 @@ const Page = () => {
                 </AccordionItem>
               ))}
             </Accordion>
-          </div>
+          </div> */}
         </div>
       </div>
     </section>

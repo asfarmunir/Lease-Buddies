@@ -31,8 +31,16 @@ const amenityCategories = {
     "Walk-in Closet",
     "Carpet",
     "Fireplace",
+    "Interior Parking Space",
   ],
-  outdoor: ["Balcony", "Patio", "Garden", "Swimming Pool", "Garage"],
+  outdoor: [
+    "Balcony",
+    "Patio",
+    "Garden",
+    "Swimming Pool",
+    "Garage",
+    "Exterior Parking Space",
+  ],
   utilities: [
     "Water Included",
     "Electricity Included",
