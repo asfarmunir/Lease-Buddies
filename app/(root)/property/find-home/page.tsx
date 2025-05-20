@@ -31,14 +31,14 @@ const propertyTypes = [
     title: "House",
     description: "Standalone property with private space.",
   },
-  {
-    title: "Townhouse",
-    description: "Multi-level home sharing walls with neighbors.",
-  },
-  {
-    title: "Other",
-    description: "Any property type outside the standard categories.",
-  },
+  // {
+  //   title: "Townhouse",
+  //   description: "Multi-level home sharing walls with neighbors.",
+  // },
+  // {
+  //   title: "Other",
+  //   description: "Any property type outside the standard categories.",
+  // },
 ];
 
 const audienceTypes = [
@@ -336,7 +336,13 @@ export default function PropertyListingForm() {
 
             {step === 0 && (
               <div className="flex flex-col items-center gap-3">
-                {/* ... existing title/prompt */}
+                <h2 className="text-xl text-center 2xl:text-2xl font-semibold text-primary-50 3xl:text-3xl">
+                  What type of property are you looking for?
+                </h2>
+                <p className="res_text text-[#28303FCC] text-center">
+                  Please choose the type of property here.
+                </p>
+
                 <div className="w-full my-4 space-y-2">
                   {propertyTypes.map((type, index) => (
                     <div
@@ -377,7 +383,7 @@ export default function PropertyListingForm() {
             )}
 
             {/* Step 1 - Audience/Budget Preference */}
-            {step === 1 && (
+            {/* {step === 1 && (
               <div className="flex flex-col items-center gap-3">
                 <h2 className="text-xl text-center 2xl:text-2xl font-semibold text-primary-50 3xl:text-3xl">
                   Tell us a little more.. What is your budget?
@@ -407,7 +413,7 @@ export default function PropertyListingForm() {
                   ))}
                 </div>
               </div>
-            )}
+            )} */}
 
             {/* Step 2 - Location */}
             {/* {step === 2 && (
@@ -427,7 +433,7 @@ export default function PropertyListingForm() {
             )} */}
 
             {/* Step 3 - Basics */}
-            {step === 2 && (
+            {step === 1 && (
               <div className="flex flex-col items-center gap-3">
                 <h2 className="text-xl text-center 2xl:text-2xl font-semibold text-primary-50 3xl:text-3xl">
                   Let's make it more your style
@@ -579,7 +585,7 @@ export default function PropertyListingForm() {
             )}
 
             {/* Step 4 - Amenities */}
-            {step === 3 && (
+            {step === 2 && (
               <div className="flex flex-col items-center gap-3">
                 <h2 className="text-xl text-center 2xl:text-2xl font-semibold text-primary-50 3xl:text-3xl">
                   What features are essential for your housing?
@@ -630,7 +636,7 @@ export default function PropertyListingForm() {
             )}
 
             {/* Step 5 - Pet Policy */}
-            {step === 4 && (
+            {step === 3 && (
               <div className="flex flex-col items-center gap-3">
                 <h2 className="text-xl text-center 2xl:text-2xl font-semibold text-primary-50 3xl:text-3xl">
                   What is your pet policy?
@@ -660,6 +666,7 @@ export default function PropertyListingForm() {
                       }}
                       className={`w-full border cursor-pointer border-primary-100 rounded-[20px] p-4 2xl:py-5 2xl:px-6
                         ${
+                          //@ts-ignore
                           formData.petsAllowed.includes(type.title)
                             ? "bg-primary/15"
                             : "bg-[#F7F7F7]"
@@ -678,7 +685,7 @@ export default function PropertyListingForm() {
             )}
 
             {/* Step 6 - Price (Final Step) */}
-            {step === 5 && (
+            {step === 4 && (
               <div className="flex flex-col items-center gap-3">
                 <h2 className="text-xl text-center 2xl:text-2xl font-semibold text-primary-50 3xl:text-3xl">
                   What's your budget?
@@ -758,8 +765,8 @@ export default function PropertyListingForm() {
                 onClick={handleNext}
                 disabled={
                   // (step === 0 && !formData.type) ||
-                  (step === 0 && formData.type.length === 0) || // Changed from !formData.type
-                  (step === 1 && !formData.audience)
+                  step === 0 && formData.type.length === 0 // Changed from !formData.type
+                  // (step === 1 && !formData.audience)
                   // (step === 2 && !formData.location)
                 }
               >

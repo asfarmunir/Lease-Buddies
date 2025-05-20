@@ -436,32 +436,28 @@ export default function ApartmentListings() {
                 ) : null}
               </DropdownMenuTrigger>
               <DropdownMenuContent className="w-[300px] sm:w-[400px] rounded-3xl shadow-lg bg-white p-4 md:px-6 ml-6 mt-2">
-                {["Apartment", "Condo", "House", "Townhouse", "Other"].map(
-                  (type) => (
-                    <div
-                      key={type}
-                      className={`flex items-center gap-2 p-4 rounded-full ${
-                        tempFilters.types.includes(type)
-                          ? "bg-[#28303F]/15"
-                          : ""
-                      }`}
-                    >
-                      <Checkbox
-                        checked={tempFilters.types.includes(type)}
-                        onCheckedChange={(checked) => {
-                          setTempFilters((prev) => ({
-                            ...prev,
-                            types: checked
-                              ? [...prev.types, type]
-                              : prev.types.filter((t) => t !== type),
-                          }));
-                        }}
-                        className="data-[state=checked]:bg-[#28303F] border border-[#28303F]"
-                      />
-                      <p className="text-sm">{type}</p>
-                    </div>
-                  )
-                )}
+                {["Apartment", "Condo", "House"].map((type) => (
+                  <div
+                    key={type}
+                    className={`flex items-center gap-2 p-4 rounded-full ${
+                      tempFilters.types.includes(type) ? "bg-[#28303F]/15" : ""
+                    }`}
+                  >
+                    <Checkbox
+                      checked={tempFilters.types.includes(type)}
+                      onCheckedChange={(checked) => {
+                        setTempFilters((prev) => ({
+                          ...prev,
+                          types: checked
+                            ? [...prev.types, type]
+                            : prev.types.filter((t) => t !== type),
+                        }));
+                      }}
+                      className="data-[state=checked]:bg-[#28303F] border border-[#28303F]"
+                    />
+                    <p className="text-sm">{type}</p>
+                  </div>
+                ))}
                 <div className="pt-4 mt-2 border-t-2 border-[#28303F1A]">
                   <button
                     className="rounded-full font-semibold res_text w-full py-3.5 bg-[#28303F] text-white"

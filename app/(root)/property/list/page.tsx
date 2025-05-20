@@ -41,14 +41,14 @@ const propertyTypes = [
     title: "House",
     description: "Standalone property with private space.",
   },
-  {
-    title: "Townhouse",
-    description: "Multi-level home sharing walls with neighbors.",
-  },
-  {
-    title: "Other",
-    description: "Any property type outside the standard categories.",
-  },
+  // {
+  //   title: "Townhouse",
+  //   description: "Multi-level home sharing walls with neighbors.",
+  // },
+  // {
+  //   title: "Other",
+  //   description: "Any property type outside the standard categories.",
+  // },
 ];
 const audienceTypes = [
   {
@@ -71,7 +71,7 @@ const petTypes = [
   },
   {
     title: "Cats Allowed",
-    description: "Suitable for places that allow cats",
+    description: "Suitable for places that allow cats.",
   },
   {
     title: "No Pets",
@@ -87,7 +87,7 @@ const amenitiesCategories = {
     { name: "Carpet", included: true },
     { name: "Fireplace", included: true },
     {
-      name: "interior Parking Space",
+      name: "Interior Parking Space",
       included: true,
     },
   ],
@@ -173,8 +173,8 @@ export default function PropertyListingForm() {
     switch (steps[step]) {
       case "type":
         return !!formData.type; // Must select a property type
-      case "audience":
-        return !!formData.audience; // Must select an audience
+      // case "audience":
+      //   return !!formData.audience; // Must select an audience
       case "Location":
         return (
           !!formData.location.trim() &&
@@ -231,9 +231,9 @@ export default function PropertyListingForm() {
       case "type":
         toast.error("Please select a property type");
         break;
-      case "audience":
-        toast.error("Please select an audience type");
-        break;
+      // case "audience":
+      //   toast.error("Please select an audience type");
+      //   break;
       case "Location":
         toast.error("Please enter a location");
         break;
@@ -480,7 +480,7 @@ export default function PropertyListingForm() {
                 </div>
               </div>
             )}
-            {step === 1 && (
+            {/* {step === 1 && (
               <div className="flex flex-col items-center gap-3">
                 <h2 className="text-xl 2xl:text-2xl font-semibold text-primary-50 3xl:text-3xl">
                   Tell us a little more.. What is your audience?
@@ -514,8 +514,8 @@ export default function PropertyListingForm() {
                   ))}
                 </div>
               </div>
-            )}
-            {step === 2 && (
+            )} */}
+            {step === 1 && (
               <div className="flex flex-col items-center gap-3">
                 <h2 className="text-xl 2xl:text-2xl font-semibold text-primary-50 3xl:text-3xl">
                   Where's your place located?
@@ -623,7 +623,7 @@ export default function PropertyListingForm() {
                 </div>
               </div>
             )}
-            {step === 3 && (
+            {step === 2 && (
               <div className="flex flex-col items-center gap-4 ">
                 <h2 className="text-xl 2xl:text-2xl font-semibold text-primary-50 3xl:text-3xl">
                   Confirm your address
@@ -750,7 +750,7 @@ export default function PropertyListingForm() {
                     htmlFor=""
                     className=" pl-4   res_text font-[500] text-start"
                   >
-                    State
+                    State/Province
                   </label>
                   <Input
                     placeholder="Enter state/province"
@@ -785,7 +785,7 @@ export default function PropertyListingForm() {
                 </div>
               </div>
             )}
-            {step === 4 && (
+            {step === 3 && (
               <div className="flex flex-col items-center gap-3">
                 <h2 className="text-xl 2xl:text-2xl font-semibold text-primary-50 3xl:text-3xl">
                   Share some basics about your place
@@ -939,7 +939,7 @@ export default function PropertyListingForm() {
                 </div>
               </div>
             )}
-            {step === 5 && (
+            {step === 4 && (
               <div className="flex flex-col items-center gap-3">
                 <h2 className="text-xl 2xl:text-2xl font-semibold text-primary-50 3xl:text-3xl">
                   Does your property offer any amenities?
@@ -990,13 +990,13 @@ export default function PropertyListingForm() {
                 </div>
               </div>
             )}
-            {step === 6 && (
+            {step === 5 && (
               <div className="flex flex-col items-center gap-3">
                 <h2 className="text-xl 2xl:text-2xl font-semibold text-primary-50 3xl:text-3xl">
                   What is your pet policy?
                 </h2>
                 <p className="res_text text-[#28303FCC] text-center">
-                  Please choose your price range from here.
+                  Please select your pet policy from here.
                 </p>
 
                 <div className=" w-full my-4 space-y-2">
@@ -1043,15 +1043,15 @@ export default function PropertyListingForm() {
                 </div>
               </div>
             )}
-            {step === 7 && (
+            {step === 6 && (
               <div className="flex flex-col items-center gap-3">
                 <h2 className="text-xl 2xl:text-2xl font-semibold text-primary-50 3xl:text-3xl">
-                  Rental Unit
+                  Add Photos
                 </h2>
                 <p className="res_text text-[#28303FCC] text-center">
                   {formData.photos.length > 0
                     ? `You've added ${formData.photos.length} photos (min 5, max 10)`
-                    : "You can add your house photos from here (min 5, max 10)."}
+                    : "You can add your photos from here (min 5, max 10)."}
                 </p>
                 {uploading && (
                   <div className="fixed inset-0 bg-black bg-opacity-50 flex flex-col items-center justify-center z-50">
@@ -1148,7 +1148,7 @@ export default function PropertyListingForm() {
                 )}
               </div>
             )}
-            {step === 8 && (
+            {step === 7 && (
               <div className="flex flex-col items-center gap-3">
                 <h2 className="text-xl 2xl:text-2xl font-semibold text-primary-50 3xl:text-3xl">
                   Now, lets give your listing a title
@@ -1177,7 +1177,7 @@ export default function PropertyListingForm() {
                 </div>
               </div>
             )}
-            {step === 9 && (
+            {step === 8 && (
               <div className="flex flex-col items-center gap-3">
                 <h2 className="text-xl 2xl:text-2xl font-semibold text-primary-50 3xl:text-3xl">
                   Now, Let’s create description
@@ -1208,13 +1208,13 @@ export default function PropertyListingForm() {
                 </div>
               </div>
             )}
-            {step === 10 && (
+            {step === 9 && (
               <div className="flex flex-col items-center gap-3">
                 <h2 className="text-xl 2xl:text-2xl font-semibold text-primary-50 3xl:text-3xl">
                   Now set your price
                 </h2>
                 <p className="res_text text-[#28303FCC] text-center">
-                  please set your price from here.
+                  Monthly rent cost.
                 </p>
                 <div className="bg-[#F7F7F7] border border-[#28303F1A] flex items-center justify-between text-xs md:text-sm 3xl:text-base rounded-2xl  py-4 2xl:py-5  px-5 xl:px-10 w-full text-[#28303FCC]">
                   <button
@@ -1271,7 +1271,7 @@ export default function PropertyListingForm() {
                 </div>
               </div>
             )}
-            {step === 11 && (
+            {step === 10 && (
               <div className="flex flex-col items-center gap-4 ">
                 <h2 className="text-xl 2xl:text-2xl font-semibold text-primary-50 3xl:text-3xl">
                   How can they contact you
@@ -1326,7 +1326,7 @@ export default function PropertyListingForm() {
                     Phone Number
                   </label>
                   <Input
-                    placeholder="Enter phone number"
+                    placeholder="Enter phone"
                     type="number"
                     value={formData.contactDetails.phoneNumber}
                     className="bg-[#F7F7F7] text-xs md:text-sm 3xl:text-base rounded-full border border-[#28303F1A] py-7 2xl:py-8 sm:px-5 w-full text-[#28303FCC]"

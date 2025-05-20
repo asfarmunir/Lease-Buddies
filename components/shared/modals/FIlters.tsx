@@ -166,7 +166,7 @@ const Filters: React.FC<FiltersModalProps> = ({
         ))}
 
         {/* Price Category */}
-        <div className="border-b pb-5 pt-1 border-[#28303F1A]">
+        {/* <div className="border-b pb-5 pt-1 border-[#28303F1A]">
           <h3 className="font-medium text-gray-700 pb-2">Price Category</h3>
           <div className="flex justify-between mt-2">
             {["Affordable", "Luxury", "Any"].map((audience) => (
@@ -185,7 +185,7 @@ const Filters: React.FC<FiltersModalProps> = ({
               </button>
             ))}
           </div>
-        </div>
+        </div> */}
 
         {/* Square Feet */}
         <div className="mt-2 space-y-3">

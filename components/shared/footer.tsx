@@ -44,12 +44,12 @@ const Footer = () => {
             >
               <RiInstagramFill size={22} />
             </a>
-            <a
+            {/* <a
               href="#"
               className="text-[#FFFFFFCC] bg-[#FFFFFF1A] p-4 rounded-full hover:text-white"
             >
               <FaYoutube size={22} />
-            </a>
+            </a> */}
           </div>
         </div>
 

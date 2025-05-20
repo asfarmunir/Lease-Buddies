@@ -386,7 +386,7 @@ const PropertyDetails: React.FC = () => {
                 </p>
               </div>
             </div>
-            <div className="grid grid-cols-1 my-4 md:grid-cols-2 gap-4">
+            {/* <div className="grid grid-cols-1 my-4 md:grid-cols-2 gap-4">
               {Array.from({ length: 4 }).map((_, index) => (
                 <div
                   key={index}
@@ -415,7 +415,7 @@ const PropertyDetails: React.FC = () => {
                   </p>
                 </div>
               ))}
-            </div>
+            </div> */}
           </div>
           <div className="mt-8">
             <h2 className="text-lg mb-4 font-semibold">Where You Will Be</h2>

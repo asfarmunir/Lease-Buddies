@@ -195,6 +195,12 @@ const Navbar = () => {
                 Settings
               </DropdownMenuItem>
               <DropdownMenuItem
+                onClick={() => router.push("/faq")}
+                className="res_text font-[500] pb-2 border-slate-200 pt-2 rounded-none border-b"
+              >
+                FAQs
+              </DropdownMenuItem>
+              <DropdownMenuItem
                 onClick={signOutUser}
                 className="res_text font-[500] pb-2 pt-2 rounded-none"
               >
@@ -308,6 +314,12 @@ const Navbar = () => {
                     className="text-sm font-[500]"
                   >
                     Settings
+                  </button>
+                  <button
+                    onClick={() => router.push("/faq")}
+                    className="text-sm font-[500]"
+                  >
+                    FAQs
                   </button>
                   <button onClick={signOutUser} className="text-sm font-[500]">
                     Logout

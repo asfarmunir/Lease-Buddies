@@ -14,6 +14,34 @@ import { LuSearch } from "react-icons/lu";
 import { FaTimes } from "react-icons/fa";
 import { useRouter } from "next/navigation";
 
+const whyChooseUs = [
+  {
+    title: "Comprehensive listings",
+    description:
+      "Browse and apply to over 1 million listings with long or short term leases throughout the U.S. and Canada.",
+  },
+  {
+    title: "Free to use",
+    description:
+      " List your properties for free, search for properties for free!",
+  },
+  {
+    title: "User-friendly",
+    description:
+      "With our simple-to-use platform you can quickly make an account and start listing or searching within minutes! ",
+  },
+  {
+    title: "Boost your listings",
+    description:
+      "With optional pay-to-boost you can expose your listings to more viewers! ",
+  },
+  {
+    title: "Exceptional customer service",
+    description:
+      "Our customers are our priority! Any issues using our platform, reach out to us and we’ll get it fixed! ",
+  },
+];
+
 const Page = () => {
   const [searchInput, setSearchInput] = useState<string>("");
   const router = useRouter();
@@ -112,7 +140,7 @@ const Page = () => {
             </div>
             <div className="bg-white rounded-[40px] flex-1 flex flex-col justify-start items-start p-4 xl:p-6 2xl:p-8 3xl:p-10">
               <Accordion type="single" collapsible className="w-full space-y-4">
-                {Array.from({ length: 5 }).map((_, index) => (
+                {whyChooseUs.map((w, index) => (
                   <AccordionItem
                     key={index}
                     value={`item-${index}`}
@@ -123,14 +151,11 @@ const Page = () => {
                         <p className="2xl:text-lg text-primary bg-[#3A99D31A] rounded-full p-1 2xl:w-9 w-8 h-8 2xl:h-9 flex items-center justify-center">
                           {index + 1}
                         </p>
-                        <h2 className="2xl:text-lg font-semibold">
-                          Comprehensive listings
-                        </h2>
+                        <h2 className="2xl:text-lg font-semibold">{w.title}</h2>
                       </div>
                     </AccordionTrigger>
                     <AccordionContent className="px-4 2xl:px-6 pb-6">
-                      Browse and apply to over 1 million listings with long or
-                      short term leases throughout the U.S. and Canada.
+                      {w.description}
                     </AccordionContent>
                   </AccordionItem>
                 ))}
@@ -194,7 +219,7 @@ const Page = () => {
           </div>
         </div>
       </div>
-      <div className="w-full relative flex flex-col items-center justify-center py-[40px] sm:h-[450px] xl:h-[550px] 2xl:h-[600px] 3xl:h-[650px] bg-[#557594] px-4 sm:rounded-[40px]">
+      {/* <div className="w-full relative flex flex-col items-center justify-center py-[40px] sm:h-[450px] xl:h-[550px] 2xl:h-[600px] 3xl:h-[650px] bg-[#557594] px-4 sm:rounded-[40px]">
         <Image
           src="/home/bg.webp"
           width={1200}
@@ -218,7 +243,7 @@ const Page = () => {
             Learn more
           </button>
         </div>
-      </div>
+      </div> */}
       <div className="w-full flex flex-col wrapper pb-[20px] md:flex-row gap-4">
         <div className="bg-[#F7F8FA] rounded-[40px] flex-1 flex flex-col justify-center items-start p-6 xl:p-6 2xl:p-9 3xl:p-10">
           <h1 className="text-4xl xl:text-4xl 2xl:text-5xl max-w-2xl 3xl:max-w-2xl 3xl:text-6xl 2xl:leading-[60px] 3xl:leading-[70px] font-bold tracking-wide">
@@ -279,7 +304,7 @@ const Page = () => {
           </div>
         </div>
       </div>
-      <div className="wrapper">
+      {/* <div className="wrapper">
         <div className="w-full flex flex-col wrapper items-center py-[40px] bg-[#FAFAFA] rounded-[40px] px-5 xl:px-8 2xl:px-10 3xl:px-12">
           <div className="flex items-center justify-between w-full">
             <div>
@@ -380,7 +405,7 @@ const Page = () => {
             </div>
           </div>
         </div>
-      </div>
+      </div> */}
       <div className="wrapper">
         <div
           className="relative py-12 2xl:h-[515px] px-6 2xl:px-10 flex flex-col md:flex-row items-center gap-6 2xl:gap-12 justify-center rounded-[40px]"
@@ -399,9 +424,9 @@ const Page = () => {
               Discover houses and apartments for rent in our most popular
               locations.
             </p>
-            <Link href={"/home"} className="">
+            <Link href={"/faq"} className="">
               <button className="res_text bg-primary rounded-full px-4 mt-3 xl:px-8 py-4 text-white">
-                Explore more
+                Explore FAQs
               </button>
             </Link>
           </div>
