@@ -2,11 +2,12 @@ import { connectToDatabase } from "@/lib/database";
 import Property from "@/lib/database/models/property.model";
 import { NextResponse } from "next/server";
 
-export const GET = async (request: Request, { params }: { params: { id: string } }) => {
+export const GET = async (request: Request, context: { params: Promise<{ id: string }> })  => {
   try {
     await connectToDatabase();
+    const { id } = await context.params;
 
-    const properties = await Property.find({ owner: params.id, isActive: true })
+    const properties = await Property.find({ owner: id, isActive: true })
       .sort({ createdAt: -1 })
       .populate('owner', 'firstname lastname profileImage');
 

@@ -87,12 +87,12 @@ export const ProfileImageUpload = ({
 export const uploadImageToCloudinary = async (file: File): Promise<string> => {
   const data = new FormData();
   data.append("file", file);
-  data.append("upload_preset", "bluepro");
-  data.append("cloud_name", "dbfn18wm7");
+  data.append("upload_preset", "leasebuddi");
+  data.append("cloud_name", "unionwealthmanagement");
 
   try {
     const response = await fetch(
-      "https://api.cloudinary.com/v1_1/dbfn18wm7/upload",
+      "https://api.cloudinary.com/v1_1/unionwealthmanagement/upload",
       {
         method: "POST",
         body: data,

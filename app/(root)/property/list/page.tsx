@@ -332,13 +332,16 @@ export default function PropertyListingForm() {
     const uploadPromises = Array.from(files).map((file) => {
       const data = new FormData();
       data.append("file", file);
-      data.append("upload_preset", "bluepro");
-      data.append("cloud_name", "dbfn18wm7");
+      data.append("upload_preset", "leasebuddi");
+      data.append("cloud_name", "unionwealthmanagement");
 
-      return fetch("https://api.cloudinary.com/v1_1/dbfn18wm7/upload", {
-        method: "POST",
-        body: data,
-      })
+      return fetch(
+        "https://api.cloudinary.com/v1_1/unionwealthmanagement/upload",
+        {
+          method: "POST",
+          body: data,
+        }
+      )
         .then((res) => res.json())
         .then((data) => data.secure_url)
         .catch((error) => {
