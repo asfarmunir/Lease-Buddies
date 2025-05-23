@@ -80,7 +80,7 @@ const Page = () => {
         {/* Image Container */}
         <div className="w-full rounded-[40px] relative flex-1">
           <Image
-            src="/home/hero1.webp"
+            src="/hero.svg"
             width={600}
             height={600}
             className="w-full h-full object-cover"
@@ -89,14 +89,14 @@ const Page = () => {
           <div className="absolute inset-0 flex items-center justify-center p-4">
             <form
               onSubmit={handleSearch}
-              className="w-full max-w-2xl bg-white rounded-full flex items-center justify-between shadow-lg px-2 py-2 relative"
+              className="w-full max-w-2xl 3xl:max-w-3xl bg-white rounded-full flex items-center justify-between shadow-lg px-2 py-2 relative"
             >
               <Input
                 type="text"
                 placeholder="Search by city, state, or zip code"
                 value={searchInput}
                 onChange={(e) => setSearchInput(e.target.value)}
-                className="w-full rounded-full px-4 border-none focus:outline-none focus:ring-0 shadow-none"
+                className="w-full rounded-full  px-4 border-none focus:outline-none focus:ring-0 shadow-none"
               />
               {searchInput && (
                 <button
