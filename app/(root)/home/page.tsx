@@ -436,7 +436,7 @@ export default function ApartmentListings() {
                 ) : null}
               </DropdownMenuTrigger>
               <DropdownMenuContent className="w-[300px] sm:w-[400px] rounded-3xl shadow-lg bg-white p-4 md:px-6 ml-6 mt-2">
-                {["Apartment", "Condo", "House"].map((type) => (
+                {["Apartment/Condo", "House"].map((type) => (
                   <div
                     key={type}
                     className={`flex items-center gap-2 p-4 rounded-full ${

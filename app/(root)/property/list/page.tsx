@@ -30,13 +30,13 @@ const steps = [
 
 const propertyTypes = [
   {
-    title: "Apartment",
+    title: "Apartment/Condo",
     description: "Multi-unit housing in a building or complex.",
   },
-  {
-    title: "Condo",
-    description: "Privately-owned unit in a shared building or community.",
-  },
+  // {
+  //   title: "Condo",
+  //   description: "Privately-owned unit in a shared building or community.",
+  // },
   {
     title: "House",
     description: "Standalone property with private space.",
