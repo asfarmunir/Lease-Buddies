@@ -49,7 +49,7 @@ const PropertySchema = new Schema(
     bathrooms: { type: Number, required: true, min: 1 },
     balcony: { type: Number, required: true, min: 0 },
     squareFeet: { type: String },
-    
+    occupancyDate: { type: Date },
     amenities: {
       interior: [{
         name: { type: String, required: true },

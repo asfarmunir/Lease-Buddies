@@ -167,6 +167,7 @@ export default function PropertyListingForm() {
       email: session?.user?.email || "",
       phoneNumber: "",
     },
+    occupancyDate: new Date(),
   });
 
   const validateCurrentStep = () => {
@@ -932,6 +933,20 @@ export default function PropertyListingForm() {
                     </button>
                   </div>
                 </div>
+                <div className="bg-[#F7F7F7] flex items-center justify-between text-xs md:text-sm 3xl:text-base rounded-full  py-5 2xl:py-6 3xl:py-7 px-5 xl:px-10 w-full text-[#28303FCC]">
+                  <p className="res-text font-[500]">Occupancy Date</p>
+                  <div className="flex items-center gap-2 xl:gap-6">
+                    <input
+                      type="date"
+                      value={formData.occupancyDate.toISOString().split("T")[0]}
+                      onChange={(e) =>
+                        handleChange("occupancyDate", new Date(e.target.value))
+                      }
+                      className="bg-transparent focus:outline-none w-full text-xs md:text-sm 3xl:text-base"
+                    />
+                  </div>
+                </div>
+
                 <div className="bg-[#F7F7F7] flex items-center justify-between text-xs md:text-sm 3xl:text-base rounded-full  py-5 2xl:py-6 3xl:py-7 px-5 xl:px-10 w-full text-[#28303FCC]">
                   <input
                     placeholder="Enter Listing’s Square feet"
