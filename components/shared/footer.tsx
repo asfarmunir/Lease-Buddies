@@ -53,7 +53,7 @@ const Footer = () => {
           </div>
         </div>
 
-        <div className="flex flex-wrap  gap-4 gap-y-8    2xl:gap-12">
+        {/* <div className="flex flex-wrap  gap-4 gap-y-8    2xl:gap-12">
           <div>
             <h3 className="text-sm 2xl:text-base 3xl:text-lg font-semibold mb-3">
               Company
@@ -162,7 +162,7 @@ const Footer = () => {
               </li>
             </ul>
           </div>
-        </div>
+        </div> */}
 
         {/* Bottom Section */}
       </div>

@@ -15,7 +15,7 @@ import { useLoadScript } from "@react-google-maps/api";
 import { useRouter } from "next/navigation";
 const steps = [
   "type",
-  "audience",
+  // "audience",
   "Location",
   "Address",
   "Basics",
@@ -158,7 +158,7 @@ export default function PropertyListingForm() {
     photos: [] as string[],
     title: "",
     type: "",
-    audience: "",
+    audience: "Any",
     description: "",
     price: 0,
     currency: "USD",

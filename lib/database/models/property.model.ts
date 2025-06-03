@@ -9,7 +9,6 @@ const PropertySchema = new Schema(
     type: { 
       type: String, 
       required: true,
-      enum: ["Apartment", "Condo", "House", "Townhouse", "Other"] 
     },
     audience: { 
       type: String, 
