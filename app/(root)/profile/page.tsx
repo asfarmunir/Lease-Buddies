@@ -18,6 +18,8 @@ import { Property } from "@/lib/types/property";
 import { User } from "@/lib/database/models/user.model";
 import { useSearchParams } from "next/navigation";
 import BoostStatus from "@/components/shared/modals/BoostStatus";
+import { Delete } from "lucide-react";
+import { RiDeleteBin5Line } from "react-icons/ri";
 
 const Profile = () => {
   const session = useSession();
@@ -131,6 +133,29 @@ const Profile = () => {
     } catch (error) {
       toast.error("Failed to update favorites");
       console.error("Error updating favorites:", error);
+    }
+  };
+  const [propertyToDelete, setPropertyToDelete] = useState<string | null>(null);
+  console.log("🚀 ~ Profile ~ propertyToDelete:", propertyToDelete);
+
+  const handleDeleteProperty = async (propertyId: string) => {
+    try {
+      const response = await fetch(`/api/properties/${propertyId}`, {
+        method: "DELETE",
+      });
+
+      if (response.ok) {
+        setProperties(properties.filter((p) => p.id !== propertyId));
+        toast.success("Property deleted successfully");
+      } else {
+        const errorData = await response.json();
+        toast.error(errorData.error || "Failed to delete property");
+      }
+    } catch (error) {
+      console.error("Error deleting property:", error);
+      toast.error("An error occurred while deleting the property");
+    } finally {
+      setPropertyToDelete(null);
     }
   };
 
@@ -333,17 +358,53 @@ const Profile = () => {
                     <div className="p-4 border border-[#28303F1A] rounded-[16px] -mt-4 bg-white relative">
                       <div className="flex items-start pt-2 justify-between">
                         <div>
-                          <h3 className="text-lg mb-1 font-semibold">
+                          <h3 className="text-lg mb-1 capitalize font-semibold">
                             {property.title}
                           </h3>
                           <p className="text-xs 3xl:text-sm text-gray-500">
                             {property.location}
                           </p>
                         </div>
-                        <p className="flex items-center text-[#28303FCC] px-2 2xl:px-2.5 font-medium gap-2 res_text rounded-full">
+                        {propertyToDelete && (
+                          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                            <div className="bg-white p-6 rounded-lg max-w-md w-full">
+                              <h3 className="text-lg font-semibold mb-4">
+                                Confirm Deletion
+                              </h3>
+                              <p className="mb-6">
+                                Are you sure you want to delete this property?
+                                This action cannot be undone.
+                              </p>
+                              <div className="flex justify-end gap-3">
+                                <button
+                                  onClick={() => setPropertyToDelete(null)}
+                                  className="px-4 py-2 border rounded-lg"
+                                >
+                                  Cancel
+                                </button>
+                                <button
+                                  onClick={() =>
+                                    handleDeleteProperty(propertyToDelete)
+                                  }
+                                  className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600"
+                                >
+                                  Delete
+                                </button>
+                              </div>
+                            </div>
+                          </div>
+                        )}
+                        <button
+                          onClick={() => setPropertyToDelete(property.id)}
+                          className="flex hover:bg-red-50 hover:text-red-600 p-1 items-center text-[#28303FCC] px-2 2xl:px-2.5 font-medium gap-2 res_text rounded-full"
+                        >
+                          <RiDeleteBin5Line className="text-lg" />
+                          Delete
+                        </button>
+                        {/* <p className="flex items-center text-[#28303FCC] px-2 2xl:px-2.5 font-medium gap-2 res_text rounded-full">
                           <FiShare2 className="text-lg" />
                           Share
-                        </p>
+                        </p> */}
                       </div>
                       <div className="mt-4 flex gap-3">
                         {activeTab === "listings" && !property.isFeatured && (
@@ -407,6 +468,7 @@ const Profile = () => {
                             {property.location}
                           </p>
                         </div>
+
                         <p className="flex items-center text-[#28303FCC] px-2 2xl:px-2.5 font-medium gap-2 res_text rounded-full">
                           <FiShare2 className="text-lg" />
                           Share

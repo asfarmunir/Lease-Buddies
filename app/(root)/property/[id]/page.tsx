@@ -181,7 +181,7 @@ const PropertyDetails: React.FC = () => {
                   {property.bathrooms < 10
                     ? `0${property.bathrooms}`
                     : property.bathrooms}{" "}
-                  Baths
+                  Bathrooms
                 </span>
               </p>
             </div>
@@ -193,7 +193,7 @@ const PropertyDetails: React.FC = () => {
                   {property.bedrooms < 10
                     ? `0${property.bedrooms}`
                     : property.bedrooms}{" "}
-                  Beds
+                  Bedrooms
                 </span>
               </p>
             </div>
@@ -320,7 +320,7 @@ const PropertyDetails: React.FC = () => {
               </div>
             </div>
           </div>
-          <div className="mt-6 p-4 md:p-6 bg-[#FDFDFD] rounded-2xl border border-[#28303F1A]">
+          {/* <div className="mt-6 p-4 md:p-6 bg-[#FDFDFD] rounded-2xl border border-[#28303F1A]">
             <h2 className="2xl:text-lg font-semibold mb-3">Overall Rating</h2>
             <div className="mt-4 bg-white flex flex-wrap rounded-2xl border gap-3 md:gap-6 border-[#28303F1A]">
               <div className="flex-1 p-3 sm:p-4 md:p-6 border-r border-[#28303F1A]">
@@ -386,7 +386,7 @@ const PropertyDetails: React.FC = () => {
                 </p>
               </div>
             </div>
-            {/* <div className="grid grid-cols-1 my-4 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 my-4 md:grid-cols-2 gap-4">
               {Array.from({ length: 4 }).map((_, index) => (
                 <div
                   key={index}
@@ -415,8 +415,8 @@ const PropertyDetails: React.FC = () => {
                   </p>
                 </div>
               ))}
-            </div> */}
-          </div>
+            </div>
+          </div> */}
           <div className="mt-8">
             <h2 className="text-lg mb-4 font-semibold">Where You Will Be</h2>
             <div className="w-full h-[400px] rounded-lg overflow-hidden">
@@ -459,19 +459,25 @@ const PropertyDetails: React.FC = () => {
               open={showBookVisit}
               onOpenChange={setShowBookVisit}
             />
-            <button
+            {/* <button
               onClick={handleContactOwner}
               className="bg-[#28303F] text-white font-semibold w-full py-3 rounded-full mt-4 flex items-center justify-center gap-2"
             >
               <AiOutlineMessage className="text-xl" /> Contact Owner
-            </button>
+            </button> */}
+            <div className="bg-[#28303F] text-white font-semibold w-full py-3 rounded-full mt-4 flex items-center justify-center gap-2">
+              <AiOutlineMessage className="text-xl" />
+              <span className="underline">
+                {property.contactDetails.phoneNumber}
+              </span>
+            </div>
             <p className="text-[#28303F] text-center res_text mt-4">
               By sending this inquiry, I accept LeaseBuddi’s Terms and
               Conditions, Privacy Policy, and Community Values.
             </p>
           </div>
           <div className="w-full md:w-[300px] 2xl:w-[400px] bg-white border border-primary-100 rounded-2xl p-4">
-            <div className="flex items-center gap-2 mt-2">
+            {/* <div className="flex items-center gap-2 mt-2">
               <Image
                 src="/images/phone.svg"
                 width={40}
@@ -481,7 +487,7 @@ const PropertyDetails: React.FC = () => {
               <span className="text-gray-800 underline">
                 {property.contactDetails.phoneNumber}
               </span>
-            </div>
+            </div> */}
           </div>
           <div className="w-full md:w-[300px] 2xl:w-[400px] bg-[#28303F1A] border border-primary-100 rounded-2xl p-4">
             <div className="flex flex-col gap-2 mt-2">

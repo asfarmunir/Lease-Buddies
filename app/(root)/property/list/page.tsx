@@ -168,7 +168,9 @@ export default function PropertyListingForm() {
       phoneNumber: "",
     },
     occupancyDate: new Date(),
+    parkingAvailable: false,
   });
+  console.log("🚀 ~ PropertyListingForm ~ formData:", formData);
 
   const validateCurrentStep = () => {
     switch (steps[step]) {
@@ -943,6 +945,18 @@ export default function PropertyListingForm() {
                         handleChange("occupancyDate", new Date(e.target.value))
                       }
                       className="bg-transparent focus:outline-none w-full text-xs md:text-sm 3xl:text-base"
+                    />
+                  </div>
+                </div>
+                <div className="bg-[#F7F7F7] flex items-center justify-between text-xs md:text-sm 3xl:text-base rounded-full  py-5 2xl:py-6 3xl:py-7 px-5 xl:px-10 w-full text-[#28303FCC]">
+                  <p className="res-text font-[500]">Parking</p>
+                  <div className="flex items-center gap-2 xl:gap-6">
+                    <Checkbox
+                      checked={formData.parkingAvailable}
+                      onCheckedChange={(checked) =>
+                        handleChange("parkingAvailable", checked)
+                      }
+                      className="data-[state=checked]:bg-primary border-primary"
                     />
                   </div>
                 </div>

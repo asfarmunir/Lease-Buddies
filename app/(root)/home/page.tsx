@@ -70,7 +70,7 @@ export default function ApartmentListings() {
   const [searchInput, setSearchInput] = useState<string>(
     searchParams.get("search") || ""
   );
-  const debouncedSearch = useDebounce(searchInput, 500);
+  const debouncedSearch = useDebounce(searchInput, 5000);
 
   // Helper function to check if any filters are applied
   const hasActiveFilters = () => {
@@ -212,8 +212,8 @@ export default function ApartmentListings() {
       search: null,
     });
     setSearchInput("");
-    router.push(pathname);
     setAppliedFilters({});
+    router.push("/home?search="); // Reset to default state
   };
 
   // Sort properties: Featured first, then by boostExpiration (newest first), then by createdAt (newest first)
@@ -773,8 +773,8 @@ function PropertyCard({ property }: { property: Property }) {
           )}
         </button>
       </div>
-      <div className="p-4 border border-[#28303F1A] rounded-[16px] -mt-4 bg-white relative">
-        <div className="flex items-center justify-between">
+      <div className="p-4 2xl:p-2 3xl:p-4 border border-[#28303F1A] rounded-[16px] -mt-4 bg-white relative">
+        {/* <div className="flex items-center justify-between">
           <p className="bg-green-100 text-green-600 px-3 inline-flex items-center gap-1.5 py-1.5 text-xs rounded-full">
             <HiOutlineShieldCheck className="text-base -mt-0.5" />
             Verified
@@ -783,7 +783,7 @@ function PropertyCard({ property }: { property: Property }) {
             <FaStar className="text-base -mt-0.5" />
             4.3
           </p>
-        </div>
+        </div> */}
         <div className="flex items-start py-4 justify-between">
           <div>
             <h3 className="text-lg font-semibold">{property.title}</h3>
@@ -818,7 +818,7 @@ function PropertyCard({ property }: { property: Property }) {
             />
             {property.bathrooms} Baths
           </p>
-          <p className="bg-white flex-1 border border-[#28303F1A] rounded-full flex items-center gap-1.5 pl-0.5 py-0.5 pr-3">
+          <p className="bg-white flex-1  border border-[#28303F1A] rounded-full flex items-center gap-1.5 pl-0.5 py-0.5 pr-3">
             <Image
               src="/images/area.svg"
               alt="Area"

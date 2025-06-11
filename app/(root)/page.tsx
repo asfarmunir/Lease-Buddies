@@ -72,7 +72,7 @@ const Page = () => {
           </p>
           <Link href={"/home"}>
             <button className="res_text bg-primary rounded-full px-4 xl:px-6 py-4 text-white mt-4 xl:mt-6 2xl:mt-8">
-              Let me see the listings
+              See the listings
             </button>
           </Link>
         </div>

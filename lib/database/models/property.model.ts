@@ -110,6 +110,7 @@ const PropertySchema = new Schema(
     updatedAt: { type: Date, default: Date.now },
     
     availabilityDate: { type: Date },
+    parkingAvailable: { type: Boolean, default: false },
     leaseTerms: { type: String },
     neighborhoodInfo: { type: String },
     nearbyAttractions: [{ type: String }],

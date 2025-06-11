@@ -315,24 +315,15 @@ export default function PropertiesMap({
                           : ""
                       }
                     </div>
-                    <button class="absolute top-2 right-2 text-white bg-black/20 hover:bg-black/50 p-2 rounded-full">
-                      <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z"></path></svg>
-                    </button>
+                   
                   </div>
                   <div class="p-4 border border-[#28303F1A] rounded-[16px] -mt-4 bg-white relative">
-                    <div class="flex items-center justify-between">
-                      <p class="bg-green-100 text-green-600 px-3 inline-flex items-center gap-1.5 py-1.5 text-xs rounded-full">
-                        <svg class="w-3 h-3 -mt-0.5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>
-                        Verified
-                      </p>
-                      <p class="bg-[#28303F1A] px-3 inline-flex items-center gap-1.5 py-1.5 text-xs rounded-full">
-                        <svg class="w-3 h-3 -mt-0.5" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path></svg>
-                        4.3
-                      </p>
-                    </div>
-                    <div class="flex items-start py-4 justify-between">
+                   
+                    <div class="flex items-start pb-4 justify-between">
                       <div>
-                        <h3 class="text-lg font-semibold">${property.title}</h3>
+                        <h3 class="text-lg font-semibold capitalize">${
+                          property.title
+                        }</h3>
                         <p class="text-xs text-ellipsis text-gray-500">${
                           property.address.city
                         }, ${property.address.state}</p>
@@ -349,19 +340,17 @@ export default function PropertiesMap({
                       </p>
                       <p class="bg-white flex-1 border border-[#28303F1A] rounded-full flex items-center gap-1.5 pl-0.5 py-0.5 pr-3">
                         <img src="/images/area.svg" alt="Area" class="w-5 h-5" />
-                        ${property.squareFeet || "N/A"} SqFt
+                        ${property.squareFeet || "N/A"} sqFt
                       </p>
                     </div>
-                    <div class="mt-3 flex items-center gap-3 border-t border-[#28303F1A] pt-3">
-                      <a href="/property/${property._id}" class="flex-1">
-                        <button class="px-1 py-2 flex items-center gap-1.5 rounded-lg">
-                          <img src="/images/calendar.svg" alt="Tour" class="w-5 h-5" />
-                          Tour
-                        </button>
-                      </a>
-                      <button class="bg-[#3A99D3] flex-grow text-white px-4 py-3 rounded-full font-semibold">
-                        Check Availability
+                    <div class="mt-3 flex items-center gap-3 border-t border-[#28303F1A] pt-3 w-full">
+                      <a href="/property/${property._id}" class="flex-1 w-full">
+                       
+                      <button class="bg-[#3A99D3] flex-grow text-white px-4 py-3 w-full rounded-full font-semibold">
+                        Quick Look
                       </button>
+                      </a>
+
                     </div>
                   </div>
                 </div>

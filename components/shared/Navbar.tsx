@@ -9,7 +9,6 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { RiArrowDownWideFill } from "react-icons/ri";
 import { GoChevronDown } from "react-icons/go";
 import { GrMenu } from "react-icons/gr";
 import {
@@ -28,12 +27,14 @@ import toast from "react-hot-toast";
 const filters = [
   {
     title: "Apartments for rent",
-    type: "Apartment",
     priceRanges: [
       { label: "$0 - $500", min: 0, max: 500 },
       { label: "$500 - $1000", min: 500, max: 1000 },
       { label: "$1000 - $1500", min: 1000, max: 1500 },
       { label: "$1500 - $2000", min: 1500, max: 2000 },
+      { label: "$2000 - $2500", min: 2000, max: 2500 },
+      { label: "$2500 - $3000", min: 2500, max: 3000 },
+      { label: "$3000+", min: 3000, max: 10000 },
     ],
   },
   {
@@ -41,20 +42,40 @@ const filters = [
     type: "House",
     bedrooms: ["1", "2", "3", "4+"],
   },
-  {
-    title: "Rooms for rent",
-    type: "Room",
-    bedrooms: ["1", "2", "3", "4+"],
-  },
+  // {
+  //   title: "Rooms for rent",
+  //   type: "Room",
+  //   bedrooms: ["1", "2", "3", "4+"],
+  // },
   {
     title: "Amenities",
-    amenities: ["Pool", "Gym", "Parking", "Pet Friendly"],
+    amenities: [
+      "Air Conditioning",
+      "Hardwood Floors",
+      "Walk-in Closet",
+      "Carpet",
+      "Balcony",
+      "Patio",
+      "Garden",
+      "Swimming Pool",
+      "Water Included",
+      "Electricity Included",
+      "Gas Included",
+      "Trash Removal",
+      "Wheelchair Access",
+      "Elevator",
+      "Gym",
+      "Laundry Facilities",
+    ],
   },
 ];
 
 const Navbar = () => {
   const session = useSession();
   const router = useRouter();
+  const [selectedAmenities, setSelectedAmenities] = React.useState<string[]>(
+    []
+  );
 
   const signOutUser = async () => {
     await signOut({
@@ -64,6 +85,16 @@ const Navbar = () => {
     toast.success("Signed out successfully!");
     router.refresh();
     router.replace("/login");
+  };
+
+  const toggleAmenity = (amenity: string) => {
+    setSelectedAmenities((prev) => {
+      if (prev.includes(amenity)) {
+        return prev.filter((a) => a !== amenity);
+      } else {
+        return [...prev, amenity];
+      }
+    });
   };
 
   const applyFilter = (filterParams: Record<string, string | string[]>) => {
@@ -83,6 +114,13 @@ const Navbar = () => {
       } else {
         params.set(key, value);
       }
+    }
+
+    // Always include selected amenities in the filter
+    if (selectedAmenities.length > 0) {
+      selectedAmenities.forEach((amenity) =>
+        params.append("amenities", amenity)
+      );
     }
 
     router.push(`/home?${params.toString()}`);
@@ -112,13 +150,11 @@ const Navbar = () => {
                 <DropdownMenuLabel>Filter by:</DropdownMenuLabel>
                 <DropdownMenuSeparator />
 
-                {/* Price Range Filters (for Apartments) */}
                 {filter.priceRanges?.map((range, i) => (
                   <DropdownMenuItem
                     key={i}
                     onClick={() =>
                       applyFilter({
-                        type: filter.type,
                         minPrice: range.min.toString(),
                         maxPrice: range.max.toString(),
                       })
@@ -129,7 +165,6 @@ const Navbar = () => {
                   </DropdownMenuItem>
                 ))}
 
-                {/* Bedroom Filters (for Houses/Rooms) */}
                 {filter.bedrooms?.map((bedroom, i) => (
                   <DropdownMenuItem
                     key={i}
@@ -144,31 +179,35 @@ const Navbar = () => {
                   </DropdownMenuItem>
                 ))}
 
-                {/* Amenities Filters */}
                 {filter.amenities?.map((amenity, i) => (
                   <DropdownMenuItem
                     key={i}
-                    onClick={() =>
-                      applyFilter({
-                        amenities:
-                          amenity === "Pet Friendly"
-                            ? ["Dogs Allowed", "Cats Allowed"]
-                            : [amenity],
-                      })
-                    }
+                    onSelect={(e) => {
+                      e.preventDefault();
+                      toggleAmenity(amenity);
+                    }}
                     className="cursor-pointer"
                   >
-                    {amenity}
+                    <div className="flex items-center">
+                      <input
+                        type="checkbox"
+                        checked={selectedAmenities.includes(amenity)}
+                        readOnly
+                        className="mr-2"
+                      />
+                      {amenity}
+                    </div>
                   </DropdownMenuItem>
                 ))}
+                <DropdownMenuItem
+                  onClick={() => applyFilter({})}
+                  className="cursor-pointer justify-center bg-gray-100 mt-1"
+                >
+                  Apply Filters
+                </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
           ))}
-          <Link href={"/profile"}>
-            <button className="res_text text-primary font-semibold">
-              Advertise
-            </button>
-          </Link>
 
           <Link href={"/property/list"}>
             <button className="res_text bg-primary rounded-full p-4 py-2.5 text-white">
@@ -255,7 +294,6 @@ const Navbar = () => {
                         key={i}
                         onClick={() =>
                           applyFilter({
-                            type: filter.type,
                             minPrice: range.min.toString(),
                             maxPrice: range.max.toString(),
                           })
@@ -284,19 +322,29 @@ const Navbar = () => {
                     {filter.amenities?.map((amenity, i) => (
                       <DropdownMenuItem
                         key={i}
-                        onClick={() =>
-                          applyFilter({
-                            amenities:
-                              amenity === "Pet Friendly"
-                                ? ["Dogs Allowed", "Cats Allowed"]
-                                : [amenity],
-                          })
-                        }
+                        onSelect={(e) => {
+                          e.preventDefault();
+                          toggleAmenity(amenity);
+                        }}
                         className="cursor-pointer"
                       >
-                        {amenity}
+                        <div className="flex items-center">
+                          <input
+                            type="checkbox"
+                            checked={selectedAmenities.includes(amenity)}
+                            readOnly
+                            className="mr-2"
+                          />
+                          {amenity}
+                        </div>
                       </DropdownMenuItem>
                     ))}
+                    <DropdownMenuItem
+                      onClick={() => applyFilter({})}
+                      className="cursor-pointer justify-center bg-gray-100 mt-1"
+                    >
+                      Apply Filters
+                    </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
               ))}
