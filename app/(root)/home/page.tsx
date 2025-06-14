@@ -1,8 +1,8 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect } from "react";
 import Image from "next/image";
-import { FaHeart, FaStar, FaSearch, FaTimes } from "react-icons/fa";
+import { FaHeart, FaStar, FaTimes } from "react-icons/fa";
 import { IoMdHeartEmpty } from "react-icons/io";
 import { HiOutlineShieldCheck } from "react-icons/hi2";
 import {
@@ -25,23 +25,7 @@ import CheckAvailability from "@/components/shared/modals/CheckAvailability";
 import BookVisit from "@/components/shared/modals/BookVisit";
 import { LuSearch } from "react-icons/lu";
 import { RiFindReplaceLine } from "react-icons/ri";
-
-// Custom debounce hook
-function useDebounce<T>(value: T, delay: number): T {
-  const [debouncedValue, setDebouncedValue] = useState<T>(value);
-
-  useEffect(() => {
-    const handler = setTimeout(() => {
-      setDebouncedValue(value);
-    }, delay);
-
-    return () => {
-      clearTimeout(handler);
-    };
-  }, [value, delay]);
-
-  return debouncedValue;
-}
+import { AiFillRightCircle } from "react-icons/ai";
 
 export default function ApartmentListings() {
   const [properties, setProperties] = useState<Property[]>([]);
@@ -70,7 +54,6 @@ export default function ApartmentListings() {
   const [searchInput, setSearchInput] = useState<string>(
     searchParams.get("search") || ""
   );
-  const debouncedSearch = useDebounce(searchInput, 5000);
 
   // Helper function to check if any filters are applied
   const hasActiveFilters = () => {
@@ -142,19 +125,10 @@ export default function ApartmentListings() {
     fetchProperties();
   }, [searchParams]);
 
-  useEffect(() => {
-    // Only update filters if searchInput was changed by user, not on initial load
-    if (searchInput !== searchParams.get("search")) {
-      console.log("Updating search filter:", searchInput);
-      updateFilters({ search: searchInput || undefined });
-    }
-  }, [debouncedSearch, searchInput, searchParams]);
-
   const updateFilters = (newFilters: Partial<FilterOptions>) => {
     const params = new URLSearchParams(searchParams.toString());
     console.log("Updating filters with:", newFilters);
 
-    // Preserve all existing filter-related parameters
     if (newFilters.type !== undefined) {
       params.delete("type");
       if (newFilters.type && newFilters.type.length > 0) {
@@ -212,8 +186,19 @@ export default function ApartmentListings() {
       search: null,
     });
     setSearchInput("");
+    updateFilters({ search: undefined }); // Explicitly clear search
+    router.push(pathname); // Reset to base pathname
     setAppliedFilters({});
-    router.push("/home?search="); // Reset to default state
+  };
+
+  // Handle search submission
+  const handleSearchSubmit = (e?: React.FormEvent) => {
+    e?.preventDefault(); // Prevent default form submission
+    if (searchInput.trim()) {
+      updateFilters({ search: searchInput });
+    } else {
+      updateFilters({ search: undefined });
+    }
   };
 
   // Sort properties: Featured first, then by boostExpiration (newest first), then by createdAt (newest first)
@@ -607,17 +592,28 @@ export default function ApartmentListings() {
             placeholder="Search by name, city, or state..."
             value={searchInput}
             onChange={(e) => setSearchInput(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                handleSearchSubmit();
+              }
+            }}
             className="bg-transparent border-none shadow-none xl:w-64 focus:ring-0 text-gray-700 placeholder-gray-400 res_text"
           />
           {searchInput && (
+            // <button
+            //   onClick={() => {
+            //     setSearchInput("");
+            //     updateFilters({ search: undefined });
+            //   }}
+            //   className="absolute right-8 z-50 text-gray-500 hover:text-gray-700"
+            // >
+            //   <FaTimes />
+            // </button>
             <button
-              onClick={() => {
-                setSearchInput("");
-                updateFilters({ search: undefined });
-              }}
-              className="absolute right-3 z-50 text-gray-500 hover:text-gray-700"
+              onClick={handleSearchSubmit}
+              className="absolute right-3 z-50 text-primary hover:text-gray-700"
             >
-              <FaTimes />
+              <AiFillRightCircle className="text-xl" />
             </button>
           )}
         </div>
@@ -650,9 +646,8 @@ export default function ApartmentListings() {
               <PropertyCard key={property._id} property={property} />
             ))}
             {sortedProperties.length === 0 && (
-              <div className="col-span-1 md:col-span-2 2xl:col-span-3  flex-col  flex items-center justify-center h-[40svh]">
+              <div className="col-span-1 md:col-span-2 2xl:col-span-3 flex-col flex items-center justify-center h-[40svh]">
                 <RiFindReplaceLine size={80} className="text-primary" />
-
                 <p className="text-gray-500 text-lg font-semibold mt-4">
                   No properties found
                 </p>
@@ -774,16 +769,6 @@ function PropertyCard({ property }: { property: Property }) {
         </button>
       </div>
       <div className="p-4 2xl:p-2 3xl:p-4 border border-[#28303F1A] rounded-[16px] -mt-4 bg-white relative">
-        {/* <div className="flex items-center justify-between">
-          <p className="bg-green-100 text-green-600 px-3 inline-flex items-center gap-1.5 py-1.5 text-xs rounded-full">
-            <HiOutlineShieldCheck className="text-base -mt-0.5" />
-            Verified
-          </p>
-          <p className="bg-[#28303F1A] px-3 inline-flex items-center gap-1.5 py-1.5 text-xs rounded-full">
-            <FaStar className="text-base -mt-0.5" />
-            4.3
-          </p>
-        </div> */}
         <div className="flex items-start py-4 justify-between">
           <div>
             <h3 className="text-lg font-semibold">{property.title}</h3>
@@ -818,7 +803,7 @@ function PropertyCard({ property }: { property: Property }) {
             />
             {property.bathrooms} Baths
           </p>
-          <p className="bg-white flex-1  border border-[#28303F1A] rounded-full flex items-center gap-1.5 pl-0.5 py-0.5 pr-3">
+          <p className="bg-white flex-1 border border-[#28303F1A] rounded-full flex items-center gap-1.5 pl-0.5 py-0.5 pr-3">
             <Image
               src="/images/area.svg"
               alt="Area"

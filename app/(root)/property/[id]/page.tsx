@@ -476,8 +476,8 @@ const PropertyDetails: React.FC = () => {
               Conditions, Privacy Policy, and Community Values.
             </p>
           </div>
-          <div className="w-full md:w-[300px] 2xl:w-[400px] bg-white border border-primary-100 rounded-2xl p-4">
-            {/* <div className="flex items-center gap-2 mt-2">
+          {/* <div className="w-full md:w-[300px] 2xl:w-[400px] bg-white border border-primary-100 rounded-2xl p-4">
+            <div className="flex items-center gap-2 mt-2">
               <Image
                 src="/images/phone.svg"
                 width={40}
@@ -487,8 +487,8 @@ const PropertyDetails: React.FC = () => {
               <span className="text-gray-800 underline">
                 {property.contactDetails.phoneNumber}
               </span>
-            </div> */}
-          </div>
+            </div>
+          </div> */}
           <div className="w-full md:w-[300px] 2xl:w-[400px] bg-[#28303F1A] border border-primary-100 rounded-2xl p-4">
             <div className="flex flex-col gap-2 mt-2">
               <Image
