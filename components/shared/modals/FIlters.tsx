@@ -188,7 +188,7 @@ const Filters: React.FC<FiltersModalProps> = ({
         </div> */}
 
         {/* Square Feet */}
-        <div className="mt-2 space-y-3">
+        {/* <div className="mt-2 space-y-3">
           <h3 className="font-medium text-gray-700">Square Feet</h3>
           <input
             type="text"
@@ -197,7 +197,7 @@ const Filters: React.FC<FiltersModalProps> = ({
             onChange={handleSquareFeetChange}
             className="w-full border flex items-center gap-2 px-4 py-4 res_text rounded-full text-left"
           />
-        </div>
+        </div> */}
 
         {/* Buttons */}
         <div className="mt-3.5 flex flex-col gap-3">
@@ -205,7 +205,7 @@ const Filters: React.FC<FiltersModalProps> = ({
             className="bg-[#28303F] font-semibold text-white py-3 rounded-full"
             onClick={applyFilters}
           >
-            View Rentals
+            Apply Filters
           </button>
           <button className="text-gray-600 res_text" onClick={clearAllFilters}>
             Clear All Filters

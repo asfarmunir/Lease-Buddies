@@ -168,7 +168,7 @@ export default function PropertyListingForm() {
       phoneNumber: "",
     },
     occupancyDate: new Date(),
-    parkingAvailable: false,
+    parkingAvailable: 1,
   });
   console.log("🚀 ~ PropertyListingForm ~ formData:", formData);
 
@@ -407,7 +407,7 @@ export default function PropertyListingForm() {
 
       await response.json();
       toast.success("Property listed successfully!");
-      router.push("/profile");
+      // router.push("/profile");
     } catch (error: any) {
       toast.error(error.message || "An error occurred");
     } finally {
@@ -951,13 +951,42 @@ export default function PropertyListingForm() {
                 <div className="bg-[#F7F7F7] flex items-center justify-between text-xs md:text-sm 3xl:text-base rounded-full  py-5 2xl:py-6 3xl:py-7 px-5 xl:px-10 w-full text-[#28303FCC]">
                   <p className="res-text font-[500]">Parking</p>
                   <div className="flex items-center gap-2 xl:gap-6">
-                    <Checkbox
-                      checked={formData.parkingAvailable}
-                      onCheckedChange={(checked) =>
-                        handleChange("parkingAvailable", checked)
+                    <button
+                      disabled={formData.parkingAvailable === 0}
+                      onClick={() =>
+                        handleChange(
+                          "parkingAvailable",
+                          formData.parkingAvailable - 1
+                        )
                       }
-                      className="data-[state=checked]:bg-primary border-primary"
-                    />
+                      className=" disabled:opacity-40"
+                    >
+                      <Image
+                        src="/images/minus.svg"
+                        width={35}
+                        height={35}
+                        alt="minus"
+                        className="                    "
+                      />
+                    </button>
+                    <span className="res_text font-semibold md:w-6 text-center">
+                      {formData.parkingAvailable}
+                    </span>
+                    <button
+                      onClick={() =>
+                        handleChange(
+                          "parkingAvailable",
+                          formData.parkingAvailable + 1
+                        )
+                      }
+                    >
+                      <Image
+                        src="/images/plus.svg"
+                        width={35}
+                        height={35}
+                        alt="plus"
+                      />
+                    </button>
                   </div>
                 </div>
 

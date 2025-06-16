@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Image from "next/image";
-import { FaHeart, FaStar, FaTimes } from "react-icons/fa";
+import { FaCarAlt, FaHeart, FaStar, FaTimes } from "react-icons/fa";
 import { IoMdHeartEmpty } from "react-icons/io";
 import { HiOutlineShieldCheck } from "react-icons/hi2";
 import {
@@ -303,7 +303,7 @@ export default function ApartmentListings() {
                       });
                     }}
                   >
-                    View Rentals
+                    Apply Filter
                   </button>
                   <button
                     className="rounded-full w-full res_text py-3.5 text-[#28303F]"
@@ -388,7 +388,7 @@ export default function ApartmentListings() {
                       });
                     }}
                   >
-                    View Rentals
+                    Apply Filter
                   </button>
                   <button
                     className="rounded-full w-full res_text py-3.5 text-[#28303F]"
@@ -454,7 +454,7 @@ export default function ApartmentListings() {
                       });
                     }}
                   >
-                    View Rentals
+                    Apply Filter
                   </button>
                   <button
                     className="rounded-full w-full res_text py-3.5 text-[#28303F]"
@@ -519,7 +519,7 @@ export default function ApartmentListings() {
                       });
                     }}
                   >
-                    View Rentals
+                    Apply Filter
                   </button>
                   <button
                     className="rounded-full w-full res_text py-3.5 text-[#28303F]"
@@ -783,7 +783,7 @@ function PropertyCard({ property }: { property: Property }) {
           </Link>
         </div>
         <div className="flex items-center p-1 bg-[#F7F7F7] rounded-full gap-1 text-gray-700 text-[12px] 2xl:text-[10px] 3xl:text-sm mt-2">
-          <p className="bg-white flex-1 border border-[#28303F1A] rounded-full flex items-center gap-1.5 pl-0.5 py-0.5 pr-3">
+          <p className="bg-white flex-1 border border-[#28303F1A] rounded-full flex items-center justify-center gap-1.5 pl-0.5 py-0.5 pr-3">
             <Image
               src="/images/bed.svg"
               alt="Bed"
@@ -793,7 +793,7 @@ function PropertyCard({ property }: { property: Property }) {
             />
             {property.bedrooms} Beds
           </p>
-          <p className="bg-white flex-1 border border-[#28303F1A] rounded-full flex items-center gap-1.5 pl-0.5 py-0.5 pr-3">
+          <p className="bg-white flex-1 border border-[#28303F1A] rounded-full flex items-center justify-center gap-1.5 pl-0.5 py-0.5 pr-3">
             <Image
               src="/images/bath.svg"
               alt="Bath"
@@ -803,7 +803,24 @@ function PropertyCard({ property }: { property: Property }) {
             />
             {property.bathrooms} Baths
           </p>
-          <p className="bg-white flex-1 border border-[#28303F1A] rounded-full flex items-center gap-1.5 pl-0.5 py-0.5 pr-3">
+        </div>
+        <div className="flex items-center p-1 bg-[#F7F7F7] rounded-full gap-1 text-gray-700 text-[12px] 2xl:text-[10px] 3xl:text-sm mt-2">
+          <p className="bg-white flex-1 border border-[#28303F1A] rounded-full flex items-center justify-center gap-1.5 pl-0.5 py-0.5 pr-3">
+            {/* <Image
+              src="/images/bath.svg"
+              alt="Bath"
+              width={20}
+              height={20}
+              className="w-7 h-7 2xl:w-6 2xl:h-6 3xl:w-8 3xl:h-8"
+            /> */}
+            <FaCarAlt className=" bg-gray-100 rounded-full p-1 text-xl" />
+
+            {property.parkingAvailable}
+            <span>
+              {property.parkingAvailable! > 1 ? "parkings" : "parking"}
+            </span>
+          </p>
+          <p className="bg-white flex-1 border border-[#28303F1A] rounded-full flex items-center justify-center gap-1.5 pl-0.5 py-0.5 pr-3">
             <Image
               src="/images/area.svg"
               alt="Area"

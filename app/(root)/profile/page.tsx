@@ -20,13 +20,14 @@ import { useSearchParams } from "next/navigation";
 import BoostStatus from "@/components/shared/modals/BoostStatus";
 import { Delete } from "lucide-react";
 import { RiDeleteBin5Line } from "react-icons/ri";
-
 const Profile = () => {
   const session = useSession();
-  const [activeTab, setActiveTab] = useState<"listings" | "favorites">(
-    "listings"
-  );
   const searchParams = useSearchParams();
+  const showFavoritesTab = searchParams.get("tab");
+  console.log("🚀 ~ Profile ~ showFavoritesTab:", showFavoritesTab);
+  const [activeTab, setActiveTab] = useState<"listings" | "favorites">(
+    showFavoritesTab === "favorites" ? "favorites" : "listings"
+  );
   const initialTab = searchParams.get("boost") as "success" | "canceled" | null;
   const [user, setUser] = useState<User | null>(null);
   const [properties, setProperties] = useState<Property[]>([]);
@@ -136,7 +137,6 @@ const Profile = () => {
     }
   };
   const [propertyToDelete, setPropertyToDelete] = useState<string | null>(null);
-  console.log("🚀 ~ Profile ~ propertyToDelete:", propertyToDelete);
 
   const handleDeleteProperty = async (propertyId: string) => {
     try {

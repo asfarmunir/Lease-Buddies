@@ -140,7 +140,7 @@ const Navbar = () => {
 
       {session.status === "authenticated" ? (
         <div className="hidden md:flex items-center gap-3 xl:gap-4 2xl:gap-5">
-          {filters.map((filter, index) => (
+          {/* {filters.map((filter, index) => (
             <DropdownMenu key={index}>
               <DropdownMenuTrigger className="flex items-center gap-2 2xl:gap-3 focus:outline-none res_text">
                 {filter.title}
@@ -207,7 +207,7 @@ const Navbar = () => {
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
-          ))}
+          ))} */}
 
           <Link href={"/property/list"}>
             <button className="res_text bg-primary rounded-full p-4 py-2.5 text-white">
@@ -226,6 +226,12 @@ const Navbar = () => {
                 className="res_text font-[500] pb-2 border-slate-200 pt-2 rounded-none border-b"
               >
                 Profile
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={() => router.push("/profile?tab=favorites")}
+                className="res_text font-[500] pb-2 border-slate-200 pt-2 rounded-none border-b"
+              >
+                Favorites
               </DropdownMenuItem>
               <DropdownMenuItem
                 onClick={() => router.push("/settings")}
@@ -279,7 +285,7 @@ const Navbar = () => {
               />
             </SheetTitle>
             <div className="flex flex-col items-start gap-3 xl:gap-4 2xl:gap-5">
-              {filters.map((filter, index) => (
+              {/* {filters.map((filter, index) => (
                 <DropdownMenu key={index}>
                   <DropdownMenuTrigger className="flex items-center gap-2 2xl:gap-3 focus:outline-none text-sm">
                     {filter.title}
@@ -347,7 +353,7 @@ const Navbar = () => {
                     </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
-              ))}
+              ))} */}
 
               {session.status === "authenticated" ? (
                 <>
@@ -356,6 +362,12 @@ const Navbar = () => {
                     className="text-sm font-[500]"
                   >
                     Profile
+                  </button>
+                  <button
+                    onClick={() => router.push("/profile?tab=favorites")}
+                    className="text-sm font-[500]"
+                  >
+                    Favorites
                   </button>
                   <button
                     onClick={() => router.push("/settings")}

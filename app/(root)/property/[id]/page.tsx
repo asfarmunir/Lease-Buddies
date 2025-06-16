@@ -157,9 +157,9 @@ const PropertyDetails: React.FC = () => {
             ) : (
               <p className="opacity-0">p</p>
             )}
-            <p className="bg-[#28303F1A] px-3 inline-flex items-center gap-1.5 py-1.5 text-xs rounded-full">
+            {/* <p className="bg-[#28303F1A] px-3 inline-flex items-center gap-1.5 py-1.5 text-xs rounded-full">
               <FaStar className="text-base -mt-0.5" /> 4.3
-            </p>
+            </p> */}
           </div>
           <h1 className="text-xl 2xl:text-2xl mb-1.5 font-semibold text-gray-800">
             {property.title}
@@ -489,7 +489,7 @@ const PropertyDetails: React.FC = () => {
               </span>
             </div>
           </div> */}
-          <div className="w-full md:w-[300px] 2xl:w-[400px] bg-[#28303F1A] border border-primary-100 rounded-2xl p-4">
+          {/* <div className="w-full md:w-[300px] 2xl:w-[400px] bg-[#28303F1A] border border-primary-100 rounded-2xl p-4">
             <div className="flex flex-col gap-2 mt-2">
               <Image
                 src="/images/promotion.svg"
@@ -505,7 +505,7 @@ const PropertyDetails: React.FC = () => {
                 fee.
               </p>
             </div>
-          </div>
+          </div> */}
         </div>
       </div>
     </div>

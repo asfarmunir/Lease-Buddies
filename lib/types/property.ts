@@ -68,6 +68,7 @@ export interface Property {
   nearbyAttractions?: string[];
   formattedAddress?: string; // Virtual field
   displayPrice?: string; // Virtual field
+  parkingAvailable?: number
 }
 
 export interface FilterOptions {
