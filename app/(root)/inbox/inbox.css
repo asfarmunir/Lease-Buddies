@@ -1,0 +1,105 @@
+.inbox-container {
+    display: flex;
+    flex-direction: row;
+    height: 70vh;
+    width: 100%;
+    border: 1px solid #e5e5e5;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.str-chat__channel-list {
+    width: 300px;
+    border-right: 1px solid #e5e5e5;
+    background-color: #f9f9f9;
+    overflow-y: auto;
+}
+
+/* Ensure Channel is a vertical flex container */
+.str-chat__channel {
+    flex: 1;
+    display: flex !important;
+    flex-direction: row !important;
+    height: 100%;
+    overflow: hidden;
+    /* Debug: Red border to visualize Channel */
+}
+
+/* Target the main panel inside Channel */
+.str-chat__main-panel {
+    flex: 1;
+    display: flex !important;
+    flex-direction: column !important;
+    height: 100%;
+    width: 100%;
+    overflow: hidden;
+    border: 1px solid #00ff00;
+    /* Debug: Green border to visualize main panel */
+}
+
+/* Ensure ChannelHeader stays at the top */
+.str-chat__header {
+    flex-shrink: 0;
+    padding: 10px;
+    border-bottom: 1px solid #e5e5e5;
+    background-color: #fff;
+    border: 1px solid #0000ff;
+    /* Debug: Blue border to visualize header */
+}
+
+/* Ensure MessageList takes available space */
+.str-chat__message-list {
+    flex: 1 !important;
+    overflow-y: auto !important;
+    padding: 10px;
+    border: 1px solid #ffff00;
+    /* Debug: Yellow border to visualize message list */
+}
+
+/* Ensure MessageInput stays at the bottom */
+.str-chat__message-input {
+    flex-shrink: 0 !important;
+    border-top: 1px solid #e5e5e5 !important;
+    padding: 10px !important;
+    background-color: #fff;
+    border: 1px solid #ff00ff;
+    /* Debug: Magenta border to visualize input */
+}
+
+/* Constrain Thread to avoid layout issues */
+.str-chat__thread {
+    flex-shrink: 0;
+    border-left: 1px solid #e5e5e5;
+    background-color: #fff;
+    max-height: 50%;
+    overflow-y: auto;
+    border: 1px solid #00ffff;
+    /* Debug: Cyan border to visualize thread */
+}
+
+/* Style channel list items */
+.str-chat__channel-list-messenger__item {
+    padding: 10px;
+    cursor: pointer;
+}
+
+.str-chat__channel-list-messenger__item:hover {
+    background-color: #e0e0e0;
+}
+
+/* Responsive design for smaller screens */
+@media (max-width: 768px) {
+    .inbox-container {
+        flex-direction: column;
+    }
+
+    .str-chat__channel-list {
+        width: 100%;
+        border-right: none;
+        border-bottom: 1px solid #e5e5e5;
+        max-height: 200px;
+    }
+
+    .str-chat__channel {
+        width: 100%;
+    } }
