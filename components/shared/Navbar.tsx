@@ -23,6 +23,8 @@ import Link from "next/link";
 import { signOut, useSession } from "next-auth/react";
 import { useRouter, usePathname } from "next/navigation";
 import toast from "react-hot-toast";
+import { Heart } from "lucide-react";
+import { BsHeartFill } from "react-icons/bs";
 
 const filters = [
   {
@@ -214,6 +216,12 @@ const Navbar = () => {
               Post a Listing
             </button>
           </Link>
+          <Link href={"/profile?tab=favorites"}>
+            <button className="res_text bg-black font-semibold rounded-full p-4 py-2.5 text-white">
+              <BsHeartFill className="inline-block mr-2" />
+              Favorites
+            </button>
+          </Link>
 
           <DropdownMenu>
             <DropdownMenuTrigger className="hidden bg-white p-2.5 rounded-full md:flex items-center gap-2 focus:outline-none res_text">
@@ -227,12 +235,12 @@ const Navbar = () => {
               >
                 Profile
               </DropdownMenuItem>
-              <DropdownMenuItem
+              {/* <DropdownMenuItem
                 onClick={() => router.push("/profile?tab=favorites")}
                 className="res_text font-[500] pb-2 border-slate-200 pt-2 rounded-none border-b"
               >
                 Favorites
-              </DropdownMenuItem>
+              </DropdownMenuItem> */}
               <DropdownMenuItem
                 onClick={() => router.push("/settings")}
                 className="res_text font-[500] pb-2 border-slate-200 pt-2 rounded-none border-b"
