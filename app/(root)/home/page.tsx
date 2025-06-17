@@ -649,7 +649,7 @@ export default function ApartmentListings() {
               <div className="col-span-1 md:col-span-2 2xl:col-span-3 flex-col flex items-center justify-center h-[40svh]">
                 <RiFindReplaceLine size={80} className="text-primary" />
                 <p className="text-gray-500 text-lg font-semibold mt-4">
-                  No properties found
+                  No properties Found
                 </p>
               </div>
             )}
