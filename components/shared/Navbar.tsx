@@ -130,13 +130,13 @@ const Navbar = () => {
 
   return (
     <nav className="w-[95%] mx-auto my-3 flex items-center justify-between bg-[#FAFAFA] rounded-full px-4 py-4">
-      <Link href={session.status === "authenticated" ? "/home" : "/"}>
+      <Link href={session.status === "authenticated" ? "/" : "/"}>
         <Image
           src="/logo.svg"
           width={100}
           height={100}
           alt="Lease Buddies Logo"
-          className="w-[100px] 2xl:w-[125px] 3xl:w-[150px] cursor-pointer"
+          className="w-[125px] 2xl:w-[150px] 3xl:w-[175px] cursor-pointer"
         />
       </Link>
 

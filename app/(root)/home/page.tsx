@@ -791,7 +791,7 @@ function PropertyCard({ property }: { property: Property }) {
               height={20}
               className="w-7 h-7 2xl:w-6 2xl:h-6 3xl:w-8 3xl:h-8"
             />
-            {property.bedrooms} Beds
+            {property.bedrooms} Bedrooms
           </p>
           <p className="bg-white flex-1 border border-[#28303F1A] rounded-full flex items-center justify-center gap-1.5 pl-0.5 py-0.5 pr-3">
             <Image
@@ -801,23 +801,16 @@ function PropertyCard({ property }: { property: Property }) {
               height={20}
               className="w-7 h-7 2xl:w-6 2xl:h-6 3xl:w-8 3xl:h-8"
             />
-            {property.bathrooms} Baths
+            {property.bathrooms} Bathrooms
           </p>
         </div>
         <div className="flex items-center p-1 bg-[#F7F7F7] rounded-full gap-1 text-gray-700 text-[12px] 2xl:text-[10px] 3xl:text-sm mt-2">
           <p className="bg-white flex-1 border border-[#28303F1A] rounded-full flex items-center justify-center gap-1.5 pl-0.5 py-0.5 pr-3">
-            {/* <Image
-              src="/images/bath.svg"
-              alt="Bath"
-              width={20}
-              height={20}
-              className="w-7 h-7 2xl:w-6 2xl:h-6 3xl:w-8 3xl:h-8"
-            /> */}
             <FaCarAlt className=" bg-gray-100 rounded-full p-1 text-xl" />
 
             {property.parkingAvailable}
             <span>
-              {property.parkingAvailable! > 1 ? "parkings" : "parking"}
+              {property.parkingAvailable! > 1 ? "Parkings" : "Parking"}
             </span>
           </p>
           <p className="bg-white flex-1 border border-[#28303F1A] rounded-full flex items-center justify-center gap-1.5 pl-0.5 py-0.5 pr-3">

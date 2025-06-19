@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import Image from "next/image";
-import { FaPhone, FaCheck, FaStar } from "react-icons/fa";
+import { FaPhone, FaCheck, FaStar, FaCarAlt } from "react-icons/fa";
 import { IoMdHeartEmpty } from "react-icons/io";
 import { AiOutlineMessage } from "react-icons/ai";
 import { useParams, useRouter } from "next/navigation";
@@ -13,6 +13,7 @@ import PropertyImageCarousel from "@/components/shared/PropertyImageCarousel";
 import { StreamChat } from "stream-chat";
 import { useSession } from "next-auth/react";
 import toast from "react-hot-toast";
+import { IoCarSportOutline } from "react-icons/io5";
 
 interface PropertyMapProps {
   lat: number;
@@ -63,6 +64,7 @@ const PropertyDetails: React.FC = () => {
   const [showAvailability, setShowAvailability] = useState(false);
   const [showBookVisit, setShowBookVisit] = useState(false);
   const [property, setProperty] = useState<Property | null>(null);
+  console.log("🚀 ~ property:", property);
   const [loading, setLoading] = useState(true);
   const [selectedImage, setSelectedImage] = useState("");
 
@@ -197,8 +199,20 @@ const PropertyDetails: React.FC = () => {
                 </span>
               </p>
             </div>
+            <div className="flex-1 p-3 md:p-4 2xl:p-6 border-r border-[#28303F1A]">
+              <h3 className="res_text mb-4 text-[#28303FCC]">Parking Spaces</h3>
+              <p className="flex items-center gap-3">
+                <IoCarSportOutline className=" bg-gray-100/70 rounded-full p-2 text-4xl" />
+                {property.parkingAvailable! < 10
+                  ? `0${property.parkingAvailable}`
+                  : property.parkingAvailable}
+                <span>
+                  {property.parkingAvailable! > 1 ? "Parkings" : "Parking"}
+                </span>
+              </p>
+            </div>
             <div className="flex-1 p-3 md:p-4 2xl:p-6">
-              <h3 className="res_text mb-3 text-[#28303FCC]">Square</h3>
+              <h3 className="res_text mb-3 text-[#28303FCC]">Squarefeet</h3>
               <p className="flex items-center gap-3">
                 <Image
                   src="/images/area.svg"
@@ -213,9 +227,9 @@ const PropertyDetails: React.FC = () => {
           <div className="mt-4 p-4 bg-[#FDFDFD] md:p-6 rounded-2xl border border-[#28303F1A]">
             <h2 className="2xl:text-lg font-semibold">About This Property</h2>
             <p className="text-gray-600 my-4">{property.description}</p>
-            <button className="px-5 py-3 xl:px-9 rounded-full bg-[#F7F7F7] font-semibold res_text border border-[#28303F1A]">
+            {/* <button className="px-5 py-3 xl:px-9 rounded-full bg-[#F7F7F7] font-semibold res_text border border-[#28303F1A]">
               Show More
-            </button>
+            </button> */}
           </div>
           <div className="mt-6 p-4 md:p-6 bg-[#FDFDFD] rounded-2xl border border-[#28303F1A]">
             <h2 className="2xl:text-lg font-semibold mb-3">
@@ -226,7 +240,8 @@ const PropertyDetails: React.FC = () => {
                 <h3 className="text-sm 2xl:text-base font-semibold">
                   Interior Details
                 </h3>
-                {property.amenities.interior.length === 0 ? (
+                {property.amenities.interior.length === 0 &&
+                property.petsAllowed.includes("No Pets") ? (
                   <p className="res_text text-[#28303FCC]">
                     No indoor amenities available.
                   </p>
@@ -244,6 +259,18 @@ const PropertyDetails: React.FC = () => {
                       {item.name}
                     </p>
                   ))
+                )}
+                {property.petsAllowed.includes("Dogs Allowed") && (
+                  <p className="res_text flex items-center gap-2.5 text-[#28303FCC]">
+                    <FaCheck className="text-green-500 ml-2" />
+                    Dogs Allowed
+                  </p>
+                )}
+                {property.petsAllowed.includes("Cats Allowed") && (
+                  <p className="res_text flex items-center gap-2.5 text-[#28303FCC]">
+                    <FaCheck className="text-green-500 ml-2" />
+                    Cats Allowed
+                  </p>
                 )}
               </div>
               <div className="bg-white space-y-3 border flex-grow border-[#28303F1A] rounded-2xl p-4 xl:p-6">
