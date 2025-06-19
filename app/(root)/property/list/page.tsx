@@ -128,6 +128,7 @@ export default function PropertyListingForm() {
   const [step, setStep] = useState(0);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [termsAccepted, setTermsAccepted] = useState(false);
+  const [featuredImageIndex, setFeaturedImageIndex] = useState(0); // Track featured image index
   const [formData, setFormData] = useState({
     location: "",
     address: {
@@ -306,7 +307,6 @@ export default function PropertyListingForm() {
     const files = e.target.files;
     if (!files) return;
 
-    // Check total images count
     const totalImages = formData.photos.length + files.length;
     if (totalImages > 10) {
       toast.error("You can upload a maximum of 10 photos");
@@ -321,6 +321,7 @@ export default function PropertyListingForm() {
         ...prev,
         photos: [...prev.photos, ...newImageUrls],
       }));
+      setFeaturedImageIndex(0); // Reset to first image as featured
     } catch (error) {
       console.error("Error uploading images:", error);
       toast.error("Failed to upload some images");
@@ -361,6 +362,25 @@ export default function PropertyListingForm() {
     setFormData((prev) => {
       const newPhotos = [...prev.photos];
       newPhotos.splice(index, 1);
+      // Adjust featured index if necessary
+      let newFeaturedIndex = featuredImageIndex;
+      if (index === featuredImageIndex) {
+        newFeaturedIndex = 0; // Reset to first image
+      } else if (index < featuredImageIndex) {
+        newFeaturedIndex = featuredImageIndex - 1; // Adjust index if removed image was before featured
+      }
+      setFeaturedImageIndex(newFeaturedIndex);
+      return { ...prev, photos: newPhotos };
+    });
+  };
+
+  const setFeaturedImage = (index: number) => {
+    setFeaturedImageIndex(0); // Featured image will always be at index 0
+    setFormData((prev) => {
+      const newPhotos = [...prev.photos];
+      // Move selected image to front
+      const [selectedImage] = newPhotos.splice(index, 1);
+      newPhotos.splice(0, 0, selectedImage);
       return { ...prev, photos: newPhotos };
     });
   };
@@ -407,7 +427,7 @@ export default function PropertyListingForm() {
 
       await response.json();
       toast.success("Property listed successfully!");
-      // router.push("/profile");
+      router.push("/profile");
     } catch (error: any) {
       toast.error(error.message || "An error occurred");
     } finally {
@@ -1105,7 +1125,7 @@ export default function PropertyListingForm() {
                 </div>
               </div>
             )}
-            {step === 6 && (
+            {/* {step === 6 && (
               <div className="flex flex-col items-center gap-3">
                 <h2 className="text-xl 2xl:text-2xl font-semibold text-primary-50 3xl:text-3xl">
                   Add Photos
@@ -1209,7 +1229,138 @@ export default function PropertyListingForm() {
                   </p>
                 )}
               </div>
+            )} */}
+
+            {step === 6 && (
+              <div className="flex flex-col items-center gap-3">
+                <h2 className="text-xl 2xl:text-2xl font-semibold text-primary-50 3xl:text-3xl">
+                  Add Photos
+                </h2>
+                <p className="res_text text-[#28303FCC] font-semibold text-center">
+                  {formData.photos.length > 0
+                    ? `You've added ${formData.photos.length} photos (min 5, max 10). Select one as the featured image, which will be shown first.`
+                    : "You can add your photos from here (min 5, max 10). The first image will be featured by default."}
+                </p>
+                {uploading && (
+                  <div className="fixed inset-0 bg-black bg-opacity-50 flex flex-col items-center justify-center z-50">
+                    <div className="bg-white/80 p-6 rounded-lg shadow-lg">
+                      <p className="res_text">Uploading Images...</p>
+                      <RiLoader3Line className="text-5xl text-primary mx-auto mt-3 animate-spin" />
+                    </div>
+                  </div>
+                )}
+                <div className="mt-6 w-full">
+                  {formData.photos.length === 0 ? (
+                    <div className="relative">
+                      <Image
+                        src="/images/upload.svg"
+                        width={700}
+                        height={700}
+                        alt="upload"
+                        className="mx-auto mb-4"
+                      />
+                      <input
+                        type="file"
+                        accept="image/*"
+                        multiple
+                        onChange={handleImageUpload}
+                        className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                      />
+                    </div>
+                  ) : (
+                    <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                      {formData.photos.map((photo, index) => {
+                        const isFeatured = index === 0; // Featured image is always at index 0
+                        return (
+                          <div key={index} className="relative group">
+                            <img
+                              src={photo}
+                              alt={`Property ${index + 1}`}
+                              className="w-full h-40 object-cover rounded-lg"
+                            />
+                            {isFeatured && (
+                              <span className="absolute top-2 left-2 bg-primary text-white text-xs font-semibold px-2 py-1 rounded-full">
+                                Featured
+                              </span>
+                            )}
+                            <button
+                              onClick={() => setFeaturedImage(index)}
+                              className={`absolute top-2 ${
+                                isFeatured ? "left-20" : "left-2"
+                              } bg-blue-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity`}
+                              title="Set as Featured"
+                            >
+                              <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                className="h-4 w-4"
+                                viewBox="0 0 20 20"
+                                fill="currentColor"
+                              >
+                                <path d="M10 2.5l2.5 5.5h5.5l-4.5 4 1.5 5.5-5-3.5-5 3.5 1.5-5.5-4.5-4h5.5L10 2.5z" />
+                              </svg>
+                            </button>
+                            <button
+                              onClick={() => removeImage(index)}
+                              className="absolute top-2 right-2 bg-red-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
+                              title="Remove Image"
+                            >
+                              <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                className="h-4 w-4"
+                                viewBox="0 0 20 20"
+                                fill="currentColor"
+                              >
+                                <path
+                                  fillRule="evenodd"
+                                  d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
+                                  clipRule="evenodd"
+                                />
+                              </svg>
+                            </button>
+                          </div>
+                        );
+                      })}
+                      {formData.photos.length < 10 && (
+                        <div className="relative border-2 h-40 border-dashed border-gray-300 rounded-lg flex items-center justify-center">
+                          <input
+                            type="file"
+                            accept="image/*"
+                            multiple
+                            onChange={handleImageUpload}
+                            className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                          />
+                          <div className="p-4 text-center">
+                            <svg
+                              xmlns="http://www.w3.org/2000/svg"
+                              className="h-8 w-8 mx-auto text-gray-400"
+                              fill="none"
+                              viewBox="0 0 24 24"
+                              stroke="currentColor"
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth={2}
+                                d="M12 6v6m0 0v6m0-6h6m-6 0H6"
+                              />
+                            </svg>
+                            <p className="res_text text-sm text-[#28303FCC]">
+                              Add more photos
+                            </p>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </div>
+                {formData.photos.length > 0 && formData.photos.length < 5 && (
+                  <p className="text-red-500 res_text mt-4">
+                    Please add at least {5 - formData.photos.length} more photos
+                  </p>
+                )}
+              </div>
             )}
+
             {step === 7 && (
               <div className="flex flex-col items-center gap-3">
                 <h2 className="text-xl 2xl:text-2xl font-semibold text-primary-50 3xl:text-3xl">
