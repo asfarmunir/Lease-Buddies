@@ -8,7 +8,7 @@ const mailgun = new Mailgun(formData);
 const mg = mailgun.client({
   username: "api",
   key: process.env.MAILGUN_API_KEY!,
-  url: "https://api.eu.mailgun.net"
+  url:"https://api.mailgun.net"
 });
 
 export async function POST(request: Request) {
@@ -77,7 +77,6 @@ function generateInquiryEmail(property: any, formData: any) {
           <p><strong>Email:</strong> ${formData.email}</p>
           <p><strong>Phone:</strong> ${formData.phone}</p>
           <p><strong>Move-in Date:</strong> ${formData.moveInDate}</p>
-          <p><strong>Floor Plan:</strong> ${formData.floorPlan}</p>
           <p><strong>Message:</strong> ${formData.message || "No additional message"}</p>
         </div>
         
@@ -122,7 +121,6 @@ function generateConfirmationEmail(property: any, formData: any) {
           <h3 style="color: #28303F; font-size: 18px; margin-bottom: 15px;">Your Inquiry Details</h3>
           
           <p><strong>Move-in Date:</strong> ${formData.moveInDate}</p>
-          <p><strong>Floor Plan:</strong> ${formData.floorPlan}</p>
           <p><strong>Your Message:</strong> ${formData.message || "No additional message"}</p>
         </div>
         

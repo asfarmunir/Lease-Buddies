@@ -8,7 +8,7 @@ const mailgun = new Mailgun(formData);
 const mg = mailgun.client({
   username: "api",
   key: process.env.MAILGUN_API_KEY!,
-  url: "https://api.eu.mailgun.net"
+  url:"https://api.mailgun.net"
 });
 
 export async function POST(request: Request) {
@@ -86,7 +86,7 @@ function generateBookingEmail(property: any, formData: any, visitDate: string) {
           <p><strong>Visit Type:</strong> ${formData.visitType === "virtual" ? "Virtual Tour" : "In-Person Visit"}</p>
           <p><strong>Preferred ${formData.visitType === "virtual" ? "Date/Time" : "Date"}:</strong> ${visitDate}</p>
           <p><strong>Move-in Date:</strong> ${formData.moveInDate ? new Date(formData.moveInDate).toLocaleDateString() : 'Not specified'}</p>
-          <p><strong>Floor Plan:</strong> ${formData.floorPlan || 'Not specified'}</p>
+         
           <p><strong>Additional Notes:</strong> ${formData.message || "None"}</p>
         </div>
         
@@ -135,7 +135,7 @@ function generateConfirmationEmail(property: any, formData: any, visitDate: stri
           <p><strong>Visit Type:</strong> ${formData.visitType === "virtual" ? "Virtual Tour" : "In-Person Visit"}</p>
           <p><strong>Preferred ${formData.visitType === "virtual" ? "Date/Time" : "Date"}:</strong> ${visitDate}</p>
           <p><strong>Move-in Date:</strong> ${formData.moveInDate ? new Date(formData.moveInDate).toLocaleDateString() : 'Not specified'}</p>
-          <p><strong>Floor Plan:</strong> ${formData.floorPlan || 'Not specified'}</p>
+         
           <p><strong>Additional Notes:</strong> ${formData.message || "None"}</p>
         </div>
         

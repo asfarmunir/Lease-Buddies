@@ -16,7 +16,7 @@ interface AvailabilityFormData {
   email: string;
   phone: string;
   moveInDate: string;
-  floorPlan: string;
+  // floorPlan: string;
   message: string;
 }
 
@@ -30,7 +30,7 @@ const CheckAvailability: React.FC<{
     email: "",
     phone: "",
     moveInDate: "",
-    floorPlan: "",
+    // floorPlan: "",
     message: "",
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -72,7 +72,7 @@ const CheckAvailability: React.FC<{
         email: "",
         phone: "",
         moveInDate: "",
-        floorPlan: "",
+        // floorPlan: "",
         message: "",
       });
     } catch (error) {
@@ -89,7 +89,7 @@ const CheckAvailability: React.FC<{
       email: "",
       phone: "",
       moveInDate: "",
-      floorPlan: "",
+      // floorPlan: "",
       message: "",
     });
   };
@@ -192,7 +192,7 @@ const CheckAvailability: React.FC<{
                 required
               />
             </div>
-            <div className="w-full space-y-2">
+            {/* <div className="w-full space-y-2">
               <label
                 htmlFor="floorPlan"
                 className="pl-4 res_text font-[500] text-start"
@@ -208,7 +208,7 @@ const CheckAvailability: React.FC<{
                 className="bg-[#F7F7F7] text-xs md:text-sm 3xl:text-base rounded-full border border-[#28303F1A] py-7 2xl:py-8 sm:px-5 w-full text-[#28303FCC]"
                 required
               />
-            </div>
+            </div> */}
           </div>
 
           {/* Custom Message */}
