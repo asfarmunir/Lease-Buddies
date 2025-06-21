@@ -15,6 +15,7 @@ interface PropertyMapProps {
     ne: { lat: number; lng: number };
     sw: { lat: number; lng: number };
   }) => void;
+  searchTerm?: string; // Add searchTerm prop
 }
 
 declare global {
@@ -29,16 +30,16 @@ export default function PropertiesMap({
   userLocation,
   onLocationChange,
   onBoundsChange,
+  searchTerm, // Add searchTerm to props
 }: PropertyMapProps) {
   const mapRef = useRef<HTMLDivElement>(null);
   const mapInstance = useRef<any>(null);
   const markersRef = useRef<any[]>([]);
-  const searchInputRef = useRef<HTMLInputElement>(null);
+  const infoWindowRef = useRef<any>(null);
   const [currentLocation, setCurrentLocation] = useState<{
     lat: number;
     lng: number;
   } | null>(null);
-  const infoWindowRef = useRef<any>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -176,60 +177,30 @@ export default function PropertiesMap({
     };
   }, [userLocation, onLocationChange, onBoundsChange]);
 
-  // Initialize Autocomplete
+  // Handle search term changes using Geocoding API
   useEffect(() => {
-    if (
-      !window.google?.maps?.places ||
-      !searchInputRef.current ||
-      loading ||
-      error
-    ) {
+    if (!searchTerm || !window.google?.maps || loading || error) {
       return;
     }
 
-    try {
-      console.log("Initializing Autocomplete");
-      const autocomplete = new window.google.maps.places.Autocomplete(
-        searchInputRef.current,
-        {
-          types: ["geocode"],
-          fields: ["geometry", "formatted_address"],
-        }
-      );
-
-      autocomplete.addListener("place_changed", () => {
-        const place = autocomplete.getPlace();
-        console.log("Place selected:", place);
-
-        if (!place.geometry || !place.geometry.location) {
-          console.warn("No valid location selected");
-          setError("Please select a valid location");
-          return;
-        }
-
+    const geocoder = new window.google.maps.Geocoder();
+    geocoder.geocode({ address: searchTerm }, (results: any, status: any) => {
+      if (status === "OK" && results[0]) {
         const location = {
-          lat: place.geometry.location.lat(),
-          lng: place.geometry.location.lng(),
+          lat: results[0].geometry.location.lat(),
+          lng: results[0].geometry.location.lng(),
         };
-
-        console.log("Centering map to:", location);
+        console.log("Geocoded search term:", searchTerm, location);
         mapInstance.current.setCenter(location);
         setCurrentLocation(location);
         onLocationChange?.(location);
-        setError(null); // Clear any previous errors
-      });
-
-      return () => {
-        window.google?.maps?.event?.clearListeners?.(
-          autocomplete,
-          "place_changed"
-        );
-      };
-    } catch (err) {
-      console.error("Autocomplete initialization error:", err);
-      setError("Failed to initialize search");
-    }
-  }, [loading, error, onLocationChange]);
+        setError(null);
+      } else {
+        console.warn("Geocode was not successful:", status);
+        setError("Unable to find location");
+      }
+    });
+  }, [searchTerm, loading, error, onLocationChange]);
 
   function createCustomMarkerIcon(isFeatured: boolean, price: string): string {
     const color = isFeatured ? "#FF5252" : "#000";
@@ -395,19 +366,6 @@ export default function PropertiesMap({
   return (
     <div className="relative w-full h-[700px] rounded-lg overflow-hidden border border-gray-200">
       <div ref={mapRef} className="w-full h-full" />
-
-      {/* Search Bar */}
-      {!loading && !error && (
-        <div className="absolute top-2 left-2 w-64 sm:w-80 bg-white rounded-md shadow-md z-20">
-          <input
-            ref={searchInputRef}
-            type="text"
-            placeholder="Search for a location..."
-            className="w-full px-4 py-3 text-xs rounded-lg border border-[#28303F1A] focus:outline-none focus:ring-2 focus:ring-[#3A99D3] placeholder-gray-400"
-            aria-label="Search for a location"
-          />
-        </div>
-      )}
 
       {loading && (
         <div className="absolute inset-0 bg-gray-100 flex items-center justify-center">

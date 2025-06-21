@@ -585,7 +585,7 @@ export default function ApartmentListings() {
             }}
           />
         </div>
-        {/* <div className="relative flex items-center bg-white px-4 py-1 rounded-full border border-[#28303F1A] text-[12px] 2xl:text-[10px] 3xl:text-sm">
+        <div className="relative flex items-center bg-white px-4 py-1 rounded-full border border-[#28303F1A] text-[12px] 2xl:text-[10px] 3xl:text-sm">
           <LuSearch className="text-gray-500 text-lg mr-1" />
           <Input
             type="text"
@@ -616,7 +616,7 @@ export default function ApartmentListings() {
               <AiFillRightCircle className="text-xl" />
             </button>
           )}
-        </div> */}
+        </div>
       </div>
 
       <div className="border border-[#28303F1A] p-4 xl:p-6 rounded-[20px]">
@@ -655,10 +655,16 @@ export default function ApartmentListings() {
             )}
           </div>
 
+          {/* <PropertiesMap
+            properties={properties}
+            onLocationChange={(location) => {}}
+            onBoundsChange={async (bounds) => {}}
+          /> */}
           <PropertiesMap
             properties={properties}
             onLocationChange={(location) => {}}
             onBoundsChange={async (bounds) => {}}
+            searchTerm={appliedFilters.search} // Change from searchInput to appliedFilters.search
           />
         </div>
       </div>
