@@ -175,7 +175,7 @@ export default function PropertiesMap({
         infoWindowRef.current.close();
       }
     };
-  }, [userLocation, onLocationChange, onBoundsChange]);
+  }, [userLocation]);
 
   // Handle search term changes using Geocoding API
   useEffect(() => {
