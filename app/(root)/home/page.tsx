@@ -589,7 +589,7 @@ export default function ApartmentListings() {
           <LuSearch className="text-gray-500 text-lg mr-1" />
           <Input
             type="text"
-            placeholder="Search by name, city, or state..."
+            placeholder="Search by city..."
             value={searchInput}
             onChange={(e) => setSearchInput(e.target.value)}
             onKeyDown={(e) => {

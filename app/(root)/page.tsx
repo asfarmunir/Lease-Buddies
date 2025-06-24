@@ -185,7 +185,7 @@ const Page = () => {
           </div>
           <div className="w-full grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 pt-[40px] gap-4">
             {[
-              { name: "Florida, CA", link: "florida" },
+              { name: "Toronto, CA", link: "toronto" },
               { name: "New York, NY", link: "new-york" },
               { name: "Los Angeles, CA", link: "los-angeles" },
             ].map((p, index) => (
