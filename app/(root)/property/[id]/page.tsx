@@ -13,7 +13,7 @@ import PropertyImageCarousel from "@/components/shared/PropertyImageCarousel";
 import { StreamChat } from "stream-chat";
 import { useSession } from "next-auth/react";
 import toast from "react-hot-toast";
-import { IoCarSportOutline } from "react-icons/io5";
+import { IoCalendarClear, IoCarSportOutline } from "react-icons/io5";
 
 interface PropertyMapProps {
   lat: number;
@@ -460,9 +460,20 @@ const PropertyDetails: React.FC = () => {
         </div>
         <div className="space-y-4">
           <div className="w-full md:w-[300px] 2xl:w-[400px] bg-white border border-primary-100 rounded-2xl p-4">
-            <h2 className="text-xl font-semibold">
+            <h2 className="text-xl mt-2 font-semibold">
               {property.currency === "USD" ? "$" : "CA$"}
               {property.price}/month
+            </h2>
+            <h2 className="3xl:text-base text-sm my-2 font-normal text-gray-700 ">
+              <IoCalendarClear className=" inline-block items-center mr-1 mb-0.5" />
+              Move-in Date:{" "}
+              <span className="text-primary font-bold">
+                {new Date(property.occupancyDate).toLocaleDateString("en-US", {
+                  month: "long",
+                  day: "numeric",
+                  year: "numeric",
+                })}
+              </span>
             </h2>
             <button
               onClick={() => setShowAvailability(true)}

@@ -266,14 +266,14 @@ const Profile = () => {
               <FaRegHeart className="text-lg" />
               Favorites
             </button>
-            <Link href="/inbox">
+            {/* <Link href="/inbox">
               <p
                 className={`bg-[#F7F7F7] border res_text font-medium border-[#28303F1A] px-3 2xl:px-4 py-2 xl:py-3.5 2xl:py-4 flex items-center gap-2 rounded-full`}
               >
                 <AiOutlineMessage className="text-xl" />
                 Inbox
               </p>
-            </Link>
+            </Link> */}
             <Link href="/settings">
               <p className="bg-[#F7F7F7] border res_text text-primary-200 font-medium border-[#28303F1A] px-3 2xl:px-4 py-2 xl:py-3.5 2xl:py-4 flex items-center gap-2 rounded-full">
                 <BsThreeDots className="text-xl" />
@@ -322,7 +322,7 @@ const Profile = () => {
                   onClick={() => setShowModal(true)}
                   className="bg-[#28303F] text-white px-4 xl:px-8 py-2.5 2xl:py-3 text-sm 2xl:text-base rounded-full font-medium"
                 >
-                  Boost New Listing
+                  Boost Listing
                 </button>
                 <BoostListing
                   properties={properties}

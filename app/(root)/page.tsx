@@ -185,16 +185,24 @@ const Page = () => {
           </div>
           <div className="w-full grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 pt-[40px] gap-4">
             {[
-              { name: "Toronto, CA", link: "toronto" },
-              { name: "New York, NY", link: "new-york" },
-              { name: "Los Angeles, CA", link: "los-angeles" },
+              { name: "Toronto, CA", link: "toronto", image: "/toronto.png" },
+              {
+                name: "New York, NY",
+                link: "new-york",
+                image: "/newyork.png",
+              },
+              {
+                name: "Los Angeles, CA",
+                link: "los-angeles",
+                image: "/losangeles.png",
+              },
             ].map((p, index) => (
               <div
                 key={index}
-                className="relative flex justify-center roun-[20px] overflow-hidden"
+                className="relative flex justify-center rounded-[20px] overflow-hidden"
               >
                 <Image
-                  src={`/home/city${index + 1}.webp`}
+                  src={p.image}
                   width={600}
                   height={600}
                   className="w-full h-full object-cover"
