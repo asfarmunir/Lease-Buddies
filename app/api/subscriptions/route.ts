@@ -77,7 +77,9 @@ export async function POST(req: NextRequest) {
         propertyId,
         userId: session.user.id,
         plan
-      }
+      },
+      currency: "usd",
+     
     });
 
     return NextResponse.json({ sessionId: checkoutSession.id });

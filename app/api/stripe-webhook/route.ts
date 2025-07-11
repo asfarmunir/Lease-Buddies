@@ -22,6 +22,8 @@ export async function POST(req: NextRequest) {
 
     await connectToDatabase();
 
+    console.log("!!!!!Received Stripe event:", event.type);
+
     switch (event.type) {
       case "checkout.session.completed": {
         const session = event.data.object as Stripe.Checkout.Session;
