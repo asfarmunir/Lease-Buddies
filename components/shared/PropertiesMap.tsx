@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { Property } from "@/lib/types/property";
-import { FaMapMarkerAlt, FaStar, FaHeart } from "react-icons/fa";
+import { FaMapMarkerAlt, FaStar, FaHeart, FaCarAlt } from "react-icons/fa";
 import { HiOutlineShieldCheck } from "react-icons/hi";
 import Image from "next/image";
 import Link from "next/link";
@@ -292,25 +292,26 @@ export default function PropertiesMap({
                    
                     <div class="flex items-start pb-4 justify-between">
                       <div>
-                        <h3 class="text-lg font-semibold capitalize">${
+                        <h3 class="text-lg font-bold capitalize">${
                           property.title
                         }</h3>
-                        <p class="text-xs text-ellipsis text-gray-500">${
+                        <p class="text-xs text-ellipsis font-semibold text-gray-500">${
                           property.address.city
                         }, ${property.address.state}</p>
                       </div>
                     </div>
-                    <div class="flex items-center p-1 bg-[#F7F7F7] rounded-full gap-1 text-gray-700 text-xs mt-2">
-                      <p class="bg-white flex-1 border border-[#28303F1A] rounded-full flex items-center gap-1.5 pl-0.5 py-0.5 pr-3">
-                        <img src="/images/bed.svg" alt="Bed" class="w-5 h-5" />
-                        ${property.beds} Beds
+                    <div class="grid grid-cols-2 p-1 bg-[#F7F7F7] rounded-[8px] gap-1 text-gray-700 text-xs mt-2">
+                      <p class="bg-white flex-1 border border-[#28303F1A] rounded-[8px] flex items-center gap-1.5 pl-0.5 py-1 pr-3 justify-center font-semibold">
+                        ${property.bedrooms} Beds
                       </p>
-                      <p class="bg-white flex-1 border border-[#28303F1A] rounded-full flex items-center gap-1.5 pl-0.5 py-0.5 pr-3">
-                        <img src="/images/bath.svg" alt="Bath" class="w-5 h-5" />
+                      <p class="bg-white flex-1 border border-[#28303F1A] rounded-[8px] flex items-center gap-1.5 pl-0.5 py-1 pr-3 justify-center font-semibold">
                         ${property.bathrooms} Baths
                       </p>
-                      <p class="bg-white flex-1 border border-[#28303F1A] rounded-full flex items-center gap-1.5 pl-0.5 py-0.5 pr-3">
-                        <img src="/images/area.svg" alt="Area" class="w-5 h-5" />
+                      <p class="bg-white flex-1 border border-[#28303F1A] rounded-[8px] flex items-center gap-1.5 pl-0.5 py-1 pr-3 justify-center font-semibold">
+                       
+                        ${property.parkingAvailable} Parking
+                      </p>
+                      <p class="bg-white flex-1 border border-[#28303F1A] rounded-[8px] flex items-center gap-1.5 pl-0.5 py-1 pr-3 justify-center font-semibold">
                         ${property.squareFeet || "N/A"} sqFt
                       </p>
                     </div>

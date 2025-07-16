@@ -300,12 +300,12 @@ const LoginFormSchema = () => {
               </Button>
               <p className="mt-4 text-xs text-center text-gray-500">
                 This site is protected by reCAPTCHA and the Google{" "}
-                <a href="#" className="text-[#28303F]">
+                <a href="/privacy-policy" className="text-[#28303F]">
                   privacy policy
                 </a>{" "}
                 <br className="hidden sm:block" />
                 and{" "}
-                <a href="#" className="text-[#28303F]">
+                <a href="/privacy-policy" className="text-[#28303F]">
                   terms of service
                 </a>{" "}
                 apply.
@@ -474,7 +474,7 @@ const LoginFormSchema = () => {
                       }}
                     />
                   </div>
-                  <div className="w-full p-3 2xl:p-5 3xl:p-6 bg-[#F7F7F7] rounded-[10px] border-[#FFFFFF1A] flex items-center justify-between gap-5">
+                  {/* <div className="w-full p-3 2xl:p-5 3xl:p-6 bg-[#F7F7F7] rounded-[10px] border-[#FFFFFF1A] flex items-center justify-between gap-5">
                     <p className="text-xs 2xl:text-sm 3xl:text-base">
                       Do you want to receive news about our project? Sign up to
                       our Newsletter
@@ -485,7 +485,7 @@ const LoginFormSchema = () => {
                         setTerms((prev) => ({ ...prev, terms: checked }));
                       }}
                     />
-                  </div>
+                  </div> */}
                   <div className="w-full p-3 2xl:p-5 3xl:p-6 bg-[#F7F7F7] rounded-[10px] border-[#FFFFFF1A] flex items-center justify-between gap-5">
                     <p className="text-xs 2xl:text-sm 3xl:text-base">
                       Confirm my name is correct and corresponds to
@@ -513,12 +513,12 @@ const LoginFormSchema = () => {
               )}
               <p className="mt-4 text-xs text-center text-gray-500">
                 This site is protected by reCAPTCHA and the Google{" "}
-                <a href="#" className="text-[#28303F]">
+                <a href="/privacy-policy" className="text-[#28303F]">
                   privacy policy
                 </a>{" "}
                 <br className="hidden sm:block" />
                 and{" "}
-                <a href="#" className="text-[#28303F]">
+                <a href="/privacy-policy" className="text-[#28303F]">
                   terms of service
                 </a>{" "}
                 apply.

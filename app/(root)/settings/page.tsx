@@ -226,7 +226,7 @@ const UserSettings: React.FC = () => {
       {/* Sidebar Navigation */}
       <div className="bg-white p-4 w-full gap-4 xl:gap-6 flex rounded-3xl">
         <aside className="w-1/4 bg-[#F7F7F7] rounded-3xl h-fit p-4 2xl:p-6 hidden md:block">
-          <Link href={`/home`}>
+          <Link href={`/profile`}>
             <h2 className="text-lg 3xl:text-xl inline-flex items-center gap-2 font-semibold mb-6">
               <Image
                 src="/images/back.svg"
@@ -267,7 +267,7 @@ const UserSettings: React.FC = () => {
                 </h2>
 
                 {/* Profile Picture */}
-                <div className="flex items-center gap-4">
+                {/* <div className="flex items-center gap-4">
                   <div className="w-20 h-20 bg-[#D9D9D9] rounded-full">
                     <Image
                       src={session?.user?.image || "/user.svg"}
@@ -295,7 +295,7 @@ const UserSettings: React.FC = () => {
                       size: 10 MB
                     </p>
                   </div>
-                </div>
+                </div> */}
 
                 {/* Personal Information Form */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">

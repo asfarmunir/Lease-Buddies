@@ -251,7 +251,7 @@ export default function BoostListing({
                       </p>
                     </div>
                     <p className="text-sm 2xl:text-base font-semibold">
-                      ${plan.price}/
+                      USD ${plan.price}/
                       {plan.plan === "monthly" ? "month" : "3 months"}
                     </p>
                   </div>
@@ -318,7 +318,8 @@ export default function BoostListing({
                       </p>
                     </div>
                     <p className="text-base font-semibold text-primary-50">
-                      ${planTypes.find((p) => p.plan === selectedPlan)?.price}/
+                      USD $
+                      {planTypes.find((p) => p.plan === selectedPlan)?.price}/
                       {selectedPlan === "monthly" ? "month" : "3 months"}
                     </p>
                   </div>
