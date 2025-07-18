@@ -15,10 +15,10 @@ export async function sendPasswordResetEmail(
 ) {
   try {
     const response = await mg.messages.create(process.env.MAILGUN_DOMAIN!, {
-      from: `Leasebuddies <no-reply@${process.env.MAILGUN_DOMAIN}>`,
+      from: `Leasebuddi <no-reply@${process.env.MAILGUN_DOMAIN}>`,
       to: userEmail,
       subject: "Password Reset Request",
-      text: `Hi,\n\nWe received a request to reset your password for your Leasebuddies account.\n\nClick this link to reset your password: ${resetLink}\n\nIf you didn't request this, please ignore this email.\n\nLeasebuddies Team`,
+      text: `Hi,\n\nWe received a request to reset your password for your Leasebuddi account.\n\nClick this link to reset your password: ${resetLink}\n\nIf you didn't request this, please ignore this email.\n\nLeasebuddi Team`,
       html: `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; color: #28303F; padding: 20px;">
       
@@ -26,7 +26,7 @@ export async function sendPasswordResetEmail(
             <h2 style="color: #28303F; font-size: 24px; margin-bottom: 20px;">Password Reset Request</h2>
             
             <p style="margin-bottom: 20px; line-height: 1.6;">
-              We received a request to reset your password for your Leasebuddies account.
+              We received a request to reset your password for your Leasebuddi account.
             </p>
             
             <div style="text-align: center; margin: 30px 0;">
@@ -45,18 +45,18 @@ export async function sendPasswordResetEmail(
             
             <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #28303F1A;">
               <p style="font-size: 12px; color: #28303FCC; margin: 5px 0;">
-                <strong>Leasebuddies Team</strong>
+                <strong>Leasebuddi Team</strong>
               </p>
               <p style="font-size: 12px; color: #28303FCC; margin: 5px 0;">
-                <a href="mailto:support@leasebuddies.com" style="color: #28303F; text-decoration: none;">
-                  support@leasebuddies.com
+                <a href="mailto:support@leasebuddi.com" style="color: #28303F; text-decoration: none;">
+                  support@leasebuddi.com
                 </a>
               </p>
             </div>
           </div>
           
           <div style="text-align: center; margin-top: 30px; font-size: 12px; color: #28303FCC;">
-            © ${new Date().getFullYear()} Leasebuddies. All rights reserved.
+            © ${new Date().getFullYear()} Leasebuddi. All rights reserved.
           </div>
         </div>
       `,

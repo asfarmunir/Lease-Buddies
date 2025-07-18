@@ -235,12 +235,7 @@ const Navbar = () => {
               >
                 Profile
               </DropdownMenuItem>
-              {/* <DropdownMenuItem
-                onClick={() => router.push("/profile?tab=favorites")}
-                className="res_text font-[500] pb-2 border-slate-200 pt-2 rounded-none border-b"
-              >
-                Favorites
-              </DropdownMenuItem> */}
+
               <DropdownMenuItem
                 onClick={() => router.push("/settings")}
                 className="res_text font-[500] pb-2 border-slate-200 pt-2 rounded-none border-b"
@@ -252,6 +247,12 @@ const Navbar = () => {
                 className="res_text font-[500] pb-2 border-slate-200 pt-2 rounded-none border-b"
               >
                 FAQs
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={() => router.push("/privacy-policy")}
+                className="res_text font-[500] pb-2 border-slate-200 pt-2 rounded-none border-b"
+              >
+                Privacy Policy
               </DropdownMenuItem>
               <DropdownMenuItem
                 onClick={signOutUser}

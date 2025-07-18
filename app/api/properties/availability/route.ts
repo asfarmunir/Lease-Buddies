@@ -28,7 +28,7 @@ export async function POST(request: Request) {
 
     // Send email to landowner
     await mg.messages.create(process.env.MAILGUN_DOMAIN!, {
-      from: `Leasebuddies <no-reply@${process.env.MAILGUN_DOMAIN}>`,
+      from: `leasebuddi <no-reply@${process.env.MAILGUN_DOMAIN}>`,
       to: property.contactDetails.email,
       subject: `New Availability Inquiry for ${property.title}`,
       text: `You have a new availability inquiry for your property at ${property.address.formattedAddress}.`,
@@ -37,7 +37,7 @@ export async function POST(request: Request) {
 
     // Optional: Send confirmation email to the user
     await mg.messages.create(process.env.MAILGUN_DOMAIN!, {
-      from: `Leasebuddies <no-reply@${process.env.MAILGUN_DOMAIN}>`,
+      from: `leasebuddi <no-reply@${process.env.MAILGUN_DOMAIN}>`,
       to: formData.email,
       subject: `Your inquiry for ${property.title}`,
       text: `Thank you for your inquiry about ${property.title}. The property owner will contact you soon.`,
@@ -91,11 +91,11 @@ function generateInquiryEmail(property: any, formData: any) {
         
         <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #28303F1A;">
           <p style="font-size: 12px; color: #28303FCC; margin: 5px 0;">
-            <strong>Leasebuddies Team</strong>
+            <strong>leasebuddi Team</strong>
           </p>
           <p style="font-size: 12px; color: #28303FCC; margin: 5px 0;">
-            <a href="mailto:support@leasebuddies.com" style="color: #28303F; text-decoration: none;">
-              support@leasebuddies.com
+            <a href="mailto:support@leasebuddi.com" style="color: #28303F; text-decoration: none;">
+              support@leasebuddi.com
             </a>
           </p>
         </div>
@@ -131,11 +131,11 @@ function generateConfirmationEmail(property: any, formData: any) {
         
         <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #28303F1A;">
           <p style="font-size: 12px; color: #28303FCC; margin: 5px 0;">
-            <strong>Leasebuddies Team</strong>
+            <strong>leasebuddi Team</strong>
           </p>
           <p style="font-size: 12px; color: #28303FCC; margin: 5px 0;">
-            <a href="mailto:support@leasebuddies.com" style="color: #28303F; text-decoration: none;">
-              support@leasebuddies.com
+            <a href="mailto:support@leasebuddi.com" style="color: #28303F; text-decoration: none;">
+              support@leasebuddi.com
             </a>
           </p>
         </div>

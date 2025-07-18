@@ -29,6 +29,8 @@ import { AiFillRightCircle } from "react-icons/ai";
 
 export default function ApartmentListings() {
   const [properties, setProperties] = useState<Property[]>([]);
+  const [boostedProperties, setBoostedProperties] = useState<Property[]>([]);
+  console.log("🚀 ~ ApartmentListings ~ boostedProperties:", boostedProperties);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [tempFilters, setTempFilters] = useState<{
@@ -125,6 +127,15 @@ export default function ApartmentListings() {
     fetchProperties();
   }, [searchParams]);
 
+  useEffect(() => {
+    const boostedProperties = properties.filter(
+      (property) => property.isFeatured
+      // property.boostExpiration &&
+      // new Date(property.boostExpiration) > new Date()
+    );
+    setBoostedProperties(boostedProperties);
+  }, [properties]);
+
   const updateFilters = (newFilters: Partial<FilterOptions>) => {
     const params = new URLSearchParams(searchParams.toString());
     console.log("Updating filters with:", newFilters);
@@ -202,7 +213,9 @@ export default function ApartmentListings() {
   };
 
   // Sort properties: Featured first, then by boostExpiration (newest first), then by createdAt (newest first)
-  const sortedProperties = [...properties].sort((a, b) => {
+  const sortedProperties = [
+    ...properties.filter((property) => !property.isFeatured),
+  ].sort((a, b) => {
     if (a.isFeatured && !b.isFeatured) return -1;
     if (!a.isFeatured && b.isFeatured) return 1;
     if (a.isFeatured && b.isFeatured) {
@@ -620,39 +633,54 @@ export default function ApartmentListings() {
       </div>
 
       <div className="border border-[#28303F1A] p-4 xl:p-6 rounded-[20px]">
-        <h2 className="text-xl 2xl:text-2xl text-primary-50 font-semibold">
-          Apartments For Rents
-        </h2>
-        <div className="flex items-center gap-4 mt-3">
-          <p className="text-primary-50 text-xs 2xl:text-sm">
-            {properties.length}{" "}
-            {properties.length === 1 ? "Property" : "Properties"}
-          </p>
-          {hasActiveFilters() && (
-            <button
-              onClick={clearAllFilters}
-              className="text-[#28303F] text-xs 2xl:text-sm underline hover:text-primary-50 transition-colors"
-            >
-              Clear All Filters
-            </button>
-          )}
-        </div>
-
         {/* Listings and Map */}
-        <div className="grid grid-cols-1 lg:grid-cols-[2fr_1fr] gap-6 mt-6">
-          {/* Apartment Listings */}
-          <div className="grid grid-cols-1 md:grid-cols-2 2xl:grid-cols-3 gap-2">
-            {sortedProperties.map((property) => (
-              <PropertyCard key={property._id} property={property} />
-            ))}
-            {sortedProperties.length === 0 && (
-              <div className="col-span-1 md:col-span-2 2xl:col-span-3 flex-col flex items-center justify-center h-[40svh]">
-                <RiFindReplaceLine size={80} className="text-primary" />
-                <p className="text-gray-500 text-lg font-semibold mt-4">
-                  No properties Found
-                </p>
+        <div className="grid grid-cols-1 lg:grid-cols-[2fr_1fr] gap-6">
+          <div className="space-y-8 2xl:space-y-10">
+            {boostedProperties && boostedProperties.length > 0 && (
+              <div>
+                <h2 className="text-2xl 2xl:text-3xl text-primary-50 mb-5 font-semibold">
+                  Featured Properties
+                </h2>
+                <div className="grid grid-cols-1 md:grid-cols-2 2xl:grid-cols-3 gap-2">
+                  {boostedProperties.map((property) => (
+                    <PropertyCard key={property._id} property={property} />
+                  ))}
+                </div>
               </div>
             )}
+            {/* Apartment Listings */}
+            <div>
+              <h2 className="text-2xl 2xl:text-3xl text-primary-50 font-semibold">
+                Apartments For Rents
+              </h2>
+              <div className="flex items-center gap-4 mb-5 mt-2">
+                <p className="text-primary-50 text-xs md:text-base">
+                  {properties.length}{" "}
+                  {properties.length === 1 ? "Property" : "Properties"}
+                </p>
+                {hasActiveFilters() && (
+                  <button
+                    onClick={clearAllFilters}
+                    className="text-[#28303F] text-xs md:text-sm 2xl:text-base underline hover:text-primary-50 transition-colors"
+                  >
+                    Clear All Filters
+                  </button>
+                )}
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 2xl:grid-cols-3 gap-2">
+                {sortedProperties.map((property) => (
+                  <PropertyCard key={property._id} property={property} />
+                ))}
+                {sortedProperties.length === 0 && (
+                  <div className="col-span-1 md:col-span-2 2xl:col-span-3 flex-col flex items-center justify-center h-[40svh]">
+                    <RiFindReplaceLine size={80} className="text-primary" />
+                    <p className="text-gray-500 text-lg font-semibold mt-4">
+                      No properties Found
+                    </p>
+                  </div>
+                )}
+              </div>
+            </div>
           </div>
 
           {/* <PropertiesMap
@@ -747,7 +775,7 @@ function PropertyCard({ property }: { property: Property }) {
         />
         <div className="absolute top-2.5 left-2.5 flex gap-2">
           {property.isFeatured && (
-            <span className="bg-[#FFFFFFF2] text-primary-50 text-xs px-2 2xl:px-3 py-2 rounded-full">
+            <span className="bg-[#FFFFFFF2] text-primary-50 text-xs font-bold px-2 2xl:px-3 py-2 rounded-full">
               Featured
             </span>
           )}
