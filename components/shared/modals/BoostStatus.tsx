@@ -44,9 +44,9 @@ const BoostStatus = ({
           <h2 className="text-2xl font-bold text-center text-slate-900 dark:text-slate-100">
             Your property is boosted!
           </h2>
-          <p className="text-sm text-center text-slate-500 dark:text-slate-400">
+          {/* <p className="text-sm text-center text-slate-500 dark:text-slate-400">
             Enjoy, your property has been bosted.
-          </p>
+          </p> */}
 
           <button
             onClick={() => router.push("/profile")}

@@ -775,7 +775,7 @@ function PropertyCard({ property }: { property: Property }) {
         />
         <div className="absolute top-2.5 left-2.5 flex gap-2">
           {property.isFeatured && (
-            <span className="bg-[#FFFFFFF2] text-primary-50 text-xs font-bold px-2 2xl:px-3 py-2 rounded-full">
+            <span className="bg-red-600 text-white text-xs font-semibold px-2 2xl:px-3 py-2 rounded-full">
               Featured
             </span>
           )}
